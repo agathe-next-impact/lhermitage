@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vue Satellite IGN</title>
+  <!-- Optimized resource preloading with highest priority -->
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="preconnect" href="https://data.geopf.fr" crossorigin>
+  <link rel="dns-prefetch" href="https://unpkg.com">
+  <link rel="dns-prefetch" href="https://data.geopf.fr">
+  <!-- Load CSS and JS with highest priority -->
+  <link rel="preload" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" as="style" fetchpriority="high">
+  <link rel="preload" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" as="script" fetchpriority="high">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; }
+    /* Map starts with opacity 0 but will transition faster */
+    #map { width: 100%; height: 100%; opacity: 0; transition: opacity 0.5s ease; }
+    .leaflet-control-attribution { font-size: 10px; }
+    .custom-popup { background-color: white; border: 1px solid #ccc; }
+    
+    #loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      font-family: 'Open Sans', system-ui, -apple-system, sans-serif;
+      transition: opacity 0.5s ease;
+    }
+    
+    #loading-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    #map.visible {
+      opacity: 1;
+    }
+    
+    .loading-container {
+      text-align: center;
+      padding: 48px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(83, 83, 83, 0.08);
+      border: 1px solid #e5e5e5;
+      max-width: 320px;
+    }
+    
+    .loading-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 24px;
+      position: relative;
+    }
+    
+    .loading-icon::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 3px solid #e5e5e5;
+      border-radius: 50%;
+    }
+    
+    .loading-icon::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 3px solid transparent;
+      border-top-color: #e75754;
+      border-right-color: #e75754;
+      border-radius: 50%;
+      animation: spin 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .loading-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #535353;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+    
+    .loading-subtitle {
+      font-size: 13px;
+      color: #999;
+      font-weight: 400;
+    }
+    
+    .loading-progress {
+      margin-top: 20px;
+      height: 3px;
+      background: #f0f0f0;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    
+    .loading-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #e75754 0%, #56939f 100%);
+      border-radius: 3px;
+      animation: progress 2s ease-in-out infinite;
+      transform-origin: left;
+    }
+    
+    @keyframes progress {
+      0% { transform: scaleX(0); }
+      50% { transform: scaleX(0.7); }
+      100% { transform: scaleX(0); }
+    }
+  </style>
+</head>
+<body>
+  <div id="loading-overlay">
+    <div class="loading-container">
+      <div class="loading-icon"></div>
+      <div class="loading-title">Chargement de la carte</div>
+      <div class="loading-subtitle">Images satellite IGN</div>
+      <div class="loading-progress">
+        <div class="loading-progress-bar"></div>
+      </div>
+    </div>
+  </div>
+  <div id="map"></div>
+  <!-- Load Leaflet with defer for faster initial page load -->
+  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    let map = null;
+    let markers = [];
+    let currentMarker = null;
+    let stopsData = [];
+    let isMapReady = false;
+    let isInitializing = false;
+    let initializationComplete = false;
+    let tileLayer = null;
+    let tilesLoading = 0;
+    let tilesLoaded = 0;
+    let stabilityCheckTimer = null;
+    let firstFlyToComplete = false;
+    let minTilesForReady = 3;
+
+    function initMap(lat, lng, zoom) {
+      if (isInitializing || initializationComplete) {
+        return;
+      }
+      
+      isInitializing = true;
+      
+      if (map) {
+        map.remove();
+      }
+
+      map = L.map('map', {
+        center: [lat, lng],
+        zoom: zoom,
+        zoomControl: true,
+        attributionControl: true,
+        preferCanvas: true,
+        fadeAnimation: false, // Disabled for faster rendering
+        zoomAnimation: true,
+        zoomSnap: 0.5,
+        markerZoomAnimation: false, // Disabled for faster rendering
+        updateWhenIdle: false, // Update while panning for smoother experience
+        updateWhenZooming: false
+      });
+
+      tileLayer = L.tileLayer('https://data.geopf.fr/wmts?' +
+        'SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&' +
+        'LAYER=ORTHOIMAGERY.ORTHOPHOTOS&STYLE=normal&' +
+        'TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&' +
+        'FORMAT=image/jpeg', {
+        attribution: '&copy; <a href="https://www.ign.fr/">IGN</a>',
+        maxZoom: 19,
+        minZoom: 0,
+        updateWhenIdle: false,
+        keepBuffer: 1, // Reduced from 2 to 1 for faster initial load
+        updateInterval: 100
+      });
+
+      tileLayer.on('tileloadstart', function() {
+        tilesLoading++;
+      });
+
+      tileLayer.on('tileload', function() {
+        tilesLoaded++;
+        checkMapStability();
+      });
+
+      tileLayer.on('tileerror', function(e) {
+        tilesLoaded++;
+        checkMapStability();
+      });
+
+      tileLayer.addTo(map);
+
+      setTimeout(() => {
+        if (!isMapReady) {
+          markMapAsReady();
+        }
+      }, 1500);
+    }
+
+    function checkMapStability() {
+      if (stabilityCheckTimer) {
+        clearTimeout(stabilityCheckTimer);
+      }
+
+      stabilityCheckTimer = setTimeout(() => {
+        // Mark as ready after minimum tiles loaded OR all tiles loaded
+        if (tilesLoaded >= minTilesForReady || (tilesLoaded >= tilesLoading && tilesLoading > 0)) {
+          markMapAsReady();
+        }
+      }, 100);
+    }
+
+    function markMapAsReady() {
+      if (isMapReady) return;
+      
+      isMapReady = true;
+      isInitializing = false;
+      initializationComplete = true;
+      
+      if (stopsData.length > 0) {
+        setTimeout(() => {
+          addAllMarkers();
+        }, 50);
+      }
+      
+      window.parent.postMessage({ type: 'ready' }, '*');
+    }
+
+    function addAllMarkers() {
+      markers.forEach(m => m.marker.remove());
+      markers = [];
+      
+      stopsData.forEach((stop, index) => {
+        if (stop.latitude && stop.longitude) {
+          addMarker(stop.latitude, stop.longitude, stop.name, index);
+        }
+      });
+    }
+
+    function addMarker(lat, lng, name, stopIndex) {
+      const marker = L.marker([lat, lng], {
+        autoPan: false,
+        riseOnHover: true,
+        keyboard: false,
+        bubblingMouseEvents: true
+      }).addTo(map);
+      
+      if (name) {
+        marker.bindPopup(`<strong>${name}</strong>`, {
+          closeButton: false,
+          className: 'custom-popup'
+        });
+      }
+      
+      marker.on('click', function() {
+        window.parent.postMessage({ 
+          type: 'markerClick', 
+          stopIndex: stopIndex 
+        }, '*');
+      });
+      
+      markers.push({ marker, stopIndex, lat, lng });
+      return marker;
+    }
+
+    function flyTo(lat, lng, zoom, duration = 3000) {
+      if (!map || !isMapReady) {
+        setTimeout(() => flyTo(lat, lng, zoom, duration), 200);
+        return;
+      }
+      
+      map.flyTo([lat, lng], zoom, {
+        duration: duration / 1000,
+        easeLinearity: 0.25,
+        animate: true
+      });
+
+      markers.forEach(m => {
+        m.marker.setIcon(L.icon({
+          iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [1, -34],
+          shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+          shadowSize: [41, 41]
+        }));
+      });
+
+      const markerData = markers.find(m => {
+        return Math.abs(m.lat - lat) < 0.001 && Math.abs(m.lng - lng) < 0.001;
+      });
+
+      if (markerData) {
+        markerData.marker.setIcon(L.icon({
+          iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+          iconSize: [38, 62],
+          iconAnchor: [19, 62],
+          popupAnchor: [1, -52],
+          shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+          shadowSize: [62, 62]
+        }));
+        currentMarker = markerData.marker;
+      }
+      
+      if (!firstFlyToComplete) {
+        setTimeout(() => {
+          const overlay = document.getElementById('loading-overlay');
+          const mapElement = document.getElementById('map');
+          if (overlay && mapElement) {
+            overlay.classList.add('hidden');
+            mapElement.classList.add('visible');
+            firstFlyToComplete = true;
+          }
+        }, duration + 300);
+      }
+    }
+
+    window.addEventListener('message', function(event) {
+      const { type, data } = event.data;
+
+      switch(type) {
+        case 'init':
+          if (!initializationComplete) {
+            stopsData = data.stops || [];
+            if (typeof L === 'undefined') {
+              setTimeout(() => initMap(data.latitude, data.longitude, data.zoom || 15), 100);
+            } else {
+              initMap(data.latitude, data.longitude, data.zoom || 15);
+            }
+          }
+          break;
+
+        case 'flyTo':
+          flyTo(data.latitude, data.longitude, data.zoom || 18, data.duration || 3000);
+          break;
+      }
+    });
+  </script>
+</body>
+</html>

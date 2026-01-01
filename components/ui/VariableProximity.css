@@ -1,0 +1,26 @@
+.variable-proximity {
+  display: inline;
+  font-feature-settings: 'kern' 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Ensure variable font settings can be animated */
+  font-variation-settings: inherit;
+}
+
+.variable-proximity span {
+  will-change: font-variation-settings;
+  /* Enable smooth transitions for font variations */
+  transition: font-variation-settings 0.05s ease-out;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

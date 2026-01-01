@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Mapbox Satellite Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet">
+  <style>
+    body { margin: 0; padding: 0; }
+    #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script>
+    let map = null;
+    let mapboxToken = null;
+    let isMapInitialized = false;
+
+    function initializeMap(token, stops) {
+      if (isMapInitialized) return;
+      
+      console.log('[v0] Mapbox viewer - Initializing with token:', token ? 'Present' : 'Missing');
+      
+      if (!token) {
+        console.error('[v0] No Mapbox token provided');
+        document.getElementById('map').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:white;flex-direction:column;gap:12px;"><div style="font-size:48px;">🗺️</div><div>Token Mapbox requis</div></div>';
+        return;
+      }
+
+      mapboxToken = token;
+      isMapInitialized = true;
+      
+      mapboxgl.accessToken = token;
+      
+      map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/satellite-v9',
+        center: [3.128, 49.437],
+        zoom: 14.5,
+        pitch: 0,
+        bearing: 0,
+        antialias: true,
+        maxZoom: 22
+      });
+
+      map.on('load', () => {
+        console.log('[v0] Mapbox map loaded successfully');
+        
+        // Add 3D terrain
+        map.addSource('mapbox-dem', {
+          'type': 'raster-dem',
+          'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+          'tileSize': 512,
+          'maxzoom': 14
+        });
+        map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 2.0 });
+
+        // Add sky layer
+        map.addLayer({
+          'id': 'sky',
+          'type': 'sky',
+          'paint': {
+            'sky-type': 'atmosphere',
+            'sky-atmosphere-sun': [0.0, 90.0],
+            'sky-atmosphere-sun-intensity': 15
+          }
+        });
+
+        // Add markers if stops provided
+        if (stops && stops.length > 0) {
+          stops.forEach((stop, index) => {
+            if (stop.longitude && stop.latitude && index > 0 && index < stops.length - 1) {
+              const el = document.createElement('div');
+              el.style.backgroundColor = '#ff4444';
+              el.style.width = '30px';
+              el.style.height = '30px';
+              el.style.borderRadius = '50%';
+              el.style.border = '4px solid white';
+              el.style.boxShadow = '0 4px 12px rgba(0,0,0,0.7)';
+              el.style.animation = 'pulse 2s ease-in-out infinite';
+              
+              new mapboxgl.Marker(el)
+                .setLngLat([stop.longitude, stop.latitude])
+                .addTo(map);
+            }
+          });
+          
+          const style = document.createElement('style');
+          style.textContent = `
+            @keyframes pulse {
+              0%, 100% { transform: scale(1); opacity: 1; }
+              50% { transform: scale(1.2); opacity: 0.8; }
+            }
+          `;
+          document.head.appendChild(style);
+        }
+
+        // Notify parent that map is ready
+        window.parent.postMessage({ type: 'mapLoaded' }, '*');
+      });
+    }
+
+    // Listen for initialization and commands from parent
+    window.addEventListener('message', (event) => {
+      console.log('[v0] Mapbox viewer - Received message:', event.data.type);
+      
+      if (event.data.type === 'initialize') {
+        initializeMap(event.data.token, event.data.stops);
+      } else if (event.data.type === 'flyTo' && map) {
+        console.log('[v0] Mapbox viewer - Flying to:', event.data.center);
+        map.flyTo({
+          center: event.data.center,
+          zoom: event.data.zoom,
+          bearing: event.data.bearing,
+          pitch: event.data.pitch,
+          duration: 4000,
+          essential: true,
+          curve: 1.2,
+          speed: 0.6
+        });
+      }
+    });
+
+    // Notify parent that iframe is ready
+    window.parent.postMessage({ type: 'iframeReady' }, '*');
+  </script>
+</body>
+</html>
