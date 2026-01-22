@@ -88,7 +88,7 @@
   transform: rotate(-45deg) translate(5px, -5px);
 }
 
-/* Removed .logo-container styles as the white logo is being removed */
+/* Removed .warno-container styles as the white logo is being removed */
 
 /* Added centered logo styling */
 .center-logo-container {
@@ -579,7 +579,7 @@
     width: auto;
   }
 
-  .logo {
+  .warno {
     height: 32px;
   }
 

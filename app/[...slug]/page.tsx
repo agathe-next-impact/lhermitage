@@ -12,19 +12,11 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
-  console.log("[v0] generateStaticParams - Starting to fetch all pages from WordPress")
 
   try {
     const pages = await wpApi.getPages({ per_page: 100 })
 
-    console.log("[v0] generateStaticParams - Total pages fetched:", pages.length)
-    console.log(
-      "[v0] generateStaticParams - Page paths:",
-      pages.map((p) => {
-        const wpBaseUrl = process.env.NEXT_PUBLIC_WP_API_URL?.replace("/wp-json/wp/v2", "") || "https://wp-asso.com"
-        return p.link.replace(wpBaseUrl, "").replace(/^\/+|\/+$/g, "")
-      }),
-    )
+
 
     const filteredPages = pages.filter((page) => {
       const wpBaseUrl = process.env.NEXT_PUBLIC_WP_API_URL?.replace("/wp-json/wp/v2", "") || "https://wp-asso.com"
@@ -40,7 +32,6 @@ export async function generateStaticParams() {
       return true
     })
 
-    console.log("[v0] generateStaticParams - Pages after filtering:", filteredPages.length)
 
     return filteredPages.map((page) => {
       const wpBaseUrl = process.env.NEXT_PUBLIC_WP_API_URL?.replace("/wp-json/wp/v2", "") || "https://wp-asso.com"
@@ -62,7 +53,7 @@ export default async function CatchAllPage({ params }: PageProps) {
 
   const fullPath = slug.join("/")
 
-  console.log("[v0] CatchAllPage - Processing WordPress path:", fullPath)
+  console.warn("[v0] CatchAllPage - Processing WordPress path:", fullPath)
 
   const isActivitesPage = fullPath.includes("activites")
   const isHistoirePage = fullPath === "tiers-lieu-rural/lhistoire-du-lieu"
@@ -83,20 +74,13 @@ export default async function CatchAllPage({ params }: PageProps) {
     activites = fetchedActivites
     teamMembers = fetchedTeamMembers
   } catch (error) {
-    console.error("[v0] CatchAllPage - Error fetching data from WordPress:", error)
     notFound()
   }
 
   if (!page) {
-    console.log("[v0] CatchAllPage - No WordPress page found for path:", fullPath)
     notFound()
   }
 
-  console.log("[v0] isHistoirePage:", isHistoirePage)
-  console.log("[v0] page.acf:", page.acf)
-  if (page.acf) {
-    console.log("[v0] page.acf.timeline:", (page.acf as any).timeline)
-  }
 
   return (
     <div>

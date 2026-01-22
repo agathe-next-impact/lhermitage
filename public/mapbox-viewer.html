@@ -21,7 +21,7 @@
     function initializeMap(token, stops) {
       if (isMapInitialized) return;
       
-      console.log('[v0] Mapbox viewer - Initializing with token:', token ? 'Present' : 'Missing');
+      console.warn('[v0] Mapbox viewer - Initializing with token:', token ? 'Present' : 'Missing');
       
       if (!token) {
         console.error('[v0] No Mapbox token provided');
@@ -46,7 +46,7 @@
       });
 
       map.on('load', () => {
-        console.log('[v0] Mapbox map loaded successfully');
+        console.warn('[v0] Mapbox map loaded successfully');
         
         // Add 3D terrain
         map.addSource('mapbox-dem', {
@@ -104,12 +104,12 @@
 
     // Listen for initialization and commands from parent
     window.addEventListener('message', (event) => {
-      console.log('[v0] Mapbox viewer - Received message:', event.data.type);
+      console.warn('[v0] Mapbox viewer - Received message:', event.data.type);
       
       if (event.data.type === 'initialize') {
         initializeMap(event.data.token, event.data.stops);
       } else if (event.data.type === 'flyTo' && map) {
-        console.log('[v0] Mapbox viewer - Flying to:', event.data.center);
+        console.warn('[v0] Mapbox viewer - Flying to:', event.data.center);
         map.flyTo({
           center: event.data.center,
           zoom: event.data.zoom,

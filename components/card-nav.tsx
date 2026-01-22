@@ -73,7 +73,7 @@ const CardNav: React.FC<CardNavProps> = ({
   const pathname = usePathname()
 
   const closeMenu = () => {
-    console.log("[v0] closeMenu called - isHamburgerOpen:", isHamburgerOpen, "isExpanded:", isExpanded)
+    console.warn("[v0] closeMenu called - isHamburgerOpen:", isHamburgerOpen, "isExpanded:", isExpanded)
     setIsHamburgerOpen(false)
     setIsExpanded(false)
 
@@ -81,13 +81,13 @@ const CardNav: React.FC<CardNavProps> = ({
     if (!navEl) return
 
     if (tlRef.current) {
-      console.log("[v0] Pausing current timeline")
+      console.warn("[v0] Pausing current timeline")
       tlRef.current.pause()
     }
 
     const closeTl = gsap.timeline({
       onComplete: () => {
-        console.log("[v0] Close animation complete")
+        console.warn("[v0] Close animation complete")
         gsap.set(navEl, { overflow: "hidden" })
         if (tlRef.current) {
           tlRef.current.kill()
@@ -245,15 +245,15 @@ const CardNav: React.FC<CardNavProps> = ({
   }, [])
 
   const toggleMenu = () => {
-    console.log("[v0] toggleMenu called - isExpanded:", isExpanded, "isHamburgerOpen:", isHamburgerOpen)
+    console.warn("[v0] toggleMenu called - isExpanded:", isExpanded, "isHamburgerOpen:", isHamburgerOpen)
     const tl = tlRef.current
     if (!tl) {
-      console.log("[v0] No timeline found!")
+      console.warn("[v0] No timeline found!")
       return
     }
 
     if (!isExpanded) {
-      console.log("[v0] Opening menu")
+      console.warn("[v0] Opening menu")
       setShouldLoadImages(true)
       setIsHamburgerOpen(true)
       setIsExpanded(true)
@@ -261,10 +261,10 @@ const CardNav: React.FC<CardNavProps> = ({
       if (isMobile) {
         setCollapsedCards(new Set(items.map((_, idx) => idx)))
       }
-      console.log("[v0] Playing timeline from 0")
+      console.warn("[v0] Playing timeline from 0")
       tl.play(0)
     } else {
-      console.log("[v0] Closing menu")
+      console.warn("[v0] Closing menu")
       closeMenu()
     }
   }

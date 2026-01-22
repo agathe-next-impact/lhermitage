@@ -3,13 +3,13 @@ import { wpApi } from "@/lib/wordpress/api"
 import { HebergementsGrid } from "@/components/hebergements-grid"
 
 export default async function HebergementsPage() {
-  console.log("[v0] HebergementsPage - Starting to fetch data")
+  console.warn("[v0] HebergementsPage - Starting to fetch data")
 
   const [page, hebergements] = await Promise.all([wpApi.getPageBySlug("hebergements"), wpApi.getHebergements()])
 
-  console.log("[v0] HebergementsPage - Page fetched:", page?.title.rendered)
-  console.log("[v0] HebergementsPage - Hebergements count:", hebergements?.length || 0)
-  console.log("[v0] HebergementsPage - Hebergements data:", JSON.stringify(hebergements, null, 2))
+  console.warn("[v0] HebergementsPage - Page fetched:", page?.title.rendered)
+  console.warn("[v0] HebergementsPage - Hebergements count:", hebergements?.length || 0)
+  console.warn("[v0] HebergementsPage - Hebergements data:", JSON.stringify(hebergements, null, 2))
 
   return (
     <div>

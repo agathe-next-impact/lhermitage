@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const url = `${PANORAMAX_API_URL}/search?bbox=${bbox}&limit=${limit}`
-    console.log(`[v0] Panoramax API - Fetching: ${url}`)
+    console.warn(`[v0] Panoramax API - Fetching: ${url}`)
 
     const response = await fetch(url, {
       headers: {
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
 
     if (contentType && contentType.includes('application/json')) {
       const data = await response.json()
-      console.log(`[v0] Panoramax API - Found ${data.features?.length || 0} pictures`)
+      console.warn(`[v0] Panoramax API - Found ${data.features?.length || 0} pictures`)
       return NextResponse.json(data)
     } else {
       const text = await response.text()

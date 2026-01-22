@@ -27,8 +27,8 @@ const GlobalSpotlight: React.FC<{
 export function HebergementsGrid({ hebergements }: HebergementsGridProps) {
   const gridRef = useRef<HTMLDivElement>(null)
 
-  console.log("[v0] HebergementsGrid - Component rendering with hebergements:", hebergements.length)
-  console.log(
+  console.warn("[v0] HebergementsGrid - Component rendering with hebergements:", hebergements.length)
+  console.warn(
     "[v0] HebergementsGrid - Hebergements details:",
     hebergements.map((h) => ({
       id: h.id,
@@ -60,7 +60,7 @@ export function HebergementsGrid({ hebergements }: HebergementsGridProps) {
   }
 
   if (!hebergements || hebergements.length === 0) {
-    console.log("[v0] HebergementsGrid - No hebergements to display")
+    console.warn("[v0] HebergementsGrid - No hebergements to display")
     return (
       <div className="text-center py-12 border-2 border-dashed border-muted rounded-lg">
         <p className="text-muted-foreground mb-2">Aucun hébergement trouvé.</p>
@@ -81,7 +81,7 @@ export function HebergementsGrid({ hebergements }: HebergementsGridProps) {
       >
         {/* Real hebergement cards */}
         {hebergements.map((hebergement, index) => {
-          console.log("[v0] HebergementsGrid - Rendering card for:", hebergement.title?.rendered, hebergement.id)
+          console.warn("[v0] HebergementsGrid - Rendering card for:", hebergement.title?.rendered, hebergement.id)
 
           const categorySlug = hebergement._embedded?.["wp:term"]?.[0]?.[0]?.slug
           const categoryColor = categorySlug ? getCategoryColor(categorySlug) : "#e75754"

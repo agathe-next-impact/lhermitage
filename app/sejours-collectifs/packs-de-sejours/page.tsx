@@ -4,7 +4,7 @@ import { wpApi } from "@/lib/wordpress/api"
 import { getColorForPath } from "@/lib/page-colors"
 
 export default async function PacksDeSejoursPage() {
-  console.log("[v0] PacksDeSejoursPage - Starting to fetch data")
+  console.warn("[v0] PacksDeSejoursPage - Starting to fetch data")
 
   let page = null
   let sejours: any[] = []
@@ -14,10 +14,10 @@ export default async function PacksDeSejoursPage() {
     page = results[0]
     sejours = results[1] || []
 
-    console.log("[v0] PacksDeSejoursPage - Page fetched:", page?.title?.rendered || "No page")
-    console.log("[v0] PacksDeSejoursPage - Page ACF:", JSON.stringify(page?.acf))
-    console.log("[v0] PacksDeSejoursPage - Sejours count:", sejours.length)
-    console.log(
+    console.warn("[v0] PacksDeSejoursPage - Page fetched:", page?.title?.rendered || "No page")
+    console.warn("[v0] PacksDeSejoursPage - Page ACF:", JSON.stringify(page?.acf))
+    console.warn("[v0] PacksDeSejoursPage - Sejours count:", sejours.length)
+    console.warn(
       "[v0] PacksDeSejoursPage - Sejours data:",
       JSON.stringify(
         sejours.map((s) => ({
@@ -33,7 +33,7 @@ export default async function PacksDeSejoursPage() {
     console.error("[v0] Error fetching packs-de-sejours data:", error instanceof Error ? error.message : error)
   }
 
-  console.log("[v0] PacksDeSejoursPage - Rendering with sejours:", sejours.length)
+  console.warn("[v0] PacksDeSejoursPage - Rendering with sejours:", sejours.length)
 
   return (
     <div>
@@ -62,7 +62,7 @@ export default async function PacksDeSejoursPage() {
         {sejours.length > 0 ? (
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {sejours.map((sejour, index) => {
-              console.log("[v0] PacksDeSejoursPage - Rendering sejour card:", sejour.id, sejour.title?.rendered)
+              console.warn("[v0] PacksDeSejoursPage - Rendering sejour card:", sejour.id, sejour.title?.rendered)
               return <SejourPricingCard key={sejour.id} sejour={sejour} featured={index === 1} />
             })}
           </div>

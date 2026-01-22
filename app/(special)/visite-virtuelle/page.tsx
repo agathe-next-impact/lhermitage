@@ -3,13 +3,13 @@ import { PageHeader } from "@/components/page-header"
 import { GuidedTourClient } from "./guided-tour-client"
 
 export default async function VisiteVirtuellePage() {
-  console.log("[v0] VisiteVirtuellePage - Loading page")
+  console.warn("[v0] VisiteVirtuellePage - Loading page")
 
   let mapPinPoints = []
 
   try {
     mapPinPoints = await wpApi.getMapPinPoints()
-    console.log("[v0] VisiteVirtuellePage - Map pin points loaded:", mapPinPoints.length)
+    console.warn("[v0] VisiteVirtuellePage - Map pin points loaded:", mapPinPoints.length)
   } catch (error) {
     console.error("[v0] VisiteVirtuellePage - Error loading map pin points:", error)
   }

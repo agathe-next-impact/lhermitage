@@ -1,0 +1,4 @@
+{
+  "/(special)/visite-virtuelle/page": "app/(special)/visite-virtuelle/page.js",
+  "/[...slug]/page": "app/[...slug]/page.js"
+}

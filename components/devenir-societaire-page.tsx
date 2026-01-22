@@ -19,9 +19,9 @@ export function DevenirSocietairePage({ page }: Props) {
   const scicInfo = acf["quest-ce_que_la_scic"] || {}
   const societariatInfo = acf.informations_societariat || []
 
-  console.log("[v0] DevenirSocietairePage - bandeau:", bandeau)
-  console.log("[v0] DevenirSocietairePage - bandeau.galerie:", bandeau.galerie)
-  console.log("[v0] DevenirSocietairePage - bandeau.galerie?.images:", bandeau.galerie?.images)
+  console.warn("[v0] DevenirSocietairePage - bandeau:", bandeau)
+  console.warn("[v0] DevenirSocietairePage - bandeau.galerie:", bandeau.galerie)
+  console.warn("[v0] DevenirSocietairePage - bandeau.galerie?.images:", bandeau.galerie?.images)
 
   const galleryImages = [
     ...(bandeau.galerie?.images || []).map((img: any) => ({
@@ -31,7 +31,7 @@ export function DevenirSocietairePage({ page }: Props) {
     })),
   ].filter(Boolean)
 
-  console.log("[v0] DevenirSocietairePage - galleryImages:", galleryImages)
+  console.warn("[v0] DevenirSocietairePage - galleryImages:", galleryImages)
 
   const motivations = [
     societaireData.motivation_1 ? { number: 1, text: societaireData.motivation_1 } : null,

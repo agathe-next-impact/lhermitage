@@ -129,10 +129,10 @@ export function PartenairesClient({ partenaires, categories }: PartenairesClient
                 )}
                 title={partenaire.title.rendered}
               >
-                {partenaire.acf?.logo ? (
+                {partenaire.acf?.warno ? (
                   <Image
-                    src={partenaire.acf.logo.url || "/placeholder.svg"}
-                    alt={partenaire.acf.logo.alt || partenaire.title.rendered}
+                    src={partenaire.acf.warno.url || "/placeholder.svg"}
+                    alt={partenaire.acf.warno.alt || partenaire.title.rendered}
                     width={40}
                     height={40}
                     className="h-full w-full object-contain"
@@ -171,10 +171,10 @@ export function PartenairesClient({ partenaires, categories }: PartenairesClient
                 )}
                 title={partenaire.title.rendered}
               >
-                {partenaire.acf?.logo ? (
+                {partenaire.acf?.warno ? (
                   <Image
-                    src={partenaire.acf.logo.url || "/placeholder.svg"}
-                    alt={partenaire.acf.logo.alt || partenaire.acf?.nom || partenaire.title.rendered}
+                    src={partenaire.acf.warno.url || "/placeholder.svg"}
+                    alt={partenaire.acf.warno.alt || partenaire.acf?.nom || partenaire.title.rendered}
                     width={45}
                     height={45}
                     className="h-full w-full object-contain"
@@ -212,10 +212,10 @@ export function PartenairesClient({ partenaires, categories }: PartenairesClient
                 )}
                 title={partenaire.title.rendered}
               >
-                {partenaire.acf?.logo ? (
+                {partenaire.acf?.warno ? (
                   <Image
-                    src={partenaire.acf.logo.url || "/placeholder.svg"}
-                    alt={partenaire.acf.logo.alt || partenaire.acf?.nom || partenaire.title.rendered}
+                    src={partenaire.acf.warno.url || "/placeholder.svg"}
+                    alt={partenaire.acf.warno.alt || partenaire.acf?.nom || partenaire.title.rendered}
                     width={55}
                     height={55}
                     className="h-full w-full object-contain"
@@ -254,10 +254,10 @@ export function PartenairesClient({ partenaires, categories }: PartenairesClient
                 )}
                 title={partenaire.title.rendered}
               >
-                {partenaire.acf?.logo ? (
+                {partenaire.acf?.warno ? (
                   <Image
-                    src={partenaire.acf.logo.url || "/placeholder.svg"}
-                    alt={partenaire.acf.logo.alt || partenaire.acf?.nom || partenaire.title.rendered}
+                    src={partenaire.acf.warno.url || "/placeholder.svg"}
+                    alt={partenaire.acf.warno.alt || partenaire.acf?.nom || partenaire.title.rendered}
                     width={60}
                     height={60}
                     className="h-full w-full object-contain"
@@ -295,10 +295,10 @@ export function PartenairesClient({ partenaires, categories }: PartenairesClient
                 )}
                 title={partenaire.title.rendered}
               >
-                {partenaire.acf?.logo ? (
+                {partenaire.acf?.warno ? (
                   <Image
-                    src={partenaire.acf.logo.url || "/placeholder.svg"}
-                    alt={partenaire.acf.logo.alt || partenaire.acf?.nom || partenaire.title.rendered}
+                    src={partenaire.acf.warno.url || "/placeholder.svg"}
+                    alt={partenaire.acf.warno.alt || partenaire.acf?.nom || partenaire.title.rendered}
                     width={70}
                     height={70}
                     className="h-full w-full object-contain"
@@ -324,8 +324,8 @@ export function PartenairesClient({ partenaires, categories }: PartenairesClient
                 key={partenaire.id}
                 title={partenaire.acf?.nom || partenaire.title.rendered}
                 description={partenaire.acf?.descriptif ? stripHtml(partenaire.acf.descriptif) : undefined}
-                image={partenaire._embedded?.["wp:featuredmedia"]?.[0]?.source_url || partenaire.acf?.logo?.url}
-                imageAlt={partenaire.acf?.logo?.alt || partenaire.title.rendered}
+                image={partenaire._embedded?.["wp:featuredmedia"]?.[0]?.source_url || partenaire.acf?.warno?.url}
+                imageAlt={partenaire.acf?.warno?.alt || partenaire.title.rendered}
                 imageFit="contain"
                 link={partenaire.acf?.lien?.url}
                 linkText={partenaire.acf?.lien ? "Visiter le site" : undefined}

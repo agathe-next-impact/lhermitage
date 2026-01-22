@@ -50,13 +50,13 @@
   transform: rotate(-45deg) translate(5px, -5px);
 }
 
-.logo-container {
+.warno-container {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
 }
 
-.logo {
+.warno {
   height: 40px;
   width: auto;
   object-fit: contain;
@@ -144,7 +144,7 @@
     min-height: auto;
   }
 
-  .logo {
+  .warno {
     height: 32px;
   }
 

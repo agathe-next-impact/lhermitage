@@ -76,12 +76,12 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data.type === "ready") {
-        console.log("[v0] Satellite map ready")
+        console.warn("[v0] Satellite map ready")
         setMapReady(true)
       }
       if (event.data.type === "markerClick") {
         const stopIndex = event.data.stopIndex
-        console.log("[v0] Marker clicked, changing to stop index:", stopIndex)
+        console.warn("[v0] Marker clicked, changing to stop index:", stopIndex)
         handleStopClick(stopIndex)
       }
     }
@@ -93,11 +93,11 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
 
   const handleIframeLoad = () => {
     if (initSentRef.current) {
-      console.log("[v0] Init message already sent, skipping")
+      console.warn("[v0] Init message already sent, skipping")
       return
     }
 
-    console.log("[v0] Iframe loaded, sending init message")
+    console.warn("[v0] Iframe loaded, sending init message")
     if (iframeRef.current?.contentWindow) {
       iframeRef.current.contentWindow.postMessage(
         {
@@ -118,7 +118,7 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
   useEffect(() => {
     if (mapReady && iframeRef.current?.contentWindow) {
       const stop = tourStops[currentStop]
-      console.log("[v0] Flying to stop:", stop.name)
+      console.warn("[v0] Flying to stop:", stop.name)
       iframeRef.current.contentWindow.postMessage(
         {
           type: "flyTo",

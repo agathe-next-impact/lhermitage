@@ -46,7 +46,7 @@ export async function searchPanoramaxPictures(
       return []
     }
     
-    console.log(`[v0] Panoramax - Searching pictures near ${lat},${lon} within ${radius}m`)
+    console.warn(`[v0] Panoramax - Searching pictures near ${lat},${lon} within ${radius}m`)
     
     const radiusDegrees = radius / 111000
     const minLon = lon - radiusDegrees
@@ -58,7 +58,7 @@ export async function searchPanoramaxPictures(
     
     const url = `/api/panoramax?bbox=${bbox}&limit=10`
     
-    console.log(`[v0] Panoramax - Request URL: ${url}`)
+    console.warn(`[v0] Panoramax - Request URL: ${url}`)
 
     const response = await fetch(url)
 
@@ -68,7 +68,7 @@ export async function searchPanoramaxPictures(
     }
 
     const data: PanoramaxCollection = await response.json()
-    console.log(`[v0] Panoramax - Found ${data.features?.length || 0} pictures`)
+    console.warn(`[v0] Panoramax - Found ${data.features?.length || 0} pictures`)
 
     return data.features || []
   } catch (error) {

@@ -10,8 +10,8 @@ interface HistoireTimelineProps {
 }
 
 export function HistoireTimeline({ acf }: HistoireTimelineProps) {
-  console.log("[v0] HistoireTimeline - acf:", acf)
-  console.log("[v0] HistoireTimeline - acf.timeline:", acf.timeline)
+  console.warn("[v0] HistoireTimeline - acf:", acf)
+  console.warn("[v0] HistoireTimeline - acf.timeline:", acf.timeline)
 
   if (!acf.timeline || acf.timeline.length === 0) {
     return (

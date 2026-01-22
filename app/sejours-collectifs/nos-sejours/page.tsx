@@ -4,7 +4,7 @@ import { wpApi } from "@/lib/wordpress/api"
 import { getColorForPath } from "@/lib/page-colors"
 
 export default async function NosSejoursPage() {
-  console.log("[v0] NosSejoursPage - Starting to fetch data")
+  console.warn("[v0] NosSejoursPage - Starting to fetch data")
 
   let page = null
   let sejours: any[] = []
@@ -14,14 +14,14 @@ export default async function NosSejoursPage() {
     page = results[0]
     sejours = results[1] || []
 
-    console.log("[v0] NosSejoursPage - Page fetched:", page?.title?.rendered || "No page")
-    console.log("[v0] NosSejoursPage - Page ACF:", JSON.stringify(page?.acf))
-    console.log("[v0] NosSejoursPage - Sejours count:", sejours.length)
+    console.warn("[v0] NosSejoursPage - Page fetched:", page?.title?.rendered || "No page")
+    console.warn("[v0] NosSejoursPage - Page ACF:", JSON.stringify(page?.acf))
+    console.warn("[v0] NosSejoursPage - Sejours count:", sejours.length)
   } catch (error) {
     console.error("[v0] Error fetching nos-sejours data:", error instanceof Error ? error.message : error)
   }
 
-  console.log("[v0] NosSejoursPage - Rendering with sejours:", sejours.length)
+  console.warn("[v0] NosSejoursPage - Rendering with sejours:", sejours.length)
 
   return (
     <div>
@@ -50,7 +50,7 @@ export default async function NosSejoursPage() {
         {sejours.length > 0 ? (
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {sejours.map((sejour, index) => {
-              console.log("[v0] NosSejoursPage - Rendering sejour card:", sejour.id, sejour.title?.rendered)
+              console.warn("[v0] NosSejoursPage - Rendering sejour card:", sejour.id, sejour.title?.rendered)
               return <SejourPricingCard key={sejour.id} sejour={sejour} featured={index === 0} />
             })}
           </div>
