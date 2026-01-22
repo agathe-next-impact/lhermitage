@@ -9,6 +9,16 @@ export const revalidate = 900
 export default async function StructuresPage() {
   const [page, structures] = await Promise.all([wpApi.getPageBySlug("structures-hebergees"), wpApi.getStructures()])
 
+  // Debug to ensure ACF data is present on structures
+  // (Will only log in dev because logger is dev-only)
+  if (structures.length === 0) {
+    console.warn("[StructuresPage] No structures returned from WP")
+  } else {
+    const s = structures[0]
+    console.warn("[StructuresPage] First structure keys", Object.keys(s))
+    console.warn("[StructuresPage] Has ACF", !!s.acf, "ACF keys", s.acf ? Object.keys(s.acf) : [])
+  }
+
   return (
     <div>
       <PageHeader

@@ -454,6 +454,15 @@ export class WordPressAPI {
   async getStructures() {
     const structures = await this.getPosts("structure")
 
+    if (structures.length > 0) {
+      const sample = structures[0]
+      logger.warn("[v0] Structures sample has acf:", !!sample.acf)
+      logger.warn("[v0] Structures sample keys:", Object.keys(sample))
+      logger.warn("[v0] Structures sample ACF keys:", sample.acf ? Object.keys(sample.acf) : [])
+    } else {
+      logger.warn("[v0] Structures fetch returned 0 items")
+    }
+
     return structures.map((structure) => ({
       ...structure,
       featured_media_url: structure._embedded?.["wp:featuredmedia"]?.[0]?.source_url || null,

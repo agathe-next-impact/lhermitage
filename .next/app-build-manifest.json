@@ -1,21 +1,3 @@
 {
-  "pages": {
-    "/[...slug]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/[...slug]/page.js"
-    ],
-    "/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/layout.css",
-      "static/chunks/app/layout.js"
-    ],
-    "/ecosysteme-innovant/structures-hebergees/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/ecosysteme-innovant/structures-hebergees/page.css",
-      "static/chunks/app/ecosysteme-innovant/structures-hebergees/page.js"
-    ]
-  }
+  "pages": {}
 }
