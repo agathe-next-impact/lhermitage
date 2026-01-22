@@ -45,7 +45,7 @@ export class WordPressAPI {
           "User-Agent": "Next.js WordPress Client",
         },
         signal: controller.signal,
-        next: { revalidate: 21600 }, // Cache for 6 hours instead of 4 hours
+        next: { revalidate: 900 }, // Cache for 15 minutes to refresh frequently
       })
 
       clearTimeout(timeoutId)

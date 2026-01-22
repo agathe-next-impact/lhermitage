@@ -11,6 +11,8 @@ interface StructurePageProps {
   params: Promise<{ slug: string }>
 }
 
+export const revalidate = 900
+
 export async function generateStaticParams() {
   const structures = await wpApi.getStructures()
   return structures.map((structure) => ({

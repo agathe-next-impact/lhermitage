@@ -4,6 +4,8 @@ import { wpApi } from "@/lib/wordpress/api"
 import { stripHtml } from "@/lib/utils"
 import { StructuresGrid } from "@/components/structures-grid"
 
+export const revalidate = 900
+
 export default async function StructuresPage() {
   const [page, structures] = await Promise.all([wpApi.getPageBySlug("structures-hebergees"), wpApi.getStructures()])
 
