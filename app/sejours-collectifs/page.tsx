@@ -2,6 +2,8 @@ import { PageHeader } from "@/components/page-header"
 import { wpApi } from "@/lib/wordpress/api"
 import { getColorForPath } from "@/lib/page-colors"
 
+export const revalidate = 3600 // Revalidate every hour
+
 export default async function SejoursCollectifsPage() {
   const page = await wpApi.getPageBySlug("sejours-collectifs")
 

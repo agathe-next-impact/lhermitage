@@ -27,18 +27,6 @@ const GlobalSpotlight: React.FC<{
 export function HebergementsGrid({ hebergements }: HebergementsGridProps) {
   const gridRef = useRef<HTMLDivElement>(null)
 
-  console.warn("[v0] HebergementsGrid - Component rendering with hebergements:", hebergements.length)
-  console.warn(
-    "[v0] HebergementsGrid - Hebergements details:",
-    hebergements.map((h) => ({
-      id: h.id,
-      title: h.title?.rendered,
-      slug: h.slug,
-      hasPhotos: !!h.acf?.photos?.length,
-      hasFeaturedMedia: !!h._embedded?.["wp:featuredmedia"]?.[0],
-    })),
-  )
-
   const getBentoClass = (index: number) => {
     const pattern = index % 6
     switch (pattern) {
@@ -60,7 +48,6 @@ export function HebergementsGrid({ hebergements }: HebergementsGridProps) {
   }
 
   if (!hebergements || hebergements.length === 0) {
-    console.warn("[v0] HebergementsGrid - No hebergements to display")
     return (
       <div className="text-center py-12 border-2 border-dashed border-muted rounded-lg">
         <p className="text-muted-foreground mb-2">Aucun hébergement trouvé.</p>
@@ -81,8 +68,6 @@ export function HebergementsGrid({ hebergements }: HebergementsGridProps) {
       >
         {/* Real hebergement cards */}
         {hebergements.map((hebergement, index) => {
-          console.warn("[v0] HebergementsGrid - Rendering card for:", hebergement.title?.rendered, hebergement.id)
-
           const categorySlug = hebergement._embedded?.["wp:term"]?.[0]?.[0]?.slug
           const categoryColor = categorySlug ? getCategoryColor(categorySlug) : "#e75754"
           const bentoClass = getBentoClass(index)

@@ -10,9 +10,6 @@ interface HistoireTimelineProps {
 }
 
 export function HistoireTimeline({ acf }: HistoireTimelineProps) {
-  console.warn("[v0] HistoireTimeline - acf:", acf)
-  console.warn("[v0] HistoireTimeline - acf.timeline:", acf.timeline)
-
   if (!acf.timeline || acf.timeline.length === 0) {
     return (
       <div className="container mx-auto px-4 py-12">

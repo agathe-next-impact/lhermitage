@@ -5,6 +5,8 @@ import { wpApi } from "@/lib/wordpress/api"
 import Link from "next/link"
 import { stripHtml } from "@/lib/utils"
 
+export const revalidate = 3600 // Revalidate every hour
+
 export default async function SejoursIndividuelsPage() {
   const [page, hebergements] = await Promise.all([wpApi.getPageBySlug("sejours-individuels"), wpApi.getHebergements()])
 

@@ -42,7 +42,7 @@ export function OrbitingCircles({
           <div
             style={
               {
-                "--duration": calculatedDuration,
+                "--duration": `${calculatedDuration}s`,
                 "--radius": radius,
                 "--angle": angle,
                 "--icon-size": `${iconSize}px`,

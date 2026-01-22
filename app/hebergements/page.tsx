@@ -2,14 +2,10 @@ import { PageHeader } from "@/components/page-header"
 import { wpApi } from "@/lib/wordpress/api"
 import { HebergementsGrid } from "@/components/hebergements-grid"
 
+export const revalidate = 3600 // Revalidate every hour
+
 export default async function HebergementsPage() {
-  console.warn("[v0] HebergementsPage - Starting to fetch data")
-
   const [page, hebergements] = await Promise.all([wpApi.getPageBySlug("hebergements"), wpApi.getHebergements()])
-
-  console.warn("[v0] HebergementsPage - Page fetched:", page?.title.rendered)
-  console.warn("[v0] HebergementsPage - Hebergements count:", hebergements?.length || 0)
-  console.warn("[v0] HebergementsPage - Hebergements data:", JSON.stringify(hebergements, null, 2))
 
   return (
     <div>

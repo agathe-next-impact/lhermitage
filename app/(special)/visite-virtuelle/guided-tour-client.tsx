@@ -36,7 +36,5 @@ interface GuidedTourClientProps {
 }
 
 export function GuidedTourClient({ mapPinPoints }: GuidedTourClientProps) {
-  console.warn("[v0] GuidedTourClient - Received map pin points:", mapPinPoints.length)
-
   return <GuidedTour mapPinPoints={mapPinPoints} />
 }

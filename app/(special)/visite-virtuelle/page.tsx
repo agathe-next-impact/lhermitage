@@ -2,16 +2,15 @@ import { wpApi } from "@/lib/wordpress/api"
 import { PageHeader } from "@/components/page-header"
 import { GuidedTourClient } from "./guided-tour-client"
 
-export default async function VisiteVirtuellePage() {
-  console.warn("[v0] VisiteVirtuellePage - Loading page")
+export const revalidate = 3600 // Revalidate every hour
 
+export default async function VisiteVirtuellePage() {
   let mapPinPoints = []
 
   try {
     mapPinPoints = await wpApi.getMapPinPoints()
-    console.warn("[v0] VisiteVirtuellePage - Map pin points loaded:", mapPinPoints.length)
   } catch (error) {
-    console.error("[v0] VisiteVirtuellePage - Error loading map pin points:", error)
+    // Silently handle error - empty array fallback
   }
 
   return (

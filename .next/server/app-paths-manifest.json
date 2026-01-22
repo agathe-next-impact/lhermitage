@@ -1,4 +1,25 @@
 {
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/panoramax/route": "app/api/panoramax/route.js",
+  "/ecosysteme-innovant/structures-hebergees/page": "app/ecosysteme-innovant/structures-hebergees/page.js",
+  "/ecosysteme-innovant/partenaires/page": "app/ecosysteme-innovant/partenaires/page.js",
+  "/api/map-styles/route": "app/api/map-styles/route.js",
+  "/infos-pratiques/contacts/page": "app/infos-pratiques/contacts/page.js",
+  "/ecosysteme-innovant/evenements/page": "app/ecosysteme-innovant/evenements/page.js",
+  "/infos-pratiques/jours-et-horaires-douverture/page": "app/infos-pratiques/jours-et-horaires-douverture/page.js",
+  "/infos-pratiques/localisation/page": "app/infos-pratiques/localisation/page.js",
+  "/sejours-collectifs/nos-sejours/page": "app/sejours-collectifs/nos-sejours/page.js",
+  "/sejours-collectifs/packs-de-sejours/page": "app/sejours-collectifs/packs-de-sejours/page.js",
+  "/sejours-collectifs/activites/page": "app/sejours-collectifs/activites/page.js",
+  "/services/page": "app/services/page.js",
   "/(special)/visite-virtuelle/page": "app/(special)/visite-virtuelle/page.js",
-  "/[...slug]/page": "app/[...slug]/page.js"
+  "/activite/[slug]/page": "app/activite/[slug]/page.js",
+  "/[...slug]/page": "app/[...slug]/page.js",
+  "/hebergement/[slug]/page": "app/hebergement/[slug]/page.js",
+  "/hebergements/page": "app/hebergements/page.js",
+  "/sejour/[slug]/page": "app/sejour/[slug]/page.js",
+  "/sejours-collectifs/page": "app/sejours-collectifs/page.js",
+  "/page": "app/page.js",
+  "/structure/[slug]/page": "app/structure/[slug]/page.js",
+  "/sejours-individuels/page": "app/sejours-individuels/page.js"
 }

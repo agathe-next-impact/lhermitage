@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation"
+import type { Metadata } from "next"
 import { wpApi } from "@/lib/wordpress/api"
 import { PageHeader } from "@/components/page-header"
 import { ActivitesFilter } from "@/components/activites-filter"
@@ -7,8 +8,54 @@ import { TeamMasonry } from "@/components/team-masonry"
 import { DevenirSocietairePage } from "@/components/devenir-societaire-page"
 import type { HistoireACF } from "@/lib/wordpress/types"
 
+export const revalidate = 3600 // Revalidate every hour
+
 interface PageProps {
   params: Promise<{ slug: string[] }>
+}
+
+// Generate metadata for SEO
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params
+  const fullPath = slug.join("/")
+  
+  try {
+    const page = await wpApi.getPageByPath(fullPath)
+    
+    if (!page) {
+      return {
+        title: "Page non trouvée",
+      }
+    }
+
+    const title = page.title?.rendered || "L'Hermitage"
+    const description = page.acf?.hero?.["sous-titre"] || 
+      page.excerpt?.rendered?.replace(/<[^>]*>/g, "").substring(0, 160) ||
+      "Découvrez L'Hermitage, tiers-lieu rural dédié aux séjours et hébergements"
+    const image = page.acf?.hero?.image?.url || "/rural-retreat-hermitage-building-nature.jpg"
+
+    return {
+      title,
+      description,
+      openGraph: {
+        title,
+        description,
+        images: [{ url: image }],
+        type: "website",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+        images: [image],
+      },
+    }
+  } catch {
+    return {
+      title: "L'Hermitage",
+      description: "Tiers-lieu rural dédié aux séjours et hébergements",
+    }
+  }
 }
 
 export async function generateStaticParams() {
@@ -52,8 +99,6 @@ export default async function CatchAllPage({ params }: PageProps) {
   const { slug } = await params
 
   const fullPath = slug.join("/")
-
-  console.warn("[v0] CatchAllPage - Processing WordPress path:", fullPath)
 
   const isActivitesPage = fullPath.includes("activites")
   const isHistoirePage = fullPath === "tiers-lieu-rural/lhistoire-du-lieu"
