@@ -441,12 +441,20 @@ export class WordPressAPI {
   }
 
   async getStructures() {
-    const structures = await this.getPosts("structure")
+    logger.warn("[v0] WordPress API - getStructures() called")
+    
+    try {
+      const structures = await this.getPosts("structure")
+      logger.warn("[v0] WordPress API - getStructures() returned:", structures.length, "items")
 
-    return structures.map((structure) => ({
-      ...structure,
-      featured_media_url: structure._embedded?.["wp:featuredmedia"]?.[0]?.source_url || null,
-    }))
+      return structures.map((structure) => ({
+        ...structure,
+        featured_media_url: structure._embedded?.["wp:featuredmedia"]?.[0]?.source_url || null,
+      }))
+    } catch (error) {
+      logger.error("[v0] WordPress API - getStructures() ERROR:", error)
+      return []
+    }
   }
 
   async getEspacesDeTravail() {
