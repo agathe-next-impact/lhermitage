@@ -4,13 +4,24 @@ import { logger } from "../logger"
 
 const WP_API_URL = process.env.NEXT_PUBLIC_WP_API_URL || "https://wp-asso.com/wp-json/wp/v2"
 
+// Normalize base URL so we always point to /wp-json/wp/v2 even if the env var misses the suffix.
+function normalizeBaseUrl(rawUrl: string): string {
+  const trimmed = rawUrl.replace(/\/+$/, "")
+  if (/\/wp-json\/wp\/v2$/i.test(trimmed)) return trimmed
+  if (/\/wp-json$/i.test(trimmed)) return `${trimmed}/wp/v2`
+  // If only domain is provided, append the full REST path
+  if (!trimmed.includes("/wp-json")) return `${trimmed}/wp-json/wp/v2`
+  return `${trimmed}/wp/v2`
+}
+
 export class WordPressAPI {
   private baseUrl: string
   private wpJsonBase: string
 
   constructor(baseUrl: string = WP_API_URL) {
-    this.baseUrl = baseUrl
-    this.wpJsonBase = baseUrl.replace("/wp/v2", "")
+    const normalized = normalizeBaseUrl(baseUrl)
+    this.baseUrl = normalized
+    this.wpJsonBase = normalized.replace("/wp/v2", "")
   }
 
   private async fetch<T>(endpoint: string, params?: Record<string, any>, retries = 2): Promise<T> {
@@ -441,20 +452,12 @@ export class WordPressAPI {
   }
 
   async getStructures() {
-    logger.warn("[v0] WordPress API - getStructures() called")
-    
-    try {
-      const structures = await this.getPosts("structure")
-      logger.warn("[v0] WordPress API - getStructures() returned:", structures.length, "items")
+    const structures = await this.getPosts("structure")
 
-      return structures.map((structure) => ({
-        ...structure,
-        featured_media_url: structure._embedded?.["wp:featuredmedia"]?.[0]?.source_url || null,
-      }))
-    } catch (error) {
-      logger.error("[v0] WordPress API - getStructures() ERROR:", error)
-      return []
-    }
+    return structures.map((structure) => ({
+      ...structure,
+      featured_media_url: structure._embedded?.["wp:featuredmedia"]?.[0]?.source_url || null,
+    }))
   }
 
   async getEspacesDeTravail() {

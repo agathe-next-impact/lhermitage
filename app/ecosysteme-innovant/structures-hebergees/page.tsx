@@ -3,18 +3,6 @@ import { PageHeader } from "@/components/page-header"
 import { wpApi } from "@/lib/wordpress/api"
 import { stripHtml } from "@/lib/utils"
 import { StructuresGrid } from "@/components/structures-grid"
-import type { Metadata } from "next"
-
-export const revalidate = 3600 // Revalidate every hour
-
-export async function generateMetadata(): Promise<Metadata> {
-  const page = await wpApi.getPageBySlug("structures-hebergees")
-  
-  return {
-    title: page?.title.rendered || "Structures Hébergées",
-    description: page?.acf?.hero?.["sous-titre"] || "Découvrez nos structures hébergées",
-  }
-}
 
 export default async function StructuresPage() {
   const [page, structures] = await Promise.all([wpApi.getPageBySlug("structures-hebergees"), wpApi.getStructures()])
