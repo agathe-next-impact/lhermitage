@@ -1,0 +1,641 @@
+.card-nav-container {
+  width: 100%;
+  position: relative;
+  /* Start with narrower width, expand on hover */
+  max-width: 70%;
+  /* Reduced top margin from 3rem to 1rem to allow video to be visible from top */
+  margin: 1rem auto 0;
+  transition: max-width 0.5s ease, margin-top 0.5s ease;
+}
+
+/* Expand to full width on hover and maintain it */
+.card-nav-container.expanded {
+  max-width: 95%;
+}
+
+/* Add scroll state styling - reduce margin and expand width */
+.card-nav-container.scrolled {
+  /* Reduced scrolled margin from 1rem to 0.5rem */
+  margin-top: 0.5rem;
+  max-width: 95%;
+}
+
+/* When scrolled, always maintain expanded width even without hover */
+.card-nav-container.scrolled.expanded {
+  max-width: 95%;
+}
+
+.card-nav {
+  position: relative;
+  width: 100%;
+  height: 60px;
+  /* Apply rounded-full (pill shape) when closed, normal rounding when open */
+  border-radius: 9999px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  /* Reduced transparency from 0.7 to 0.9 for less transparency */
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: border-radius 0.4s ease, background 0.4s ease, backdrop-filter 0.4s ease, border 0.4s ease;
+}
+
+/* Remove glass effect and change border-radius when menu is open */
+.card-nav.open {
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 1) !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: none;
+}
+
+.card-nav-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  padding: 0 1rem;
+  position: relative;
+  z-index: 10;
+}
+
+.hamburger-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.hamburger-menu:hover {
+  opacity: 0.7;
+}
+
+.hamburger-line {
+  width: 24px;
+  height: 3px; /* Increased thickness from 2px to 3px */
+  background-color: #e75754; /* Applied coral color instead of currentColor */
+  transition: all 0.3s ease;
+  border-radius: 2px;
+}
+
+.hamburger-menu.open .hamburger-line:first-child {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger-menu.open .hamburger-line:last-child {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* Removed .warno-container styles as the white logo is being removed */
+
+/* Added centered logo styling */
+.center-logo-container {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+}
+
+.center-logo {
+  height: 45px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* Added card-nav-center-logo styles for clickable center logo */
+.card-nav-center-logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  transition: opacity 0.3s ease;
+  z-index: 5;
+}
+
+.card-nav-center-logo:hover {
+  opacity: 0.8;
+}
+
+.center-logo-image {
+  height: auto;
+  width: auto;
+  max-height: 40px;
+}
+
+.card-nav-cta-button {
+  padding: 0.5rem 1rem;
+  /* Changed border-radius from 0.5rem to 9999px for fully rounded pill shape */
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.card-nav-cta-button:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.card-nav-content {
+  display: grid;
+  /* Changed from 4 columns to 3 columns for bento layout */
+  grid-template-columns: repeat(3, 1fr);
+  /* Reduced gap from 1rem to 0.75rem to minimize empty spaces */
+  gap: 0.75rem;
+  padding: 0 1rem 1rem;
+  visibility: hidden;
+  pointer-events: none;
+  position: relative;
+  /* Added z-index to ensure megamenu stays above timeline */
+  z-index: 50;
+  /* Changed to auto for content-based height */
+  grid-auto-rows: auto;
+  grid-auto-flow: dense;
+  /* Remove max-height and overflow on desktop for proper height calculation */
+  max-height: none;
+  overflow-y: visible;
+  /* Hide scrollbar while keeping scroll functionality */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.card-nav-content::-webkit-scrollbar {
+  display: none;
+}
+
+.card-nav.open .card-nav-content {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Add styles for collapsible card header */
+.nav-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.2s ease;
+}
+
+.nav-card-header:hover {
+  opacity: 0.8;
+}
+
+/* Add chevron icon styles */
+.nav-card-chevron {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+  display: none; /* Hidden by default on desktop */
+}
+
+.nav-card-chevron.expanded {
+  transform: rotate(180deg);
+}
+
+/* Adjust collapsed card styles */
+.nav-card.collapsed .nav-card-links {
+  display: none;
+}
+
+.nav-card.collapsed {
+  min-height: auto;
+}
+
+.nav-card {
+  border-radius: 0.625rem;
+  /* Reduced padding from 1.5rem to 1.25rem to minimize internal empty space */
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  /* Added transition for smooth layout changes */
+  transition: all 0.3s ease;
+  /* Added relative positioning and z-index for proper stacking */
+  position: relative;
+  z-index: 1;
+}
+
+/* Removed fixed nth-child sizing to allow dynamic sizing based on content */
+/* Added dynamic card sizing based on number of children */
+
+/* Removed all multi-column spanning - all cards now occupy single column */
+/* Cards with 5+ children - single column, content height */
+.nav-card.has-many-children {
+  grid-column: span 1;
+}
+
+/* Cards with 3-4 children - single column, content height */
+.nav-card.has-medium-children {
+  grid-column: span 1;
+}
+
+/* Cards with 1-2 children - single column, content height */
+.nav-card.has-few-children {
+  grid-column: span 1;
+}
+
+/* Cards with no children - single column, content height */
+.nav-card.has-no-children {
+  grid-column: span 1;
+  /* Removed min-height to allow content-based sizing */
+  padding: 0.75rem 1rem;
+}
+
+/* Adjust label size for compact cards */
+.nav-card.has-no-children .nav-card-label {
+  font-size: 0.95rem;
+  margin-bottom: 0;
+}
+
+.nav-card.full-width {
+  grid-column: 1 / -1;
+}
+
+/* Updated full-width card to span all columns dynamically */
+.nav-card.full-width .nav-card-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.nav-card-label {
+  font-size: 1.25rem;
+  font-weight: 700;
+  /* Reduced margin-bottom from 0.5rem to 0.25rem to minimize empty space */
+  margin-bottom: 0.25rem;
+}
+
+.nav-card-links {
+  display: flex;
+  flex-direction: column;
+  /* Reduced gap from 0.75rem to 0.5rem to minimize empty space between links */
+  gap: 0.5rem;
+}
+
+.nav-card-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s ease;
+  padding: 0.25rem 0;
+}
+
+.nav-card-link:hover {
+  opacity: 0.8;
+  transform: translateX(4px);
+}
+
+.nav-card-link-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* Removed fixed positioning for specific cards to allow natural flow */
+/* Removed: .nav-card:nth-child(4), .nav-card:nth-child(5) rules */
+
+/* Changed image card from 2 columns to 1 column to match other cards */
+.nav-card.image-card {
+  position: relative;
+  min-height: 200px;
+  padding: 1.5rem;
+  overflow: hidden;
+  /* Changed from span 2 to span 1 to match other cards */
+  grid-column: span 1;
+  /* Added background color instead of image */
+  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+}
+
+/* Removed image container styles as background image is removed */
+.nav-card-image-container {
+  display: none;
+}
+
+.nav-card-image {
+  display: none;
+}
+
+/* Updated content styles for no background image layout */
+.nav-card-image-content-no-bg {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.nav-card-image-content-no-bg .nav-card-label {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #000;
+}
+
+.nav-card-image-content {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 1.5rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.3) 50%, transparent 100%);
+}
+
+.nav-card-image-content .nav-card-label {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Updated to support multiple CTAs displayed horizontally */
+.nav-card-image-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.nav-card-image-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  /* Changed to white background with black text and fully rounded pill shape */
+  color: #000;
+  padding: 0.5rem 1rem;
+  background-color: rgba(255, 255, 255, 1);
+  backdrop-filter: blur(8px);
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+  width: fit-content;
+}
+
+.nav-card-image-cta:hover {
+  background-color: rgba(255, 255, 255, 0.9);
+  transform: translateY(-2px);
+}
+
+/* Added specific colors for each CTA button */
+.nav-card-image-cta.cta-primary {
+  background-color: #e75754;
+  color: #fff;
+}
+
+.nav-card-image-cta.cta-primary:hover {
+  background-color: #d14643;
+}
+
+.nav-card-image-cta.cta-secondary {
+  background-color: #4a5568;
+  color: #fff;
+}
+
+.nav-card-image-cta.cta-secondary:hover {
+  background-color: #2d3748;
+}
+
+/* Updated megamenu logo to be partially visible and positioned to the right */
+.megamenu-logo {
+  position: absolute;
+  /* Changed bottom to top positioning to anchor from top */
+  top: 50%;
+  transform: translateY(-50%);
+  right: -80px;
+  left: auto;
+  z-index: 5;
+  /* Removed opacity to make white logo fully visible */
+  opacity: 1;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.megamenu-logo:hover {
+  opacity: 1;
+}
+
+.megamenu-logo-image {
+  width: auto;
+  height: auto;
+  /* Reduced max-width from 300px to 150px (half size) */
+  max-width: 150px;
+  object-fit: contain;
+}
+
+/* Added 3 coral logos with different sizes and positions behind cards */
+.megamenu-logo-coral {
+  position: absolute;
+  z-index: 1; /* Behind cards (cards are z-index 2+) */
+  opacity: 1;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.megamenu-logo-coral-image {
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Repositioned coral logos to appear partially behind cards */
+/* First coral logo - top left, partially hidden behind left edge */
+.megamenu-logo-coral-1 {
+  top: 15%;
+  left: -50px; /* More negative to hide more of the logo */
+}
+
+.megamenu-logo-coral-1 .megamenu-logo-coral-image {
+  max-width: 100px;
+}
+
+/* Second coral logo - middle right, partially hidden behind right edge */
+.megamenu-logo-coral-2 {
+  top: 45%;
+  right: -30px; /* Negative to hide part behind right edge */
+  transform: translateY(-50%);
+}
+
+.megamenu-logo-coral-2 .megamenu-logo-coral-image {
+  max-width: 80px;
+}
+
+/* Third coral logo - bottom center, partially hidden behind bottom cards */
+.megamenu-logo-coral-3 {
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.megamenu-logo-coral-3 .megamenu-logo-coral-image {
+  max-width: 90px;
+}
+
+@media (max-width: 768px) {
+  /* Update mobile container to use full width */
+  .card-nav-container {
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .card-nav-container.expanded,
+  .card-nav-container.scrolled {
+    max-width: 100%;
+  }
+
+  /* Update mobile nav to use full width with minimal border radius */
+  .card-nav {
+    border-radius: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-nav.open {
+    border-radius: 0;
+  }
+
+  .card-nav-content {
+    grid-template-columns: 1fr;
+    padding: 0 1rem 6rem;
+    grid-auto-rows: auto;
+    max-height: calc(100vh - 60px);
+    overflow-y: auto;
+    gap: 0.5rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .card-nav-content::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-card {
+    padding: 1rem;
+  }
+
+  /* Show chevron icon on mobile */
+  .nav-card-chevron {
+    display: block;
+  }
+
+  /* Adjust collapsed card padding on mobile */
+  .nav-card.collapsed {
+    padding: 0.75rem 1rem;
+  }
+
+  .nav-card.full-width .nav-card-links {
+    grid-template-columns: 1fr;
+  }
+
+  /* Reset all dynamic sizing on mobile */
+  .nav-card.has-many-children,
+  .nav-card.has-medium-children,
+  .nav-card.has-few-children,
+  .nav-card.has-no-children {
+    grid-column: span 1;
+    grid-row: span 1;
+    min-height: auto;
+  }
+
+  .nav-card.has-no-children .nav-card-label {
+    font-size: 1.25rem;
+  }
+
+  .nav-card:nth-child(4),
+  .nav-card:nth-child(5) {
+    grid-column: span 1;
+  }
+
+  .nav-card.image-card {
+    min-height: 180px;
+    grid-column: span 1; /* Reset on mobile */
+  }
+
+  /* Stack CTAs vertically on mobile */
+  .nav-card-image-ctas {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .nav-card-image-cta {
+    width: auto;
+  }
+
+  .warno {
+    height: 32px;
+  }
+
+  /* Added responsive sizing for center logo */
+  .center-logo {
+    height: 36px;
+  }
+
+  /* Added responsive sizing for center logo image */
+  .center-logo-image {
+    max-height: 32px;
+  }
+
+  /* Adjust logo size and position on mobile for partial visibility */
+  /* Hide white arc logo on mobile */
+  .megamenu-logo {
+    /* Changed bottom to top positioning on mobile */
+    top: 50%;
+    transform: translateY(-50%);
+    right: -60px;
+    display: none;
+  }
+
+  .megamenu-logo-image {
+    /* Reduced max-width from 200px to 100px (half size) on mobile */
+    max-width: 100px;
+  }
+
+  /* Adjust coral logos for mobile */
+  .megamenu-logo-coral-1 {
+    top: 10%;
+    left: -40px;
+  }
+
+  .megamenu-logo-coral-1 .megamenu-logo-coral-image {
+    max-width: 80px;
+  }
+
+  .megamenu-logo-coral-2 {
+    top: 40%;
+    right: -20px;
+  }
+
+  .megamenu-logo-coral-2 .megamenu-logo-coral-image {
+    max-width: 60px;
+  }
+
+  /* Third coral logo - bottom center, partially hidden behind bottom cards */
+  .megamenu-logo-coral-3 {
+    bottom: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .megamenu-logo-coral-3 .megamenu-logo-coral-image {
+    max-width: 70px;
+  }
+}

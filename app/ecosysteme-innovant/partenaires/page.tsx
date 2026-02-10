@@ -1,5 +1,6 @@
-import { PageHeader } from "@/components/page-header"
+import { PageHeader } from "@/components/layout/page-header"
 import { wpApi } from "@/lib/wordpress/api"
+import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 import { PartenairesClient } from "@/components/partenaires-client"
 
 export default async function PartenairesPage() {
@@ -24,7 +25,7 @@ export default async function PartenairesPage() {
       <div className="py-12">
         {page?.content.rendered && (
           <div className="container mx-auto px-4 mb-12">
-            <div className="prose prose-stone max-w-none" dangerouslySetInnerHTML={{ __html: page.content.rendered }} />
+            <div className="prose prose-stone max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }} />
           </div>
         )}
 

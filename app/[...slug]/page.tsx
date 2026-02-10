@@ -1,14 +1,19 @@
 import { notFound } from "next/navigation"
+import dynamic from "next/dynamic"
 import type { Metadata } from "next"
-import { wpApi } from "@/lib/wordpress/api"
-import { PageHeader } from "@/components/page-header"
-import { ActivitesFilter } from "@/components/activites-filter"
-import { HistoireTimeline } from "@/components/histoire-timeline"
-import { TeamMasonry } from "@/components/team-masonry"
-import { DevenirSocietairePage } from "@/components/devenir-societaire-page"
+import { wpApi, getPageByPath } from "@/lib/wordpress/api"
+import { PageHeader } from "@/components/layout/page-header"
 import type { HistoireACF } from "@/lib/wordpress/types"
+import { REVALIDATION } from "@/lib/constants"
+import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 
-export const revalidate = 3600 // Revalidate every hour
+// Code-split: ces composants lourds ne sont chargés que pour leur page spécifique
+const ActivitesFilter = dynamic(() => import("@/components/activites-filter").then((m) => m.ActivitesFilter))
+const HistoireTimeline = dynamic(() => import("@/components/histoire-timeline").then((m) => m.HistoireTimeline))
+const TeamMasonry = dynamic(() => import("@/components/team-masonry").then((m) => m.TeamMasonry))
+const DevenirSocietairePage = dynamic(() => import("@/components/features/devenir-societaire/devenir-societaire-page").then((m) => m.DevenirSocietairePage))
+
+export const revalidate = REVALIDATION.listing
 
 interface PageProps {
   params: Promise<{ slug: string[] }>
@@ -20,7 +25,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const fullPath = slug.join("/")
   
   try {
-    const page = await wpApi.getPageByPath(fullPath)
+    const page = await getPageByPath(fullPath)
     
     if (!page) {
       return {
@@ -90,7 +95,7 @@ export async function generateStaticParams() {
       }
     })
   } catch (error) {
-    console.error("[v0] Error in generateStaticParams:", error)
+    console.error("Error in generateStaticParams:", error)
     return []
   }
 }
@@ -111,7 +116,7 @@ export default async function CatchAllPage({ params }: PageProps) {
 
   try {
     const [fetchedPage, fetchedActivites, fetchedTeamMembers] = await Promise.all([
-      wpApi.getPageByPath(fullPath),
+      getPageByPath(fullPath),
       isActivitesPage ? wpApi.getActivites() : Promise.resolve([]),
       isEquipePage ? wpApi.getTeamMembers() : Promise.resolve([]),
     ])
@@ -142,7 +147,7 @@ export default async function CatchAllPage({ params }: PageProps) {
           {page.content.rendered && (
             <div
               className="prose prose-stone max-w-none mb-12"
-              dangerouslySetInnerHTML={{ __html: page.content.rendered }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }}
             />
           )}
           <TeamMasonry members={teamMembers} />
@@ -154,7 +159,7 @@ export default async function CatchAllPage({ params }: PageProps) {
           {page.content.rendered && (
             <div
               className="prose prose-stone max-w-none mb-12"
-              dangerouslySetInnerHTML={{ __html: page.content.rendered }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }}
             />
           )}
 

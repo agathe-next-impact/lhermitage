@@ -1,7 +1,8 @@
 import { Calendar, Clock, MapPin } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { PageHeader } from "@/components/page-header"
+import { PageHeader } from "@/components/layout/page-header"
 import { wpApi } from "@/lib/wordpress/api"
+import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 
 export default async function EvenementsPage() {
   const [page, evenements] = await Promise.all([wpApi.getPageBySlug("evenements"), wpApi.getEvenements()])
@@ -18,7 +19,7 @@ export default async function EvenementsPage() {
         {page?.content.rendered && (
           <div
             className="prose prose-stone mb-12 max-w-none"
-            dangerouslySetInnerHTML={{ __html: page.content.rendered }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }}
           />
         )}
 
@@ -58,7 +59,7 @@ export default async function EvenementsPage() {
                 <CardContent>
                   <div
                     className="prose prose-stone max-w-none"
-                    dangerouslySetInnerHTML={{ __html: evenement.acf.descriptif }}
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(evenement.acf.descriptif) }}
                   />
                 </CardContent>
               )}

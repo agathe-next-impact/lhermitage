@@ -60,6 +60,36 @@ export interface PageACF {
     "sous-titre"?: string
     image?: WPImage
   }
+  timeline?: Array<{
+    titre?: string
+    annee?: string
+    descriptif?: string
+    image?: WPImage
+  }>
+  // Devenir sociétaire page fields
+  chapeau?: string
+  bandeau?: {
+    titre?: string
+    cta?: { url: string; title?: string; target?: string }
+    galerie?: { images: Array<{ ID: number; url: string; alt: string }> }
+  }
+  pourquoi_rejoindre?: {
+    titre?: string
+    raisons?: Array<{ raison: string }>
+  }
+  ce_quest_devenir_societaire?: {
+    titre?: string
+    motivation_1?: string
+    motivation_2?: string
+    motivation_3?: string
+    motivation_4?: string
+  }
+  "quest-ce_que_la_scic"?: {
+    titre?: string
+    caracteristiques_de_la_scic?: Array<{ caracteristique: { titre?: string; descriptif?: string } }>
+  }
+  informations_societariat?: Array<{ titre?: string; descriptif?: string }>
+  [key: string]: any
 }
 
 export interface ActiviteACF {

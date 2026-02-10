@@ -3,6 +3,8 @@
  * Converts full WordPress URLs to relative paths for the Next.js frontend
  */
 
+import { sanitizeUrl } from "./sanitize"
+
 const WP_API_URL = process.env.NEXT_PUBLIC_WP_API_URL || "https://wp-asso.com/wp-json/wp/v2"
 
 // Extract the WordPress base URL from the API URL
@@ -24,10 +26,10 @@ export function transformWordPressUrl(url: string): string {
     return url
   }
 
-  // If it's an external URL (not from WordPress), return as is
+  // If it's an external URL (not from WordPress), sanitize protocol and return
   const wpBaseUrl = getWordPressBaseUrl()
   if (!url.startsWith(wpBaseUrl)) {
-    return url
+    return sanitizeUrl(url)
   }
 
   // Remove the WordPress base URL to get the path

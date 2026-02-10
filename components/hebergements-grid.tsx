@@ -8,20 +8,12 @@ import Image from "next/image"
 import Link from "next/link"
 import type { WPPost, HebergementACF } from "@/lib/wordpress/types"
 import { getCategoryColor } from "@/lib/wordpress/category-colors"
+import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 
 import "@/components/ui/MagicBento.css"
 
 interface HebergementsGridProps {
   hebergements: WPPost<HebergementACF>[]
-}
-
-const GlobalSpotlight: React.FC<{
-  gridRef: React.RefObject<HTMLDivElement | null>
-  spotlightRadius?: number
-  glowColor?: string
-}> = ({ gridRef, spotlightRadius = 300, glowColor = "229, 87, 84" }) => {
-  const spotlightRef = useRef<HTMLDivElement | null>(null)
-  return null
 }
 
 export function HebergementsGrid({ hebergements }: HebergementsGridProps) {
@@ -60,8 +52,6 @@ export function HebergementsGrid({ hebergements }: HebergementsGridProps) {
 
   return (
     <>
-      <GlobalSpotlight gridRef={gridRef} spotlightRadius={300} glowColor="229, 87, 84" />
-
       <div
         ref={gridRef}
         className="card-grid bento-section grid grid-cols-1 md:grid-cols-6 auto-rows-[400px] md:auto-rows-[280px] md:grid-flow-dense gap-6"
@@ -124,7 +114,7 @@ export function HebergementsGrid({ hebergements }: HebergementsGridProps) {
                   {hebergement.acf?.descriptif && (
                     <div
                       className="prose prose-sm line-clamp-6 text-gray-700 mb-4"
-                      dangerouslySetInnerHTML={{ __html: hebergement.acf.descriptif }}
+                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(hebergement.acf.descriptif) }}
                     />
                   )}
 

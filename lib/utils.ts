@@ -8,3 +8,12 @@ export function cn(...inputs: ClassValue[]) {
 export function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, "").trim()
 }
+
+export function truncateText(html: string, maxLength: number): string {
+  const text = html
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+  if (text.length <= maxLength) return text
+  return text.substring(0, maxLength).trim() + "..."
+}

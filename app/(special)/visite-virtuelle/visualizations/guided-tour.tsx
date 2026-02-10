@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { ExternalLink, Camera } from "lucide-react"
 import Image from "next/image"
+import { sanitizeUrl } from "@/lib/wordpress/sanitize"
 
 interface MapPinPointData {
   id: number
@@ -64,7 +65,7 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
     zoom: 19,
     image: point.mapPinPoint?.images?.[0]?.url,
     link: `/${point.type}/${point.slug}`,
-    externalLink: typeof point.mapPinPoint?.lien === "string" ? point.mapPinPoint?.lien : point.mapPinPoint?.lien?.url,
+    externalLink: sanitizeUrl(typeof point.mapPinPoint?.lien === "string" ? point.mapPinPoint?.lien : point.mapPinPoint?.lien?.url || ""),
     type: point.type,
     slug: point.slug,
     pointId: point.id,
@@ -75,13 +76,12 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
+      if (!event.data || typeof event.data !== "object") return
       if (event.data.type === "ready") {
-        console.warn("[v0] Satellite map ready")
         setMapReady(true)
       }
       if (event.data.type === "markerClick") {
         const stopIndex = event.data.stopIndex
-        console.warn("[v0] Marker clicked, changing to stop index:", stopIndex)
         handleStopClick(stopIndex)
       }
     }
@@ -93,11 +93,9 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
 
   const handleIframeLoad = () => {
     if (initSentRef.current) {
-      console.warn("[v0] Init message already sent, skipping")
       return
     }
 
-    console.warn("[v0] Iframe loaded, sending init message")
     if (iframeRef.current?.contentWindow) {
       iframeRef.current.contentWindow.postMessage(
         {
@@ -118,7 +116,6 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
   useEffect(() => {
     if (mapReady && iframeRef.current?.contentWindow) {
       const stop = tourStops[currentStop]
-      console.warn("[v0] Flying to stop:", stop.name)
       iframeRef.current.contentWindow.postMessage(
         {
           type: "flyTo",

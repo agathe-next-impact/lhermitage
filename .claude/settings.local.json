@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc:*)",
+      "Bash(git mv:*)",
+      "Bash(git add:*)",
+      "Bash(npx next build:*)",
+      "Bash(find:*)",
+      "Bash(wc:*)",
+      "Bash(xargs:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Read(//c/dev/lhermitage/**)",
+      "Bash(sort:*)",
+      "Bash(dir:*)",
+      "Bash(npm audit:*)",
+      "Bash(git -C /c/dev/lhermitage log --oneline --all)",
+      "Bash(git -C /c/dev/lhermitage log --all --full-history -S \".env.local\" -- .env.local)",
+      "WebFetch(domain:wp-asso.com)",
+      "Bash(curl:*)",
+      "Bash(python -m json.tool:*)",
+      "Bash(findstr:*)",
+      "Bash(python:*)",
+      "Bash(node -e:*)",
+      "Bash(node:*)",
+      "Bash(del:*)",
+      "Bash(npx ts-node:*)",
+      "Bash(npx next dev:*)",
+      "Bash(netstat:*)"
+    ]
+  }
+}

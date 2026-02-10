@@ -162,9 +162,13 @@
       if (isInitializing || initializationComplete) {
         return;
       }
-      
+
+      if (typeof L === 'undefined') {
+        return;
+      }
+
       isInitializing = true;
-      
+
       if (map) {
         map.remove();
       }
@@ -337,18 +341,24 @@
       }
     }
 
+    function waitForLeafletThenInit(lat, lng, zoom, retries) {
+      if (typeof L !== 'undefined') {
+        initMap(lat, lng, zoom);
+      } else if (retries > 0) {
+        setTimeout(function() { waitForLeafletThenInit(lat, lng, zoom, retries - 1); }, 100);
+      }
+    }
+
     window.addEventListener('message', function(event) {
-      const { type, data } = event.data;
+      if (!event.data || typeof event.data !== 'object') return;
+      var type = event.data.type;
+      var data = event.data.data;
 
       switch(type) {
         case 'init':
           if (!initializationComplete) {
-            stopsData = data.stops || [];
-            if (typeof L === 'undefined') {
-              setTimeout(() => initMap(data.latitude, data.longitude, data.zoom || 15), 100);
-            } else {
-              initMap(data.latitude, data.longitude, data.zoom || 15);
-            }
+            stopsData = (data && data.stops) || [];
+            waitForLeafletThenInit(data.latitude, data.longitude, data.zoom || 15, 50);
           }
           break;
 

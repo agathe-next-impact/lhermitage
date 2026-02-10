@@ -5,7 +5,7 @@ export async function GET() {
   const mapboxToken = process.env.MAPBOX_TOKEN
 
   if (!mapboxToken) {
-    return NextResponse.json({ error: "Mapbox token not configured" }, { status: 500 })
+    return NextResponse.json({ error: "Map configuration unavailable" }, { status: 503 })
   }
 
   const satelliteStyle = {
@@ -60,9 +60,12 @@ export async function GET() {
     ],
   }
 
-  return NextResponse.json({
-    mapboxToken,
+  // Note: le token est intégré dans les URLs de tuiles (nécessaire pour Mapbox).
+  // On ne le renvoie PAS séparément pour limiter l'exposition.
+  const response = NextResponse.json({
     satelliteStyle,
     terrainStyle,
   })
+  response.headers.set("Cache-Control", "public, max-age=3600, s-maxage=3600")
+  return response
 }

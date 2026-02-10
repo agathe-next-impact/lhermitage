@@ -1,10 +1,12 @@
+import { BRAND_COLORS } from "@/lib/theme/colors"
+
 export const CATEGORY_COLORS: Record<string, string> = {
-  "atelier-de-facilitation": "#C14C66", // Rose
-  "zero-dechets": "#78AD7D", // Vert
-  "prendre-lair": "#56939F", // Teal
-  "festivite": "#DC6F45", // Orange
-  "decouverte-du-site": "#2A4A51", // Bleu foncé
-  default: "#E75754", // Corail (couleur par défaut)
+  "atelier-de-facilitation": BRAND_COLORS.rose,
+  "zero-dechets": BRAND_COLORS.green,
+  "prendre-lair": BRAND_COLORS.teal,
+  "festivite": BRAND_COLORS.orange,
+  "decouverte-du-site": BRAND_COLORS.darkBlue,
+  default: BRAND_COLORS.coral,
 }
 
 export function getCategoryColor(categorySlug?: string): string {

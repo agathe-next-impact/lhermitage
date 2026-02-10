@@ -1,8 +1,9 @@
 import { wpApi } from "@/lib/wordpress/api"
-import { PageHeader } from "@/components/page-header"
+import { PageHeader } from "@/components/layout/page-header"
 import { GuidedTourClient } from "./guided-tour-client"
+import { REVALIDATION } from "@/lib/constants"
 
-export const revalidate = 3600 // Revalidate every hour
+export const revalidate = REVALIDATION.listing
 
 export default async function VisiteVirtuellePage() {
   let mapPinPoints = []

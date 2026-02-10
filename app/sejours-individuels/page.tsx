@@ -1,11 +1,13 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { PageHeader } from "@/components/page-header"
+import { PageHeader } from "@/components/layout/page-header"
 import { wpApi } from "@/lib/wordpress/api"
 import Link from "next/link"
 import { stripHtml } from "@/lib/utils"
+import { REVALIDATION } from "@/lib/constants"
+import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 
-export const revalidate = 3600 // Revalidate every hour
+export const revalidate = REVALIDATION.listing
 
 export default async function SejoursIndividuelsPage() {
   const [page, hebergements] = await Promise.all([wpApi.getPageBySlug("sejours-individuels"), wpApi.getHebergements()])
@@ -22,7 +24,7 @@ export default async function SejoursIndividuelsPage() {
         {page?.content.rendered && (
           <div
             className="prose prose-stone mb-12 max-w-none"
-            dangerouslySetInnerHTML={{ __html: page.content.rendered }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }}
           />
         )}
 

@@ -1,20 +1,17 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import Image from "next/image"
 import type { WPPost, TeamMemberACF } from "@/lib/wordpress/types"
 import { motion } from "framer-motion"
+import { useIsMounted } from "@/hooks/use-is-mounted"
+import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 
 interface TeamMasonryProps {
   members: WPPost<TeamMemberACF>[]
 }
 
 export function TeamMasonry({ members }: TeamMasonryProps) {
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const mounted = useIsMounted()
 
   if (!mounted || members.length === 0) {
     return (
@@ -103,7 +100,7 @@ export function TeamMasonry({ members }: TeamMasonryProps) {
                     {description ? (
                       <div
                         className="text-sm md:text-base leading-relaxed prose prose-sm max-w-none text-foreground"
-                        dangerouslySetInnerHTML={{ __html: description }}
+                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(description) }}
                       />
                     ) : (
                       <p className="text-muted-foreground">Aucune description disponible</p>

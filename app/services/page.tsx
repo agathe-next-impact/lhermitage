@@ -1,5 +1,6 @@
-import { PageHeader } from "@/components/page-header"
+import { PageHeader } from "@/components/layout/page-header"
 import { wpApi } from "@/lib/wordpress/api"
+import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 
 export default async function ServicesPage() {
   const page = await wpApi.getPageBySlug("services")
@@ -14,7 +15,7 @@ export default async function ServicesPage() {
 
       <div className="container mx-auto px-4 py-12">
         {page?.content.rendered && (
-          <div className="prose prose-stone max-w-none" dangerouslySetInnerHTML={{ __html: page.content.rendered }} />
+          <div className="prose prose-stone max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }} />
         )}
       </div>
     </div>

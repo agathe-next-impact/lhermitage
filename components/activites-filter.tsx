@@ -1,12 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import Link from "next/link"
 import type { WPPost, ActiviteACF } from "@/lib/wordpress/types"
 import { getCategoryColor } from "@/lib/wordpress/category-colors"
+import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 
 interface ActivitesFilterProps {
   activites: WPPost<ActiviteACF>[]
@@ -15,40 +16,39 @@ interface ActivitesFilterProps {
 export function ActivitesFilter({ activites }: ActivitesFilterProps) {
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
 
-  // Extract and organize categories
-  const activitesByCategory = new Map<number, { name: string; slug: string; activites: WPPost<ActiviteACF>[] }>()
+  // Extract and organize categories (memoized — only recomputes when activites prop changes)
+  const sortedCategories = useMemo(() => {
+    const byCategory = new Map<number, { name: string; slug: string; activites: WPPost<ActiviteACF>[] }>()
 
-  activites.forEach((activite) => {
-    const categories = activite._embedded?.["wp:term"]?.[0] || []
+    activites.forEach((activite) => {
+      const categories = activite._embedded?.["wp:term"]?.[0] || []
 
-    if (categories.length > 0) {
-      const category = categories[0]
-      const categoryId = category.id
-      const categoryName = category.name
-      const categorySlug = category.slug
+      if (categories.length > 0) {
+        const category = categories[0]
+        const categoryId = category.id
 
-      if (!activitesByCategory.has(categoryId)) {
-        activitesByCategory.set(categoryId, { name: categoryName, slug: categorySlug, activites: [] })
+        if (!byCategory.has(categoryId)) {
+          byCategory.set(categoryId, { name: category.name, slug: category.slug, activites: [] })
+        }
+        byCategory.get(categoryId)!.activites.push(activite)
+      } else {
+        if (!byCategory.has(0)) {
+          byCategory.set(0, { name: "Toutes nos activités", slug: "default", activites: [] })
+        }
+        byCategory.get(0)!.activites.push(activite)
       }
-      activitesByCategory.get(categoryId)!.activites.push(activite)
-    } else {
-      const defaultCategoryId = 0
-      const defaultCategoryName = "Toutes nos activités"
-      const defaultCategorySlug = "default"
-      if (!activitesByCategory.has(defaultCategoryId)) {
-        activitesByCategory.set(defaultCategoryId, { name: defaultCategoryName, slug: defaultCategorySlug, activites: [] })
-      }
-      activitesByCategory.get(defaultCategoryId)!.activites.push(activite)
-    }
-  })
+    })
 
-  const sortedCategories = Array.from(activitesByCategory.entries()).sort((a, b) => a[0] - b[0])
+    return Array.from(byCategory.entries()).sort((a, b) => a[0] - b[0])
+  }, [activites])
 
-  // Filter activities based on selected category
-  const filteredCategories =
-    selectedCategory === null
-      ? sortedCategories
-      : sortedCategories.filter(([categoryId]) => categoryId === selectedCategory)
+  const filteredCategories = useMemo(
+    () =>
+      selectedCategory === null
+        ? sortedCategories
+        : sortedCategories.filter(([categoryId]) => categoryId === selectedCategory),
+    [sortedCategories, selectedCategory],
+  )
 
   return (
     <div className="space-y-8">
@@ -125,7 +125,7 @@ export function ActivitesFilter({ activites }: ActivitesFilterProps) {
                         {activite.acf?.descriptif && (
                           <div
                             className="prose prose-sm line-clamp-6 text-gray-700 mb-4"
-                            dangerouslySetInnerHTML={{ __html: activite.acf.descriptif }}
+                            dangerouslySetInnerHTML={{ __html: sanitizeHtml(activite.acf.descriptif) }}
                           />
                         )}
                         

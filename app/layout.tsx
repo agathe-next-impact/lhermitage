@@ -3,7 +3,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Open_Sans, Inter } from 'next/font/google'
 import "./globals.css"
-import { SiteHeader } from "@/components/site-header"
+import { SiteHeader } from "@/components/layout/site-header"
 import { Providers } from "@/components/providers"
 
 const openSans = Open_Sans({
@@ -20,9 +20,17 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "Tiers-Lieu Rural - Séjours et Hébergements",
-  description: "Découvrez notre lieu unique et nos séjours personnalisés en milieu rural",
-    generator: 'v0.app'
+  title: {
+    default: "L'Hermitage - Tiers-Lieu Rural",
+    template: "%s | L'Hermitage",
+  },
+  description: "L'Hermitage, tiers-lieu rural dédié aux séjours collectifs, hébergements et activités en pleine nature.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://lhermitage.fr"),
+  openGraph: {
+    type: "website",
+    locale: "fr_FR",
+    siteName: "L'Hermitage",
+  },
 }
 
 export default async function RootLayout({
@@ -32,6 +40,10 @@ export default async function RootLayout({
 }) {
   return (
     <html lang="fr" className={`${openSans.variable} ${inter.variable}`}>
+      <head>
+        <link rel="preconnect" href="https://wp-asso.com" />
+        <link rel="dns-prefetch" href="https://wp-asso.com" />
+      </head>
       <body className="min-h-screen bg-background font-sans antialiased">
         <Providers>
           <SiteHeader />

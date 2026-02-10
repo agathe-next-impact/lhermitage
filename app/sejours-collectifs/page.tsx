@@ -1,8 +1,10 @@
-import { PageHeader } from "@/components/page-header"
+import { PageHeader } from "@/components/layout/page-header"
 import { wpApi } from "@/lib/wordpress/api"
 import { getColorForPath } from "@/lib/page-colors"
+import { REVALIDATION } from "@/lib/constants"
+import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 
-export const revalidate = 3600 // Revalidate every hour
+export const revalidate = REVALIDATION.listing
 
 export default async function SejoursCollectifsPage() {
   const page = await wpApi.getPageBySlug("sejours-collectifs")
@@ -20,7 +22,7 @@ export default async function SejoursCollectifsPage() {
         {page?.content.rendered && (
           <div
             className="prose prose-stone mx-auto max-w-3xl"
-            dangerouslySetInnerHTML={{ __html: page.content.rendered }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }}
           />
         )}
       </div>

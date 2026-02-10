@@ -1,8 +1,9 @@
 import { Mail, Phone, MapPin } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { PageHeader } from "@/components/page-header"
+import { PageHeader } from "@/components/layout/page-header"
 import { wpApi } from "@/lib/wordpress/api"
 import { getColorForPath } from "@/lib/page-colors"
+import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 
 export default async function ContactsPage() {
   const page = await wpApi.getPageBySlug("contacts")
@@ -56,7 +57,7 @@ export default async function ContactsPage() {
         </div>
 
         {page?.content.rendered && (
-          <div className="prose prose-stone max-w-none" dangerouslySetInnerHTML={{ __html: page.content.rendered }} />
+          <div className="prose prose-stone max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }} />
         )}
       </div>
     </div>

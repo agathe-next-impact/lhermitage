@@ -4,6 +4,7 @@ import Image from "next/image"
 import { Timeline } from "@/components/ui/timeline"
 import type { HistoireACF } from "@/lib/wordpress/types"
 import { decodeHtmlEntities } from "@/lib/wordpress/decode"
+import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 
 interface HistoireTimelineProps {
   acf: HistoireACF
@@ -47,7 +48,7 @@ export function HistoireTimeline({ acf }: HistoireTimelineProps) {
           {item.descriptif && (
             <div
               className="prose prose-stone max-w-none text-xs text-gray-700 md:text-base [&>p]:mb-2 md:[&>p]:mb-4 [&>ul]:mb-2 md:[&>ul]:mb-4 [&>ol]:mb-2 md:[&>ol]:mb-4"
-              dangerouslySetInnerHTML={{ __html: item.descriptif }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.descriptif) }}
             />
           )}
         </div>

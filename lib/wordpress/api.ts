@@ -1,500 +1,385 @@
-import type { WPPost, WPPage, GlobalOptionsACF, WPMenuItem, WPTerm, TeamMemberACF } from "./types"
-import { decodeObjectEntities } from "./decode"
+import type {
+  WPPost,
+  WPPage,
+  GlobalOptionsACF,
+  WPMenuItem,
+  WPTerm,
+  TeamMemberACF,
+  HebergementACF,
+  SejourACF,
+  ActiviteACF,
+  StructureACF,
+  EvenementACF,
+  PartenaireACF,
+  EspaceDeTravailACF,
+} from "./types"
+import { gqlRequest, gqlRequestList } from "./graphql/client"
+import {
+  transformPage,
+  transformPost,
+  transformHebergementAcf,
+  transformActiviteAcf,
+  transformStructureAcf,
+  transformEvenementAcf,
+  transformPartenaireAcf,
+  transformTeamMemberAcf,
+  transformEspaceDeTravailAcf,
+  transformSejourAcf,
+  transformMenuItems,
+  transformTerm,
+} from "./graphql/transformers"
+import {
+  GET_PAGE_BY_SLUG,
+  GET_PAGE_BY_ID,
+  GET_ALL_PAGES,
+} from "./graphql/queries/pages"
+import {
+  GET_HEBERGEMENTS,
+  GET_HEBERGEMENT_BY_SLUG,
+  GET_ACTIVITES,
+  GET_ACTIVITE_BY_SLUG,
+  GET_STRUCTURES,
+  GET_STRUCTURE_BY_SLUG,
+  GET_EVENEMENTS,
+  GET_PARTENAIRES,
+  GET_ESPACES_DE_TRAVAIL,
+  GET_TEAM_MEMBERS,
+} from "./graphql/queries/posts"
+import { GET_SEJOURS, GET_SEJOUR_BY_SLUG } from "./graphql/queries/sejours"
+import { GET_MENU } from "./graphql/queries/menu"
+import { GET_TYPES_DE_PARTENAIRE } from "./graphql/queries/taxonomy"
 import { logger } from "../logger"
 
-const WP_API_URL = process.env.NEXT_PUBLIC_WP_API_URL || "https://wp-asso.com/wp-json/wp/v2"
-
-// Normalize base URL so we always point to /wp-json/wp/v2 even if the env var misses the suffix.
-function normalizeBaseUrl(rawUrl: string): string {
-  const trimmed = rawUrl.replace(/\/+$/, "")
-  if (/\/wp-json\/wp\/v2$/i.test(trimmed)) return trimmed
-  if (/\/wp-json$/i.test(trimmed)) return `${trimmed}/wp/v2`
-  // If only domain is provided, append the full REST path
-  if (!trimmed.includes("/wp-json")) return `${trimmed}/wp-json/wp/v2`
-  return `${trimmed}/wp/v2`
-}
-
 export class WordPressAPI {
-  private baseUrl: string
-  private wpJsonBase: string
+  // --- Pages ---
 
-  constructor(baseUrl: string = WP_API_URL) {
-    const normalized = normalizeBaseUrl(baseUrl)
-    this.baseUrl = normalized
-    this.wpJsonBase = normalized.replace("/wp/v2", "")
-  }
-
-  private async fetch<T>(endpoint: string, params?: Record<string, any>, retries = 2): Promise<T> {
-    const url = new URL(`${this.baseUrl}${endpoint}`)
-
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          url.searchParams.append(key, String(value))
-        }
-      })
-    }
-
-    try {
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 15000) // Increased to 15s
-
-      const response = await fetch(url.toString(), {
-        headers: {
-          Accept: "application/json",
-          "User-Agent": "Next.js WordPress Client",
-        },
-        signal: controller.signal,
-        next: { revalidate: 900 }, // Cache for 15 minutes to refresh frequently
-      })
-
-      clearTimeout(timeoutId)
-
-      if (!response.ok) {
-        const body = await response.text()
-        logger.error(`[v0] WordPress API error - Status: ${response.status}`)
-        logger.error(`[v0] WordPress API error - Body:`, body.substring(0, 500))
-
-        // For 404 errors, return empty array for list endpoints
-        if (response.status === 404) {
-          if (endpoint.includes("?") || !/\/\d+$/.test(endpoint)) {
-            logger.warn(`[v0] Returning empty array for 404 on endpoint: ${endpoint}`)
-            return [] as T
-          }
-        }
-
-        if (response.status >= 500 && retries > 0) {
-          logger.warn(`[v0] Retrying request (${retries} retries left)...`)
-          await new Promise((resolve) => setTimeout(resolve, Math.pow(2, 3 - retries) * 1000))
-          return this.fetch<T>(endpoint, params, retries - 1)
-        }
-
-        if (endpoint.includes("?") || !/\/\d+$/.test(endpoint)) {
-          logger.error(`[v0] Returning empty array due to error on endpoint: ${endpoint}`)
-          return [] as T
-        }
-
-        throw new Error(
-          `WordPress API error (${response.status}): ${response.statusText}. Check server logs for details.`,
-        )
-      }
-
-      const data = await response.json()
-      return decodeObjectEntities(data)
-    } catch (error) {
-      if (error instanceof Error) {
-        if (error.name === "AbortError") {
-          logger.error(`[v0] Request timeout for ${url}`)
-
-          // Retry on timeout
-          if (retries > 0) {
-            logger.warn(`[v0] Retrying after timeout (${retries} retries left)...`)
-            await new Promise((resolve) => setTimeout(resolve, 3000)) // 3s delay between retries
-            return this.fetch<T>(endpoint, params, retries - 1)
-          }
-        } else if (error.message.includes("fetch")) {
-          logger.error(`[v0] Network error fetching ${url}:`, error.message)
-
-          // Retry on network error
-          if (retries > 0) {
-            logger.warn(`[v0] Retrying after network error (${retries} retries left)...`)
-            await new Promise((resolve) => setTimeout(resolve, 3000)) // 3s delay between retries
-            return this.fetch<T>(endpoint, params, retries - 1)
-          }
-        }
-      }
-
-      // For list endpoints, return empty array on error
-      if (endpoint.includes("?") || !/\/\d+$/.test(endpoint)) {
-        logger.error(`[v0] Returning empty array due to error for endpoint: ${endpoint}`)
-        return [] as T
-      }
-
-      throw error
-    }
-  }
-
-  // Pages
-  async getPages(params?: { parent?: number; per_page?: number }): Promise<WPPage[]> {
-    logger.warn("[v0] WordPress API - getPages() called with params:", params)
-
-    const perPage = 100 // WordPress maximum
-    let allPages: WPPage[] = []
-    let page = 1
+  async getPages(): Promise<WPPage[]> {
+    const allPages: WPPage[] = []
     let hasMore = true
+    let after: string | null = null
 
     while (hasMore) {
-      const pages = await this.fetch<WPPage[]>("/pages", {
-        _embed: true,
-        acf_format: "standard",
-        per_page: perPage,
-        page: page,
-        orderby: "menu_order",
-        order: "asc",
-        ...params,
-      })
-
-      if (pages.length === 0) {
-        hasMore = false
-      } else {
-        allPages = [...allPages, ...pages]
-        if (pages.length < perPage) {
-          hasMore = false
-        } else {
-          page++
+      const data = await gqlRequestList<{
+        pages: {
+          pageInfo: { hasNextPage: boolean; endCursor: string }
+          nodes: any[]
         }
-      }
+      }>(GET_ALL_PAGES, { first: 100, after })
+
+      const nodes = data.pages?.nodes || []
+      allPages.push(...nodes.map(transformPage))
+
+      hasMore = data.pages?.pageInfo?.hasNextPage || false
+      after = data.pages?.pageInfo?.endCursor || null
     }
 
-    logger.warn("[v0] WordPress API - Total pages fetched:", allPages.length)
     return allPages
   }
 
   async getPageBySlug(slug: string): Promise<WPPage | null> {
-    const pages = await this.fetch<WPPage[]>("/pages", {
-      slug,
-      _embed: true,
-      acf_format: "standard",
-    })
-
-    if (pages[0]) {
-      logger.warn("[v0] WordPress API - Full page data for slug:", slug)
-      logger.warn("[v0] Full page object:", JSON.stringify(pages[0], null, 2))
-      logger.warn("[v0] Page title:", pages[0].title?.rendered)
-      logger.warn("[v0] Page ACF data:", JSON.stringify(pages[0].acf, null, 2))
-
-      if (pages[0].acf?.hero) {
-        logger.warn("[v0] Hero sous-titre:", pages[0].acf.hero["sous-titre"])
-        logger.warn("[v0] Hero image:", pages[0].acf.hero.image)
-      } else {
-        logger.warn("[v0] WARNING: No hero data found in ACF")
-      }
-    } else {
-      logger.warn("[v0] WARNING: No page found for slug:", slug)
+    try {
+      const data = await gqlRequest<{ page: any | null }>(GET_PAGE_BY_SLUG, { slug })
+      if (!data.page) return null
+      return transformPage(data.page)
+    } catch {
+      return null
     }
-
-    return pages[0] || null
   }
 
   async getPageByPath(path: string): Promise<WPPage | null> {
     const cleanPath = path.replace(/^\/+|\/+$/g, "")
+    const segments = cleanPath.split("/").filter(Boolean)
+    const slug = segments[segments.length - 1]
 
-    logger.warn("[v0] WordPress API - getPageByPath() called with path:", cleanPath)
+    if (!slug) return null
 
-    const allPages = await this.getPages()
+    // WPGraphQL URI type handles full paths
+    // Try full path first, then fall back to slug only
+    const page = await this.getPageBySlug(cleanPath)
+    if (page) return page
 
-    logger.warn("[v0] WordPress API - Total pages fetched:", allPages.length)
-
-    // Find page that matches the full path
-    const page = allPages.find((p) => {
-      // WordPress link contains the full URL, extract the path
-      const pageUrl = p.link || ""
-      const wpBaseUrl = this.baseUrl.replace("/wp-json/wp/v2", "")
-      const pagePath = pageUrl.replace(wpBaseUrl, "").replace(/^\/+|\/+$/g, "")
-
-      logger.warn(`[v0] Comparing: "${pagePath}" === "${cleanPath}"`)
-
-      return pagePath === cleanPath
-    })
-
-    if (page) {
-      logger.warn("[v0] WordPress API - Found page by path:", page.title.rendered)
-      logger.warn("[v0] Page link:", page.link)
-    } else {
-      logger.warn("[v0] WordPress API - No page found for path:", cleanPath)
-    }
-
-    return page || null
+    return this.getPageBySlug(slug)
   }
 
   async getPageById(id: number): Promise<WPPage> {
-    return this.fetch<WPPage>(`/pages/${id}`, {
-      _embed: true,
-      acf_format: "standard",
-    })
+    const data = await gqlRequest<{ page: any }>(GET_PAGE_BY_ID, { id: String(id) })
+    return transformPage(data.page)
   }
 
-  // Custom Post Types
+  // --- Generic post methods (kept for backwards compatibility) ---
+
   async getPosts<T = any>(
     postType: string,
-    params?: { per_page?: number; orderby?: string; order?: string },
+    _params?: { per_page?: number; orderby?: string; order?: string },
   ): Promise<WPPost<T>[]> {
-    logger.warn("[v0] WordPress API - getPosts() called for postType:", postType)
-
-    try {
-      const result = await this.fetch<WPPost<T>[]>(`/${postType}`, {
-        _embed: true,
-        acf_format: "standard",
-        per_page: params?.per_page || 100,
-        ...params,
-      })
-
-      logger.warn("[v0] WordPress API - getPosts() returned:", result.length, "items for", postType)
-      return result
-    } catch (error) {
-      logger.error("[v0] WordPress API - getPosts() ERROR for", postType, ":", error)
-      return []
+    // Route to specific typed methods
+    switch (postType) {
+      case "hebergement":
+        return this.getHebergements() as Promise<WPPost<T>[]>
+      case "activite":
+        return this.getActivites() as Promise<WPPost<T>[]>
+      case "evenement":
+        return this.getEvenements() as Promise<WPPost<T>[]>
+      case "partenaire":
+        return this.getPartenaires() as Promise<WPPost<T>[]>
+      case "structure":
+        return this.getStructures() as Promise<WPPost<T>[]>
+      case "espace-de-travail":
+        return this.getEspacesDeTravail() as Promise<WPPost<T>[]>
+      case "sejour":
+        return this.getSejours() as Promise<WPPost<T>[]>
+      case "membre":
+        return this.getTeamMembers() as Promise<WPPost<T>[]>
+      default:
+        logger.error(`Unknown post type for GraphQL: ${postType}`)
+        return []
     }
   }
 
   async getPostBySlug<T = any>(postType: string, slug: string): Promise<WPPost<T> | null> {
-    const posts = await this.fetch<WPPost<T>[]>(`/${postType}`, {
-      slug,
-      _embed: true,
-      acf_format: "standard",
-    })
-    return posts[0] || null
+    switch (postType) {
+      case "hebergement":
+        return this.getHebergementBySlug(slug) as Promise<WPPost<T> | null>
+      case "activite":
+        return this.getActiviteBySlug(slug) as Promise<WPPost<T> | null>
+      case "sejour":
+        return this.getSejourBySlug(slug) as Promise<WPPost<T> | null>
+      case "structure":
+        return this.getStructureBySlug(slug) as Promise<WPPost<T> | null>
+      default:
+        logger.error(`Unknown post type for GraphQL getPostBySlug: ${postType}`)
+        return null
+    }
   }
 
-  async getPostById<T = any>(postType: string, id: number): Promise<WPPost<T>> {
-    return this.fetch<WPPost<T>>(`/${postType}/${id}`, {
-      _embed: true,
-      acf_format: "standard",
-    })
-  }
+  // --- Specific typed methods ---
 
-  // Specific post types
-  async getSejours() {
-    logger.warn("[v0] WordPress API - getSejours() called")
-
+  async getHebergements(): Promise<WPPost<HebergementACF>[]> {
     try {
-      // Fetch sejours with embedded data
-      const sejours = await this.getPosts("sejour")
-
-      logger.warn("[v0] Sejours fetched:", sejours.length)
-
-      const extractSlugFromUrl = (url: string): string | null => {
-        try {
-          // URL format: https://wp-asso.com/hebergement/maison-forestiere/
-          const urlParts = url.split("/").filter((part) => part.length > 0)
-          // Get the last part as slug
-          return urlParts[urlParts.length - 1] || null
-        } catch (error) {
-          logger.error("[v0] Error extracting slug from URL:", url, error)
-          return null
-        }
-      }
-
-      // For each sejour, fetch complete data for hebergements and activites
-      const sejoursWithCompleteData = await Promise.all(
-        sejours.map(async (sejour) => {
-          try {
-            logger.warn("[v0] Processing sejour:", sejour.title?.rendered || "Unknown")
-
-            if (!sejour.acf) {
-              logger.warn("[v0] Sejour has no ACF data:", sejour.id)
-              return sejour
-            }
-
-            if (sejour.acf?.hebergements?.hebergements && Array.isArray(sejour.acf.hebergements.hebergements)) {
-              try {
-                sejour.acf.hebergements.hebergements = await Promise.all(
-                  sejour.acf.hebergements.hebergements.map(async (urlOrItem: any) => {
-                    try {
-                      // If it's a string URL, extract slug and fetch
-                      if (typeof urlOrItem === "string") {
-                        const slug = extractSlugFromUrl(urlOrItem)
-                        if (slug) {
-                          const fullHebergement = await this.getPostBySlug("hebergement", slug)
-                          if (fullHebergement) {
-                            logger.warn(
-                              "[v0] Fetched hebergement from URL:",
-                              fullHebergement.title?.rendered || "Unknown",
-                              fullHebergement.slug,
-                            )
-                            return { hebergement: fullHebergement }
-                          }
-                        }
-                      }
-                      // If it's already an object with ID
-                      else if (urlOrItem?.hebergement?.ID) {
-                        const fullHebergement = await this.getPostById("hebergement", urlOrItem.hebergement.ID)
-                        logger.warn(
-                          "[v0] Fetched hebergement from ID:",
-                          fullHebergement.title?.rendered || "Unknown",
-                          fullHebergement.slug,
-                        )
-                        return { hebergement: fullHebergement }
-                      }
-                    } catch (error) {
-                      logger.error(
-                        "[v0] Error fetching hebergement, skipping:",
-                        error instanceof Error ? error.message : error,
-                      )
-                      // Return null for failed items so they can be filtered out
-                      return null
-                    }
-                    return urlOrItem
-                  }),
-                )
-                // Filter out null values from failed fetches
-                sejour.acf.hebergements.hebergements = sejour.acf.hebergements.hebergements.filter(
-                  (item) => item !== null,
-                )
-              } catch (error) {
-                logger.error(
-                  "[v0] Error processing hebergements array:",
-                  error instanceof Error ? error.message : error,
-                )
-                // Keep original data if processing fails
-              }
-            }
-
-            if (sejour.acf?.activites?.activite && Array.isArray(sejour.acf.activites.activite)) {
-              try {
-                sejour.acf.activites.activite = await Promise.all(
-                  sejour.acf.activites.activite.map(async (urlOrItem: any) => {
-                    try {
-                      // If it's a string URL, extract slug and fetch
-                      if (typeof urlOrItem === "string") {
-                        const slug = extractSlugFromUrl(urlOrItem)
-                        if (slug) {
-                          const fullActivite = await this.getPostBySlug("activite", slug)
-                          if (fullActivite) {
-                            logger.warn(
-                              "[v0] Fetched activite from URL:",
-                              fullActivite.title?.rendered || "Unknown",
-                              fullActivite.slug,
-                            )
-                            return { activite: fullActivite }
-                          }
-                        }
-                      }
-                      // If it's already an object with ID
-                      else if (urlOrItem?.activite?.ID) {
-                        const fullActivite = await this.getPostById("activite", urlOrItem.activite.ID)
-                        logger.warn(
-                          "[v0] Fetched activite from ID:",
-                          fullActivite.title?.rendered || "Unknown",
-                          fullActivite.slug,
-                        )
-                        return { activite: fullActivite }
-                      }
-                    } catch (error) {
-                      logger.error(
-                        "[v0] Error fetching activite, skipping:",
-                        error instanceof Error ? error.message : error,
-                      )
-                      // Return null for failed items so they can be filtered out
-                      return null
-                    }
-                    return urlOrItem
-                  }),
-                )
-                // Filter out null values from failed fetches
-                sejour.acf.activites.activite = sejour.acf.activites.activite.filter((item) => item !== null)
-              } catch (error) {
-                logger.error("[v0] Error processing activites array:", error instanceof Error ? error.message : error)
-                // Keep original data if processing fails
-              }
-            }
-
-            return sejour
-          } catch (error) {
-            logger.error("[v0] Error processing sejour:", sejour.id, error instanceof Error ? error.message : error)
-            return sejour
-          }
-        }),
+      const data = await gqlRequestList<{ hBergements: { nodes: any[] } }>(GET_HEBERGEMENTS)
+      const nodes = data.hBergements?.nodes || []
+      return nodes.map((node) =>
+        transformPost<HebergementACF>(node, transformHebergementAcf(node), "hebergement")
       )
-
-      logger.warn("[v0] Sejours with complete data:", sejoursWithCompleteData.length)
-      return sejoursWithCompleteData
     } catch (error) {
-      logger.error("[v0] Error in getSejours():", error instanceof Error ? error.message : error)
+      logger.error("Failed to fetch hebergements:", error)
       return []
     }
   }
 
-  async getHebergements() {
-    logger.warn("[v0] WordPress API - getHebergements() called")
-    const result = await this.getPosts("hebergement")
-    logger.warn("[v0] WordPress API - getHebergements() result count:", result.length)
-    return result
-  }
-
-  async getActivites() {
-    logger.warn("[v0] WordPress API - getActivites() method called - START")
-
+  async getHebergementBySlug(slug: string): Promise<WPPost<HebergementACF> | null> {
     try {
-      const activites = await this.getPosts("activite")
-      logger.warn("[v0] WordPress API - getActivites() returned:", activites.length, "activités")
+      const data = await gqlRequest<{ hBergement: any | null }>(GET_HEBERGEMENT_BY_SLUG, { slug })
+      if (!data.hBergement) return null
+      return transformPost<HebergementACF>(
+        data.hBergement,
+        transformHebergementAcf(data.hBergement),
+        "hebergement"
+      )
+    } catch {
+      return null
+    }
+  }
 
-      if (activites.length > 0) {
-        logger.warn("[v0] First activité full data:", JSON.stringify(activites[0], null, 2))
-        logger.warn("[v0] First activité title:", activites[0].title?.rendered)
-        logger.warn("[v0] First activité ACF:", JSON.stringify(activites[0].acf, null, 2))
-
-        if (activites[0].acf) {
-          logger.warn("[v0] Activité nom:", activites[0].acf.nom)
-          logger.warn("[v0] Activité descriptif:", activites[0].acf.descriptif)
-        } else {
-          logger.warn("[v0] WARNING: No ACF data found for activité")
+  async getActivites(): Promise<WPPost<ActiviteACF>[]> {
+    try {
+      const data = await gqlRequestList<{ activitS: { nodes: any[] } }>(GET_ACTIVITES)
+      const nodes = data.activitS?.nodes || []
+      return nodes.map((node) => {
+        const post = transformPost<ActiviteACF>(node, transformActiviteAcf(node), "activite")
+        // Inject taxonomy terms into _embedded["wp:term"] for filter compatibility
+        const catTerms = node.categories?.nodes
+        if (catTerms?.length) {
+          if (!post._embedded) post._embedded = {}
+          post._embedded["wp:term"] = [
+            catTerms.map((t: any) => ({
+              id: t.databaseId,
+              name: t.name,
+              slug: t.slug,
+              taxonomy: "category",
+            })),
+          ]
         }
-      } else {
-        logger.warn("[v0] WARNING: No activités found in WordPress")
-      }
-
-      return activites
+        return post
+      })
     } catch (error) {
-      logger.error("[v0] ERROR: Failed to fetch activités from WordPress API:", error)
-      logger.error("[v0] This usually means the CPT 'activite' is not registered or not exposed in REST API")
-      logger.error("[v0] Please check WordPress CPT configuration: show_in_rest should be true")
+      logger.error("Failed to fetch activites:", error)
       return []
     }
   }
 
-  async getEvenements() {
-    return this.getPosts("evenement", { orderby: "date", order: "desc" })
-  }
-
-  async getPartenaires() {
-    return this.getPosts("partenaire")
-  }
-
-  async getStructures() {
-    const structures = await this.getPosts("structure")
-
-    if (structures.length > 0) {
-      const sample = structures[0]
-      logger.warn("[v0] Structures sample has acf:", !!sample.acf)
-      logger.warn("[v0] Structures sample keys:", Object.keys(sample))
-      logger.warn("[v0] Structures sample ACF keys:", sample.acf ? Object.keys(sample.acf) : [])
-    } else {
-      logger.warn("[v0] Structures fetch returned 0 items")
+  async getActiviteBySlug(slug: string): Promise<WPPost<ActiviteACF> | null> {
+    try {
+      const data = await gqlRequest<{ activit: any | null }>(GET_ACTIVITE_BY_SLUG, { slug })
+      if (!data.activit) return null
+      const post = transformPost<ActiviteACF>(
+        data.activit,
+        transformActiviteAcf(data.activit),
+        "activite"
+      )
+      const catTerms = data.activit.categories?.nodes
+      if (catTerms?.length) {
+        if (!post._embedded) post._embedded = {}
+        post._embedded["wp:term"] = [
+          catTerms.map((t: any) => ({
+            id: t.databaseId,
+            name: t.name,
+            slug: t.slug,
+            taxonomy: "category",
+          })),
+        ]
+      }
+      return post
+    } catch {
+      return null
     }
-
-    return structures.map((structure) => ({
-      ...structure,
-      featured_media_url: structure._embedded?.["wp:featuredmedia"]?.[0]?.source_url || null,
-    }))
   }
 
-  async getEspacesDeTravail() {
-    logger.warn("[v0] WordPress API - getEspacesDeTravail() called")
-    return this.getPosts("espace-de-travail")
+  async getStructures(): Promise<WPPost<StructureACF>[]> {
+    try {
+      const data = await gqlRequestList<{ structures: { nodes: any[] } }>(GET_STRUCTURES)
+      const nodes = data.structures?.nodes || []
+      return nodes.map((node) => {
+        const post = transformPost<StructureACF>(node, transformStructureAcf(node), "structure")
+        // Add featured_media_url for backwards compatibility
+        return {
+          ...post,
+          featured_media_url: node.featuredImage?.node?.sourceUrl || null,
+        }
+      })
+    } catch (error) {
+      logger.error("Failed to fetch structures:", error)
+      return []
+    }
   }
+
+  async getStructureBySlug(slug: string): Promise<WPPost<StructureACF> | null> {
+    try {
+      const data = await gqlRequest<{ structure: any | null }>(GET_STRUCTURE_BY_SLUG, { slug })
+      if (!data.structure) return null
+      return transformPost<StructureACF>(
+        data.structure,
+        transformStructureAcf(data.structure),
+        "structure"
+      )
+    } catch {
+      return null
+    }
+  }
+
+  async getEvenements(): Promise<WPPost<EvenementACF>[]> {
+    try {
+      const data = await gqlRequestList<{ evNements: { nodes: any[] } }>(GET_EVENEMENTS)
+      const nodes = data.evNements?.nodes || []
+      return nodes.map((node) =>
+        transformPost<EvenementACF>(node, transformEvenementAcf(node), "evenement")
+      )
+    } catch (error) {
+      logger.error("Failed to fetch evenements:", error)
+      return []
+    }
+  }
+
+  async getPartenaires(): Promise<WPPost<PartenaireACF>[]> {
+    try {
+      const data = await gqlRequestList<{ partenaires: { nodes: any[] } }>(GET_PARTENAIRES)
+      const nodes = data.partenaires?.nodes || []
+      return nodes.map((node) => {
+        const post = transformPost<PartenaireACF>(node, transformPartenaireAcf(node), "partenaire")
+        // Inject taxonomy terms into _embedded["wp:term"] for filter compatibility
+        const taxTerms = node.typesDePartenaire?.nodes
+        if (taxTerms?.length) {
+          if (!post._embedded) post._embedded = {}
+          post._embedded["wp:term"] = [
+            taxTerms.map((t: any) => ({
+              id: t.databaseId,
+              name: t.name,
+              slug: t.slug,
+              taxonomy: "type-de-partenaire",
+            })),
+          ]
+        }
+        return post
+      })
+    } catch (error) {
+      logger.error("Failed to fetch partenaires:", error)
+      return []
+    }
+  }
+
+  async getEspacesDeTravail(): Promise<WPPost<EspaceDeTravailACF>[]> {
+    try {
+      const data = await gqlRequestList<{ espacesDeTravail: { nodes: any[] } }>(GET_ESPACES_DE_TRAVAIL)
+      const nodes = data.espacesDeTravail?.nodes || []
+      return nodes.map((node) =>
+        transformPost<EspaceDeTravailACF>(node, transformEspaceDeTravailAcf(node), "espace-de-travail")
+      )
+    } catch (error) {
+      logger.error("Failed to fetch espaces de travail:", error)
+      return []
+    }
+  }
+
+  async getTeamMembers(): Promise<WPPost<TeamMemberACF>[]> {
+    try {
+      const data = await gqlRequestList<{ equipes: { nodes: any[] } }>(GET_TEAM_MEMBERS)
+      const nodes = data.equipes?.nodes || []
+      return nodes.map((node) =>
+        transformPost<TeamMemberACF>(node, transformTeamMemberAcf(node), "membre")
+      )
+    } catch (error) {
+      logger.error("Error fetching team members:", error)
+      return []
+    }
+  }
+
+  // --- Séjours (N+1 eliminated — single GraphQL query with nested relations) ---
+
+  async getSejours(): Promise<WPPost<SejourACF>[]> {
+    try {
+      const data = await gqlRequestList<{ sJours: { nodes: any[] } }>(GET_SEJOURS)
+      const nodes = data.sJours?.nodes || []
+      return nodes.map((node) =>
+        transformPost<SejourACF>(node, transformSejourAcf(node), "sejour")
+      )
+    } catch (error) {
+      logger.error("Error in getSejours():", error instanceof Error ? error.message : error)
+      return []
+    }
+  }
+
+  async getSejourBySlug(slug: string): Promise<WPPost<SejourACF> | null> {
+    try {
+      const data = await gqlRequest<{ sJour: any | null }>(GET_SEJOUR_BY_SLUG, { slug })
+      if (!data.sJour) return null
+      return transformPost<SejourACF>(
+        data.sJour,
+        transformSejourAcf(data.sJour),
+        "sejour"
+      )
+    } catch {
+      return null
+    }
+  }
+
+  // --- Map pin points ---
 
   async getMapPinPoints() {
-    logger.warn("[v0] getMapPinPoints() - START")
-
     try {
-      const structures = await this.getStructures()
-      await new Promise((resolve) => setTimeout(resolve, 100))
-
-      const hebergements = await this.getHebergements()
-      await new Promise((resolve) => setTimeout(resolve, 100))
-
-      const espacesDeTravail = await this.getEspacesDeTravail()
+      const [structures, hebergements, espacesDeTravail] = await Promise.all([
+        this.getStructures(),
+        this.getHebergements(),
+        this.getEspacesDeTravail(),
+      ])
 
       const allPosts = [...structures, ...hebergements, ...espacesDeTravail]
 
-      const pinPoints = allPosts
+      return allPosts
         .filter((post) => {
           const hasVisibility = post.acf?.visibilite === true
           const latitude = post.acf?.position?.latitude
           const longitude = post.acf?.position?.longitude
           const hasPosition = latitude !== undefined && longitude !== undefined
-
           return hasVisibility && hasPosition
         })
         .map((post) => {
@@ -525,135 +410,97 @@ export class WordPressAPI {
             },
           }
         })
-
-      logger.warn("[v0] Filtered visible pin points:", pinPoints.length)
-      return pinPoints
     } catch (error) {
-      logger.error("[v0] ERROR fetching map pin points:", error)
+      logger.error("Error fetching map pin points:", error)
       return []
     }
   }
 
+  // --- Homepage ---
+
   async getHomepage(): Promise<WPPage> {
-    return this.getPageById(138) // Homepage ID from ACF export
+    return this.getPageById(138)
   }
+
+  // --- Global options ---
 
   async getGlobalOptions(): Promise<GlobalOptionsACF> {
-    logger.warn("[v0] WordPress API - getGlobalOptions() called")
-
-    try {
-      const data = await this.fetch<any>("/options-globales", {
-        acf_format: "standard",
-      })
-
-      const optimizeImageData = (img: any) => {
-        if (!img) return img
-        return {
-          url: img.sizes?.thumbnail || img.url,
-          alt: img.alt || "",
-          width: img.sizes?.["thumbnail-width"] || img.width,
-          height: img.sizes?.["thumbnail-height"] || img.height,
-        }
-      }
-
-      return {
-        lien_du_cta_de_barre_superieure: data.menu?.lien_du_cta_de_barre_superieure || {
-          title: "Réserver",
-          url: "/contact",
+    // NOTE: OptionsGlobales ACF Options Page exists in GraphQL but the "menu" field group
+    // is not yet properly attached. Using fallback values until WordPress ACF configuration
+    // exposes the menu field group on the optionsGlobales query.
+    return {
+      lien_du_cta_de_barre_superieure: {
+        title: "Réserver",
+        url: "/contact",
+        target: "",
+      },
+      miniature_du_megamenu: {
+        titre_cta_1: "Découvrir le lieu",
+        lien_cta_1: {
+          title: "Découvrir le lieu",
+          url: "/visite-virtuelle",
           target: "",
         },
-        miniature_du_megamenu: {
-          titre_cta_1: data.menu?.miniature_du_megamenu?.titre_cta_1 || "Découvrir le lieu",
-          lien_cta_1: data.menu?.miniature_du_megamenu?.lien_cta_1 || {
-            title: "Découvrir le lieu",
-            url: "/visite-virtuelle",
-            target: "",
-          },
-          titre_cta_2: data.menu?.miniature_du_megamenu?.titre_cta_2,
-          lien_cta_2: data.menu?.miniature_du_megamenu?.lien_cta_2,
-          image: optimizeImageData(data.menu?.miniature_du_megamenu?.image),
+        image: {
+          url: "/rural-retreat-hermitage-building-nature.jpg",
+          alt: "Vue de l'Hermitage",
         },
-      }
-    } catch (error) {
-      logger.error("[v0] ERROR fetching global options:", error instanceof Error ? error.message : error)
-
-      return {
-        lien_du_cta_de_barre_superieure: {
-          title: "Réserver",
-          url: "/contact",
-          target: "",
-        },
-        miniature_du_megamenu: {
-          titre_cta_1: "Découvrir le lieu",
-          lien_cta_1: {
-            title: "Découvrir le lieu",
-            url: "/visite-virtuelle",
-            target: "",
-          },
-          image: {
-            url: "/rural-retreat-hermitage-building-nature.jpg",
-            alt: "Vue de l'Hermitage",
-          },
-        },
-      }
+      },
     }
   }
+
+  // --- Menu ---
 
   async getMenu(menuSlug = "menu-1"): Promise<WPMenuItem[]> {
-    logger.warn(`[v0] Fetching WordPress menu: ${menuSlug}`)
-
     try {
-      // Try custom endpoint first
-      const customUrl = `${this.wpJsonBase}/custom/v1/menu/${menuSlug}`
-      logger.warn(`[v0] Trying custom menu endpoint: ${customUrl}`)
+      const data = await gqlRequest<{
+        menu: {
+          menuItems: {
+            nodes: Array<{
+              databaseId: number
+              label: string
+              url: string
+              parentDatabaseId: number | null
+              order: number
+            }>
+          }
+        } | null
+      }>(GET_MENU, { slug: menuSlug }, { revalidate: 3600 })
 
-      const response = await fetch(customUrl, {
-        headers: {
-          Accept: "application/json",
-        },
-        next: { revalidate: 3600 },
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        logger.warn(`[v0] Successfully fetched menu from custom endpoint`)
-        logger.warn(`[v0] Menu data:`, JSON.stringify(data, null, 2))
-        return decodeObjectEntities(data)
-      } else {
-        logger.error(`[v0] Custom menu endpoint failed with status: ${response.status}`)
-      }
+      if (!data.menu?.menuItems?.nodes) return []
+      return transformMenuItems(data.menu.menuItems.nodes)
     } catch (error) {
-      logger.error(`[v0] Error fetching menu:`, error)
+      logger.error("Error fetching menu:", error)
+      return []
     }
-
-    // Return empty array as fallback
-    logger.warn(`[v0] Returning empty menu array`)
-    return []
   }
+
+  // --- Taxonomy ---
 
   async getTaxonomyTerms(taxonomy: string): Promise<WPTerm[]> {
-    logger.warn(`[v0] Fetching terms for taxonomy: ${taxonomy}`)
-    return this.fetch<WPTerm[]>(`/${taxonomy}`, {
-      per_page: 100,
-      hide_empty: true,
-    })
-  }
-
-  async getTeamMembers() {
-    logger.warn("[v0] WordPress API - getTeamMembers() called")
     try {
-      const membres = await this.getPosts<TeamMemberACF>("membre", {
-        per_page: 100,
-        orderby: "date",
-        order: "asc", // Changed order from "desc" to "asc"
-      })
-      logger.warn("[v0] WordPress API - getTeamMembers() returned:", membres.length, "membres")
-      return membres
+      if (taxonomy === "type-de-partenaire") {
+        const data = await gqlRequestList<{
+          typesDePartenaire: { nodes: any[] }
+        }>(GET_TYPES_DE_PARTENAIRE)
+        const nodes = data.typesDePartenaire?.nodes || []
+        return nodes.map((node) => transformTerm({ ...node, taxonomyName: taxonomy }))
+      }
+
+      // For unknown taxonomies, log a warning
+      logger.warn(`Unknown taxonomy for GraphQL: ${taxonomy}. Add a specific query.`)
+      return []
     } catch (error) {
-      logger.error("[v0] Error fetching team members:", error)
+      logger.error(`Failed to fetch taxonomy terms for ${taxonomy}:`, error)
       return []
     }
   }
 }
 
 export const wpApi = new WordPressAPI()
+
+// React cache() wrapper — deduplicates identical calls within a single Server Component render pass.
+// Used by [...slug] catch-all page where generateMetadata() + Page both call getPageByPath().
+import { cache } from "react"
+
+export const getPageByPath = cache((path: string) => wpApi.getPageByPath(path))

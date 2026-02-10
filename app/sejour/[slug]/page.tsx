@@ -1,13 +1,46 @@
 import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import { cache } from "react"
+import type { Metadata } from "next"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { wpApi } from "@/lib/wordpress/api"
-import type { SejourACF } from "@/lib/wordpress/types"
+import { stripHtml } from "@/lib/utils"
+import { REVALIDATION } from "@/lib/constants"
+import { sanitizeHtml } from "@/lib/wordpress/sanitize"
+
+export const revalidate = REVALIDATION.detail
+
+const getSejour = cache((slug: string) =>
+  wpApi.getSejourBySlug(slug)
+)
 
 interface SejourPageProps {
   params: Promise<{ slug: string }>
+}
+
+export async function generateMetadata({ params }: SejourPageProps): Promise<Metadata> {
+  const { slug } = await params
+  const sejour = await getSejour(slug)
+
+  if (!sejour) {
+    return { title: "Séjour non trouvé" }
+  }
+
+  const title = sejour.acf?.nom || sejour.title?.rendered || "Séjour"
+  const description = sejour.content?.rendered
+    ? stripHtml(sejour.content.rendered).substring(0, 160)
+    : "Découvrez ce séjour à L'Hermitage"
+  const image = sejour._embedded?.["wp:featuredmedia"]?.[0]?.source_url
+    || "/rural-retreat-hermitage-building-nature.jpg"
+
+  return {
+    title,
+    description,
+    openGraph: { title, description, images: [{ url: image }], type: "website" },
+    twitter: { card: "summary_large_image", title, description, images: [image] },
+  }
 }
 
 export async function generateStaticParams() {
@@ -19,7 +52,7 @@ export async function generateStaticParams() {
 
 export default async function SejourPage({ params }: SejourPageProps) {
   const { slug } = await params
-  const sejour = await wpApi.getPostBySlug<SejourACF>("sejour", slug)
+  const sejour = await getSejour(slug)
 
   if (!sejour) {
     notFound()
@@ -33,7 +66,7 @@ export default async function SejourPage({ params }: SejourPageProps) {
           {sejour.acf?.nom || sejour.title?.rendered || "Séjour"}
         </h1>
         {sejour.content?.rendered && (
-          <div className="prose prose-stone max-w-none" dangerouslySetInnerHTML={{ __html: sejour.content.rendered }} />
+          <div className="prose prose-stone max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeHtml(sejour.content.rendered) }} />
         )}
       </div>
 

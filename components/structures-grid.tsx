@@ -8,30 +8,13 @@ import Image from "next/image"
 import Link from "next/link"
 import type { WPPost, StructureACF } from "@/lib/wordpress/types"
 import { getCategoryColor } from "@/lib/wordpress/category-colors"
+import { truncateText } from "@/lib/utils"
+import { sanitizeUrl } from "@/lib/wordpress/sanitize"
 
 import "@/components/ui/MagicBento.css"
 
 interface StructuresGridProps {
   structures: WPPost<StructureACF>[]
-}
-
-const GlobalSpotlight: React.FC<{
-  gridRef: React.RefObject<HTMLDivElement | null>
-  spotlightRadius?: number
-  glowColor?: string
-}> = ({ gridRef, spotlightRadius = 300, glowColor = "229, 87, 84" }) => {
-  const spotlightRef = useRef<HTMLDivElement | null>(null)
-  return null
-}
-
-const truncateText = (html: string, cardHeight: "small" | "large"): string => {
-  const maxLength = cardHeight === "large" ? 250 : 120
-  const text = html
-    .replace(/<[^>]*>/g, " ")
-    .replace(/\s+/g, " ")
-    .trim()
-  if (text.length <= maxLength) return text
-  return text.substring(0, maxLength).trim() + "..."
 }
 
 const StructureCard: React.FC<{
@@ -130,7 +113,7 @@ const StructureCard: React.FC<{
                 className="w-full rounded-full transition-colors hover:bg-gray-50 bg-transparent"
                 style={{ borderColor: categoryColor, color: categoryColor }}
               >
-                <a href={structure.acf.lien.url} target="_blank" rel="noopener noreferrer">
+                <a href={sanitizeUrl(structure.acf.lien.url)} target="_blank" rel="noopener noreferrer">
                   {structure.acf.lien.title || "Site web"}
                 </a>
               </Button>
@@ -172,8 +155,6 @@ export function StructuresGrid({ structures }: StructuresGridProps) {
 
   return (
     <>
-      <GlobalSpotlight gridRef={gridRef} spotlightRadius={300} glowColor="229, 87, 84" />
-
       <div
         ref={gridRef}
         className="card-grid bento-section grid grid-cols-1 md:grid-cols-6 auto-rows-[400px] md:auto-rows-[280px] md:grid-flow-dense gap-6"
@@ -184,7 +165,7 @@ export function StructuresGrid({ structures }: StructuresGridProps) {
           const bentoClass = getBentoClass(index)
           const cardHeight = getCardHeight(index)
           const truncatedDescription = structure.acf?.descriptif
-            ? truncateText(structure.acf.descriptif, cardHeight)
+            ? truncateText(structure.acf.descriptif, cardHeight === "large" ? 250 : 120)
             : ""
 
           const featuredImageUrl = structure.featured_media_url || structure.acf?.photos?.[0]?.url

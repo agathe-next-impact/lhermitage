@@ -1,8 +1,9 @@
 import { Clock } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { PageHeader } from "@/components/page-header"
+import { PageHeader } from "@/components/layout/page-header"
 import { wpApi } from "@/lib/wordpress/api"
 import { getColorForPath } from "@/lib/page-colors"
+import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 
 export default async function HorairesPage() {
   const page = await wpApi.getPageBySlug("jours-et-horaires-douverture")
@@ -45,7 +46,7 @@ export default async function HorairesPage() {
         {page?.content.rendered && (
           <div
             className="prose prose-stone mt-8 max-w-none"
-            dangerouslySetInnerHTML={{ __html: page.content.rendered }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }}
           />
         )}
       </div>

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { CategoryFilter } from "@/components/category-filter"
-import { HeroCard } from "@/components/hero-card"
+import { HeroCard } from "@/components/features/home/hero-card"
 
 interface Category {
   id: string

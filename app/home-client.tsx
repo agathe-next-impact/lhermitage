@@ -2,10 +2,10 @@
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { HeroCard } from "@/components/hero-card"
+import { HeroCard } from "@/components/features/home/hero-card"
 import { motion } from "framer-motion"
-import { useEffect, useState } from "react"
-import { AnimatedHeading } from "@/components/animated-heading"
+import { AnimatedHeading } from "@/components/features/home/animated-heading"
+import { useIsMounted } from "@/hooks/use-is-mounted"
 
 function getYouTubeEmbedUrl(oembedUrl: string): string | null {
   const patterns = [
@@ -36,11 +36,7 @@ interface HomeClientProps {
 }
 
 export function HomeClient({ homepage, sejours, hebergements, evenements }: HomeClientProps) {
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const mounted = useIsMounted()
 
   const videoUrl = homepage?.acf?.video ? getYouTubeEmbedUrl(homepage.acf.video) : null
   const slogan = homepage?.acf?.slogan || "Bienvenue au Tiers-Lieu Rural"

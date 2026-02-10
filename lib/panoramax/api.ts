@@ -42,11 +42,11 @@ export async function searchPanoramaxPictures(
     const lon = Number(longitude)
     
     if (isNaN(lat) || isNaN(lon)) {
-      console.error('[v0] Panoramax - Invalid coordinates:', { latitude, longitude })
+      console.error('Panoramax: Invalid coordinates:', { latitude, longitude })
       return []
     }
     
-    console.warn(`[v0] Panoramax - Searching pictures near ${lat},${lon} within ${radius}m`)
+    // Search pictures near coordinates
     
     const radiusDegrees = radius / 111000
     const minLon = lon - radiusDegrees
@@ -58,21 +58,21 @@ export async function searchPanoramaxPictures(
     
     const url = `/api/panoramax?bbox=${bbox}&limit=10`
     
-    console.warn(`[v0] Panoramax - Request URL: ${url}`)
+    // fetch from local proxy
 
     const response = await fetch(url)
 
     if (!response.ok) {
-      console.warn(`[v0] Panoramax - API returned ${response.status}`)
+      // non-ok response
       return []
     }
 
     const data: PanoramaxCollection = await response.json()
-    console.warn(`[v0] Panoramax - Found ${data.features?.length || 0} pictures`)
+    // return found pictures
 
     return data.features || []
   } catch (error) {
-    console.error('[v0] Panoramax - Error fetching pictures:', error)
+    console.error('Panoramax: Error fetching pictures:', error)
     return []
   }
 }

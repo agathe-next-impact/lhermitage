@@ -1,12 +1,14 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
 import { OrbitingCircles } from "@/components/ui/orbiting-circles"
 import type { WPPost, PartenaireACF, WPTerm } from "@/lib/wordpress/types"
 import { cn, stripHtml } from "@/lib/utils"
-import { HeroCard } from "@/components/hero-card"
+import { sanitizeUrl } from "@/lib/wordpress/sanitize"
+import { HeroCard } from "@/components/features/home/hero-card"
+import { useIsMounted } from "@/hooks/use-is-mounted"
 
 interface PartenairesClientProps {
   partenaires: WPPost<PartenaireACF>[]
@@ -40,11 +42,7 @@ const BOULE_STYLE = "rounded-full bg-white shadow-[0_4px_12px_rgba(0,0,0,0.1)] b
 
 export function PartenairesClient({ partenaires, categories }: PartenairesClientProps) {
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
-  const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
+  const isMounted = useIsMounted()
 
   // Filter partenaires based on selected category
   const filteredPartenaires = selectedCategory
@@ -327,7 +325,7 @@ export function PartenairesClient({ partenaires, categories }: PartenairesClient
                 image={partenaire._embedded?.["wp:featuredmedia"]?.[0]?.source_url || partenaire.acf?.logo?.url}
                 imageAlt={partenaire.acf?.logo?.alt || partenaire.title.rendered}
                 imageFit="contain"
-                link={partenaire.acf?.lien?.url}
+                link={partenaire.acf?.lien?.url ? sanitizeUrl(partenaire.acf.lien.url) : undefined}
                 linkText={partenaire.acf?.lien ? "Visiter le site" : undefined}
                 category={category?.name}
                 categorySlug={category?.slug}

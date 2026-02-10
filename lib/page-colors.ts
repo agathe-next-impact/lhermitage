@@ -1,28 +1,29 @@
+import { BRAND_COLORS } from "@/lib/theme/colors"
+
 // Mapping between routes and megamenu card colors
-// These colors match exactly the megamenu cards in site-header.tsx
 export const PAGE_COLORS: Record<string, string> = {
-  "/sejours-collectifs": "#56939F",
-  "/sejours-individuels": "#56939F",
-  "/hebergements": "#56939F",
-  "/hebergement": "#56939F",
-  "/sejour": "#56939F",
-  "/activite": "#56939F",
-  "/services": "#56939F",
+  "/sejours-collectifs": BRAND_COLORS.teal,
+  "/sejours-individuels": BRAND_COLORS.teal,
+  "/hebergements": BRAND_COLORS.teal,
+  "/hebergement": BRAND_COLORS.teal,
+  "/sejour": BRAND_COLORS.teal,
+  "/activite": BRAND_COLORS.teal,
+  "/services": BRAND_COLORS.teal,
 
-  "/ecosysteme-innovant": "#78AD7D",
+  "/ecosysteme-innovant": BRAND_COLORS.green,
 
-  "/tiers-lieu-rural": "#C14C66",
-  "/le-projet": "#C14C66",
-  "/le-concept": "#C14C66",
-  "/nos-valeurs": "#C14C66",
-  "/lequipe": "#C14C66",
-  "/visite-virtuelle": "#C14C66",
-  "/lhistoire-du-lieu": "#C14C66",
-  "/le-domaine": "#C14C66",
+  "/tiers-lieu-rural": BRAND_COLORS.rose,
+  "/le-projet": BRAND_COLORS.rose,
+  "/le-concept": BRAND_COLORS.rose,
+  "/nos-valeurs": BRAND_COLORS.rose,
+  "/lequipe": BRAND_COLORS.rose,
+  "/visite-virtuelle": BRAND_COLORS.rose,
+  "/lhistoire-du-lieu": BRAND_COLORS.rose,
+  "/le-domaine": BRAND_COLORS.rose,
 
-  "/infos-pratiques": "#DC6F45",
+  "/infos-pratiques": BRAND_COLORS.orange,
 
-  "/participer": "#E75754",
+  "/participer": BRAND_COLORS.coral,
 }
 
 export function getColorForPath(pathname: string): string | undefined {

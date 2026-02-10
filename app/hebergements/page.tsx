@@ -1,8 +1,10 @@
-import { PageHeader } from "@/components/page-header"
+import { PageHeader } from "@/components/layout/page-header"
 import { wpApi } from "@/lib/wordpress/api"
 import { HebergementsGrid } from "@/components/hebergements-grid"
+import { REVALIDATION } from "@/lib/constants"
+import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 
-export const revalidate = 3600 // Revalidate every hour
+export const revalidate = REVALIDATION.listing
 
 export default async function HebergementsPage() {
   const [page, hebergements] = await Promise.all([wpApi.getPageBySlug("hebergements"), wpApi.getHebergements()])
@@ -19,7 +21,7 @@ export default async function HebergementsPage() {
         {page?.content.rendered && (
           <div
             className="prose prose-stone mb-12 max-w-none"
-            dangerouslySetInnerHTML={{ __html: page.content.rendered }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }}
           />
         )}
 
