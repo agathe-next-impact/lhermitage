@@ -1,4 +1,10 @@
 {
+  "app\\(special)\\visite-virtuelle\\guided-tour-client.tsx -> ./visualizations/guided-tour": {
+    "id": "app\\(special)\\visite-virtuelle\\guided-tour-client.tsx -> ./visualizations/guided-tour",
+    "files": [
+      "static/chunks/_app-pages-browser_app_special_visite-virtuelle_visualizations_guided-tour_tsx.js"
+    ]
+  },
   "node_modules\\@heroui\\react\\node_modules\\@heroui\\accordion\\dist\\chunk-CI6JLEHY.mjs -> @heroui/dom-animation": {
     "id": "node_modules\\@heroui\\react\\node_modules\\@heroui\\accordion\\dist\\chunk-CI6JLEHY.mjs -> @heroui/dom-animation",
     "files": []

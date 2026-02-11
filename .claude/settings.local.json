@@ -28,7 +28,8 @@
       "Bash(npx next dev:*)",
       "Bash(netstat:*)",
       "Bash(if exist .next rmdir /s /q .next)",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "WebFetch(domain:data.geopf.fr)"
     ]
   }
 }
