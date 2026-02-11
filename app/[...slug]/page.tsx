@@ -143,10 +143,10 @@ export default async function CatchAllPage({ params }: PageProps) {
       {isHistoirePage && page.acf ? (
         <div className="relative z-10"><HistoireTimeline acf={page.acf as HistoireACF} /></div>
       ) : isEquipePage ? (
-        <div className="relative z-10 container mx-auto px-4 py-12">
+        <div className="relative z-10 container mx-auto px-4 py-2">
           {page.content.rendered && (
             <div
-              className="prose prose-stone max-w-none mb-12"
+              className="prose prose-stone max-w-none mb-6"
               dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }}
             />
           )}
@@ -155,10 +155,10 @@ export default async function CatchAllPage({ params }: PageProps) {
       ) : isDevenirSocietairePage ? (
         <div className="relative z-10"><DevenirSocietairePage page={page} /></div>
       ) : (
-        <div className="relative z-10 container mx-auto px-4 py-12">
+        <div className="relative z-10 container mx-auto px-4 py-2">
           {page.content.rendered && (
             <div
-              className="prose prose-stone max-w-none mb-12"
+              className="prose prose-stone max-w-none mb-6"
               dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }}
             />
           )}

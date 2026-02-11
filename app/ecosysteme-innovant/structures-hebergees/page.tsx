@@ -19,7 +19,7 @@ export default async function StructuresPage() {
         image={page?.acf?.hero?.image?.url || "/rural-retreat-landscape.jpg"}
       />
 
-      <div className="relative z-10 container mx-auto px-4 py-12">
+      <div className="relative z-10 container mx-auto px-4 py-2">
         {page?.content.rendered && (
           <div
             className="prose prose-stone mb-12 max-w-none"

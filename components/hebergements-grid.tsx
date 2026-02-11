@@ -65,7 +65,7 @@ export function HebergementsGrid({ hebergements }: HebergementsGridProps) {
           return (
             <div
               key={hebergement.id}
-              className={`magic-bento-card magic-bento-card--border-glow group relative overflow-hidden rounded-3xl shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 ${bentoClass}`}
+              className={`magic-bento-card magic-bento-card--border-glow group relative overflow-hidden rounded-xl shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 ${bentoClass}`}
               style={
                 {
                   "--glow-color":
@@ -121,8 +121,7 @@ export function HebergementsGrid({ hebergements }: HebergementsGridProps) {
                   <div className="flex-grow" />
 
                   <Button
-                    asChild
-                    className="w-full rounded-full text-white transition-colors mt-auto flex-shrink-0 hover:opacity-90"
+                    className="w-full rounded-xl text-white transition-colors mt-auto flex-shrink-0 hover:opacity-90"
                     style={{ backgroundColor: categoryColor }}
                   >
                     <Link href={`/hebergement/${hebergement.slug}`}>Découvrir</Link>
