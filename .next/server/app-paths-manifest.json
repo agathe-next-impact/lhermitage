@@ -1,6 +1,7 @@
 {
-  "/page": "app/page.js",
-  "/(special)/visite-virtuelle/page": "app/(special)/visite-virtuelle/page.js",
+  "/hebergements/page": "app/hebergements/page.js",
+  "/sejours-collectifs/activites/page": "app/sejours-collectifs/activites/page.js",
+  "/[...slug]/page": "app/[...slug]/page.js",
   "/ecosysteme-innovant/structures-hebergees/page": "app/ecosysteme-innovant/structures-hebergees/page.js",
-  "/structure/[slug]/page": "app/structure/[slug]/page.js"
+  "/(special)/visite-virtuelle/page": "app/(special)/visite-virtuelle/page.js"
 }

@@ -39,17 +39,16 @@ export function CategoryFilter({ categories, onCategoryChange }: CategoryFilterP
   return (
     <div className="mb-12 w-full">
       <div className="w-full">
-        <div className="flex flex-wrap gap-3 mb-6">
+        <div className="flex flex-wrap gap-1">
           {allTabs.map((category) => (
             <button
               key={category.slug}
               onClick={() => handleCategoryClick(category.slug)}
-              className={`text-white text-sm font-semibold px-4 py-2 rounded-full shadow-md transition-all hover:shadow-lg ${
-                selectedCategory === category.slug ? "ring-2 ring-offset-2 scale-105" : "opacity-80 hover:opacity-100"
+              className={`text-white text-sm font-semibold px-4 py-2 rounded-lg shadow-md transition-all hover:shadow-lg ${
+                selectedCategory === category.slug ? "shadow-lg" : "opacity-80 hover:opacity-100"
               }`}
               style={{
                 backgroundColor: category.color,
-                ringColor: selectedCategory === category.slug ? category.color : undefined,
               }}
             >
               {category.name}
@@ -59,7 +58,7 @@ export function CategoryFilter({ categories, onCategoryChange }: CategoryFilterP
 
         {/* Tab content - description card */}
         <div
-          className="mt-6 rounded-3xl p-6 shadow-lg backdrop-blur-md"
+          className="mt-2 rounded-xl p-6 shadow-lg backdrop-blur-md"
           style={{
             backgroundColor: `${selectedTab.color}CC`, // 80% opacity (CC in hex)
           }}

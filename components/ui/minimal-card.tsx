@@ -21,8 +21,8 @@ MinimalCard.displayName = "MinimalCard"
 
 const MinimalCardImage = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & { src: string; alt: string }
->(({ className, alt, src, ...props }, ref) => (
+  React.HTMLAttributes<HTMLDivElement> & { src: string; alt: string; objectFit?: "cover" | "contain" }
+>(({ className, alt, src, objectFit = "cover", ...props }, ref) => (
   <div
     ref={ref}
     className={cn(
@@ -36,7 +36,7 @@ const MinimalCardImage = React.forwardRef<
       alt={alt}
       width={200}
       height={200}
-      className="absolute inset-0 h-full w-full object-cover"
+      className={cn("absolute inset-0 h-full w-full", objectFit === "cover" ? "object-cover" : "object-contain")}
     />
     <div className="absolute inset-0" />
   </div>

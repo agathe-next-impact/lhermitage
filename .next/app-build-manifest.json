@@ -1,9 +1,10 @@
 {
   "pages": {
-    "/page": [
+    "/ecosysteme-innovant/structures-hebergees/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
+      "static/css/app/ecosysteme-innovant/structures-hebergees/page.css",
+      "static/chunks/app/ecosysteme-innovant/structures-hebergees/page.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
@@ -21,21 +22,41 @@
       "static/chunks/main-app.js",
       "static/chunks/app/loading.js"
     ],
+    "/ecosysteme-innovant/partenaires/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/ecosysteme-innovant/partenaires/page.js"
+    ],
+    "/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/page.js"
+    ],
+    "/[...slug]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/[...slug]/page.js"
+    ],
+    "/sejours-collectifs/nos-sejours/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/sejours-collectifs/nos-sejours/page.js"
+    ],
+    "/hebergements/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/hebergements/page.css",
+      "static/chunks/app/hebergements/page.js"
+    ],
+    "/sejours-collectifs/activites/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/sejours-collectifs/activites/page.js"
+    ],
     "/(special)/visite-virtuelle/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(special)/visite-virtuelle/page.js"
-    ],
-    "/ecosysteme-innovant/structures-hebergees/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/ecosysteme-innovant/structures-hebergees/page.css",
-      "static/chunks/app/ecosysteme-innovant/structures-hebergees/page.js"
-    ],
-    "/structure/[slug]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/structure/[slug]/page.js"
     ]
   }
 }

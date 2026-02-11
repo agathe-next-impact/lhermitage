@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import Link from "next/link"
@@ -51,45 +50,45 @@ export function ActivitesFilter({ activites }: ActivitesFilterProps) {
   )
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-0">
       {/* Category Filter Buttons */}
       <div className="flex flex-wrap gap-3">
-        <button
+        <Button
           onClick={() => setSelectedCategory(null)}
-          className={`rounded-full px-5 py-2 font-semibold text-white transition-all duration-300 ${
+          className={`rounded-lg px-5 py-2 font-semibold text-white transition-all duration-300 ${
             selectedCategory === null
-              ? "bg-[#e75754] shadow-lg shadow-[#e75754]/50 scale-105 ring-4 ring-[#e75754]/30"
+              ? "bg-[#e75754]"
               : "bg-[#e75754] hover:opacity-80"
           }`}
         >
           Toutes
-        </button>
+        </Button>
         {sortedCategories.map(([categoryId, { name, slug }]) => {
           const categoryColor = getCategoryColor(slug)
           return (
-            <button
+            <Button
               key={categoryId}
               onClick={() => setSelectedCategory(categoryId)}
               style={{ backgroundColor: categoryColor }}
-              className={`rounded-full px-5 py-2 font-semibold text-white transition-all duration-300 ${
+              className={`rounded-sm px-5 py-2 font-semibold text-white transition-all duration-300 ${
                 selectedCategory === categoryId
-                  ? "shadow-lg scale-105 ring-4"
+                  ? "shadow-lg scale-105"
                   : "hover:opacity-80"
               }`}
             >
               {name}
-            </button>
+            </Button>
           )
         })}
       </div>
 
       {/* Filtered Activities */}
-      <div className="space-y-16">
+      <div className="space-y-0">
         {filteredCategories.map(([categoryId, { name: categoryName, slug: categorySlug, activites: categoryActivites }]) => {
           const categoryColor = getCategoryColor(categorySlug)
           
           return (
-            <section key={categoryId}>
+            <div key={categoryId}>
               <h2 className="mb-8 font-serif text-3xl font-extrabold uppercase" style={{ color: categoryColor }}>
                 {categoryName}
               </h2>
@@ -97,7 +96,7 @@ export function ActivitesFilter({ activites }: ActivitesFilterProps) {
                 {categoryActivites.map((activite) => (
                   <div
                     key={activite.id}
-                    className="group relative h-[320px] overflow-hidden rounded-3xl shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
+                    className="group relative overflow-hidden rounded-sm shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
                   >
                     {/* Background Image */}
                     {activite._embedded?.["wp:featuredmedia"]?.[0] && (
@@ -114,7 +113,7 @@ export function ActivitesFilter({ activites }: ActivitesFilterProps) {
                       </div>
                     )}
 
-                    <div className="absolute inset-x-0 bottom-0 bg-white/95 backdrop-blur-sm rounded-t-3xl p-6 transform translate-y-[calc(100%-100px)] transition-transform duration-700 ease-out group-hover:translate-y-0 z-20 h-full flex flex-col">
+                    <div className="absolute inset-x-0 bottom-0 bg-white/95 backdrop-blur-sm rounded-t-lg p-6 transform translate-y-[calc(100%-100px)] transition-transform duration-700 ease-out group-hover:translate-y-0 z-20 h-full flex flex-col">
                       <div className="flex-shrink-0">
                         <h3 className="text-xl font-bold line-clamp-2" style={{ color: categoryColor }}>
                           {activite.acf?.nom || activite.title.rendered}
@@ -133,7 +132,7 @@ export function ActivitesFilter({ activites }: ActivitesFilterProps) {
                         
                         <Button
                           asChild
-                          className="w-full rounded-full text-white transition-colors mt-auto flex-shrink-0 hover:opacity-90"
+                          className="w-full rounded-l-lg text-white transition-colors mt-auto flex-shrink-0 hover:opacity-90"
                           style={{ backgroundColor: categoryColor }}
                         >
                           <Link href={`/activite/${activite.slug}`}>En savoir plus</Link>
@@ -143,7 +142,7 @@ export function ActivitesFilter({ activites }: ActivitesFilterProps) {
                   </div>
                 ))}
               </div>
-            </section>
+            </div>
           )
         })}
       </div>

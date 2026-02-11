@@ -41,10 +41,10 @@ export function PageHeader({ title, subtitle, image, className = "", color }: Pa
 
   return (
     <div className={`w-[calc(100%-1rem)] mt-3 mx-auto relative pt-16 ${className}`}>
-      {/* Bento grid 4 colonnes × 2 lignes */}
+      {/* Bento grid 4 colonnes × 3 lignes */}
       <div
         className="grid grid-cols-4 grid-rows-2 relative"
-        style={{ height: 'clamp(160px, 25vh, 280px)' }}
+        style={{ height: 'clamp(160px, 35vh, 480px)' }}
       >
         {/* Fond image : couvre toute la grille, reveal latéral */}
         <motion.div
@@ -67,21 +67,16 @@ export function PageHeader({ title, subtitle, image, className = "", color }: Pa
         {/* Encoche titre : col 4, ligne 1 (mobile: cols 3-4) */}
         <div className="col-start-3 md:col-start-4 col-end-5 row-start-1 row-end-2 z-10 bg-background relative flex items-end pb-2 pl-2 rounded-bl-2xl">
           <motion.div
-            className="h-full w-full rounded-lg flex items-center justify-center p-3 md:p-5"
+            className="h-full w-full rounded-lg flex items-end p-3 md:p-5"
             style={{ backgroundColor: mainBlobColor }}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <div className="text-center">
-              <h1 className="font-sans text-xs sm:text-sm md:text-lg lg:text-xl xl:text-2xl font-extrabold uppercase text-white leading-tight drop-shadow-sm">
+            <div>
+              <h1 className="font-sans text-xs sm:text-sm md:text-lg lg:text-xl xl:text-4xl font-extrabold uppercase text-white leading-tight drop-shadow-sm">
                 {title}
               </h1>
-              {subtitle && (
-                <p className="text-[9px] sm:text-[10px] md:text-xs text-white/80 mt-1 leading-snug line-clamp-2">
-                  {subtitle}
-                </p>
-              )}
             </div>
           </motion.div>
           {/* Arrondi convexe – haut gauche de l'encoche */}
@@ -103,6 +98,15 @@ export function PageHeader({ title, subtitle, image, className = "", color }: Pa
             }}
           />
         </div>
+      </div>
+      <div className="relative z-10 mx-auto my-2 px-4 py-2 rounded-xl py-8"
+        style={{ backgroundColor: mainBlobColor }}
+      >
+        {subtitle && (
+          <p className="text-xl text-center text-white mx-auto">
+            {subtitle}
+          </p>
+        )}
       </div>
     </div>
   )

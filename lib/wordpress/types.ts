@@ -157,6 +157,7 @@ export interface StructureACF {
     altitude: number
   }
   localisation?: WPGoogleMap
+  type_de_structure?: "interne" | "hebergee"
 }
 
 export interface EspaceDeTravailACF {
