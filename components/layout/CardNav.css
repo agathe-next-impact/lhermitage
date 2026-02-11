@@ -2,27 +2,27 @@
   width: 100%;
   position: relative;
   /* Start with narrower width, expand on hover */
-  max-width: 70%;
+  max-width: calc(100% - 0.5rem);
   /* Reduced top margin from 3rem to 1rem to allow video to be visible from top */
-  margin: 1rem auto 0;
+  margin: 0.5rem auto;
   transition: max-width 0.5s ease, margin-top 0.5s ease;
 }
 
 /* Expand to full width on hover and maintain it */
 .card-nav-container.expanded {
-  max-width: 95%;
+  max-width: calc(100% - 1rem);
 }
 
 /* Add scroll state styling - reduce margin and expand width */
 .card-nav-container.scrolled {
   /* Reduced scrolled margin from 1rem to 0.5rem */
   margin-top: 0.5rem;
-  max-width: 95%;
+  max-width: calc(100% - 1rem);
 }
 
 /* When scrolled, always maintain expanded width even without hover */
 .card-nav-container.scrolled.expanded {
-  max-width: 95%;
+  max-width: calc(100% - 1rem);
 }
 
 .card-nav {
@@ -30,7 +30,7 @@
   width: 100%;
   height: 60px;
   /* Apply rounded-full (pill shape) when closed, normal rounding when open */
-  border-radius: 9999px;
+  border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   /* Reduced transparency from 0.7 to 0.9 for less transparency */

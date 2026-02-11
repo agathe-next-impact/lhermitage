@@ -3,7 +3,7 @@ import { decodeObjectEntities } from "../decode"
 import { logger } from "../../logger"
 
 const GRAPHQL_URL =
-  process.env.WP_GRAPHQL_URL || "https://wp-asso.com/graphql"
+  process.env.WP_GRAPHQL_URL || "https://admin.hermitagelelab.com/graphql"
 
 function createClient(revalidate: number = 900): GraphQLClient {
   return new GraphQLClient(GRAPHQL_URL, {

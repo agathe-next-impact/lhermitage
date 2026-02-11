@@ -41,8 +41,8 @@ export default async function RootLayout({
   return (
     <html lang="fr" className={`${openSans.variable} ${inter.variable}`}>
       <head>
-        <link rel="preconnect" href="https://wp-asso.com" />
-        <link rel="dns-prefetch" href="https://wp-asso.com" />
+        <link rel="preconnect" href="https://admin.hermitagelelab.com" />
+        <link rel="dns-prefetch" href="https://admin.hermitagelelab.com" />
       </head>
       <body className="min-h-screen bg-background font-sans antialiased">
         <Providers>

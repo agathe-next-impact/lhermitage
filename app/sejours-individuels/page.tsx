@@ -17,10 +17,10 @@ export default async function SejoursIndividuelsPage() {
       <PageHeader
         title={page?.title.rendered || "Séjours Individuels"}
         subtitle={page?.acf?.hero?.["sous-titre"]}
-        image={page?.acf?.hero?.image || "/placeholder.svg?key=8xk2p"}
+        image={page?.acf?.hero?.image?.url || "/rural-retreat-landscape.jpg"}
       />
 
-      <div className="container mx-auto px-4 py-12">
+      <div className="relative z-10 container mx-auto px-4 py-12">
         {page?.content.rendered && (
           <div
             className="prose prose-stone mb-12 max-w-none"

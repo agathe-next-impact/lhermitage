@@ -13,11 +13,11 @@ export default async function ContactsPage() {
       <PageHeader
         title={page?.title.rendered || "Contacts"}
         subtitle={page?.acf?.hero?.["sous-titre"]}
-        image={page?.acf?.hero?.image || "/placeholder.svg?key=2bc5n"}
+        image={page?.acf?.hero?.image?.url || "/rural-retreat-landscape.jpg"}
         color={getColorForPath("/infos-pratiques/contacts")}
       />
 
-      <div className="container mx-auto px-4 py-12">
+      <div className="relative z-10 container mx-auto px-4 py-12">
         <div className="grid gap-6 max-w-md mx-auto mb-12">
           <Card>
             <CardHeader>

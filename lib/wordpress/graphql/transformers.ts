@@ -176,13 +176,11 @@ export function transformPage(gqlPage: GqlPostBase & {
 }): WPPage {
   const pageAcf: PageACF = {}
 
-  // Try known page-specific ACF field groups
-  // "elementsDePageHero" — requires WordPress admin fix (graphql_field_name + map_graphql_types_from_location_rules)
-  // Also try legacy names for backwards compatibility
-  const heroData = gqlPage.elementsDePageHero || gqlPage.pageHero || gqlPage.hero
+  // "elementsDePage" ACF field group — hero image + subtitle for all pages
+  const heroData = gqlPage.elementsDePage?.hero
   if (heroData) {
     pageAcf.hero = {
-      "sous-titre": heroData.sousTitre || heroData["sous-titre"],
+      "sous-titre": heroData.sousTitre,
       image: heroData.image ? transformAcfMediaEdge(heroData.image) : undefined,
     }
   }

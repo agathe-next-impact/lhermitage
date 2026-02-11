@@ -1,9 +1,9 @@
 {
   "pages": {
-    "/(special)/visite-virtuelle/page": [
+    "/sejours-collectifs/nos-sejours/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(special)/visite-virtuelle/page.js"
+      "static/chunks/app/sejours-collectifs/nos-sejours/page.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
@@ -25,6 +25,33 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/[...slug]/page.js"
+    ],
+    "/ecosysteme-innovant/partenaires/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/ecosysteme-innovant/partenaires/page.js"
+    ],
+    "/ecosysteme-innovant/structures-hebergees/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/ecosysteme-innovant/structures-hebergees/page.css",
+      "static/chunks/app/ecosysteme-innovant/structures-hebergees/page.js"
+    ],
+    "/ecosysteme-innovant/evenements/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/ecosysteme-innovant/evenements/page.js"
+    ],
+    "/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/page.js"
+    ],
+    "/hebergements/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/hebergements/page.css",
+      "static/chunks/app/hebergements/page.js"
     ]
   }
 }

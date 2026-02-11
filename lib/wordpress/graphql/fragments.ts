@@ -27,10 +27,6 @@ export const FEATURED_IMAGE_FRAGMENT = gql`
   ${IMAGE_FIELDS}
 `
 
-// TODO: After WordPress admin ACF configuration, add these ACF field groups to PageFields:
-//   elementsDePageHero { sousTitre, image { node { ...ImageFields } } }
-// Requires: graphql_field_name fix (remove accents) + map_graphql_types_from_location_rules: 1
-// WARNING: Adding fields that don't exist in the schema will break ALL page queries.
 export const PAGE_FIELDS = gql`
   fragment PageFields on Page {
     databaseId
@@ -44,6 +40,16 @@ export const PAGE_FIELDS = gql`
     menuOrder
     featuredImage {
       ...FeaturedImageFields
+    }
+    elementsDePage {
+      hero {
+        sousTitre
+        image {
+          node {
+            ...ImageFields
+          }
+        }
+      }
     }
     pageDAccueil {
       slogan

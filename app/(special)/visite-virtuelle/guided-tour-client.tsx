@@ -1,35 +1,23 @@
 "use client"
 
 import dynamic from "next/dynamic"
+import type { MapPinPointData } from "@/lib/map/types"
 
-interface MapPinPointData {
-  id: number
-  type: string
-  title: string
-  slug: string
-  link: string
-  mapPinPoint: {
-    visibilite: boolean
-    nom?: string
-    images?: Array<{ url: string; alt: string }>
-    descriptif?: string
-    lien?: string | { url: string; title: string }
-    position?: {
-      latitude: number
-      longitude: number
-      altitude: number
-    }
+const GuidedTour = dynamic(
+  () => import("./visualizations/guided-tour").then((mod) => ({ default: mod.GuidedTour })),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        className="flex h-[600px] items-center justify-center rounded-lg border border-muted bg-muted/50"
+        role="status"
+        aria-label="Chargement de la visite virtuelle"
+      >
+        <p className="text-muted-foreground">Chargement de la visite virtuelle...</p>
+      </div>
+    ),
   }
-}
-
-const GuidedTour = dynamic(() => import("./visualizations/guided-tour").then((mod) => ({ default: mod.GuidedTour })), {
-  ssr: false,
-  loading: () => (
-    <div className="flex h-[600px] items-center justify-center rounded-lg border border-muted bg-muted/50">
-      <p className="text-muted-foreground">Chargement de la visite virtuelle...</p>
-    </div>
-  ),
-})
+)
 
 interface GuidedTourClientProps {
   mapPinPoints: MapPinPointData[]

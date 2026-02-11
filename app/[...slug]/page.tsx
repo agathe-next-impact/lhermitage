@@ -71,7 +71,7 @@ export async function generateStaticParams() {
 
 
     const filteredPages = pages.filter((page) => {
-      const wpBaseUrl = process.env.WP_API_URL?.replace("/wp-json/wp/v2", "") || "https://wp-asso.com"
+      const wpBaseUrl = process.env.WP_API_URL?.replace("/wp-json/wp/v2", "") || "https://admin.hermitagelelab.com"
       const pagePath = page.link.replace(wpBaseUrl, "").replace(/^\/+|\/+$/g, "")
 
       // Exclude empty paths and dedicated pages
@@ -86,7 +86,7 @@ export async function generateStaticParams() {
 
 
     return filteredPages.map((page) => {
-      const wpBaseUrl = process.env.WP_API_URL?.replace("/wp-json/wp/v2", "") || "https://wp-asso.com"
+      const wpBaseUrl = process.env.WP_API_URL?.replace("/wp-json/wp/v2", "") || "https://admin.hermitagelelab.com"
       const pagePath = page.link.replace(wpBaseUrl, "").replace(/^\/+|\/+$/g, "")
       const slugArray = pagePath.split("/").filter(Boolean)
 
@@ -137,13 +137,13 @@ export default async function CatchAllPage({ params }: PageProps) {
       <PageHeader
         title={page.title.rendered}
         subtitle={page.acf?.hero?.["sous-titre"]}
-        image={page.acf?.hero?.image || "/rural-retreat-landscape.jpg"}
+        image={page.acf?.hero?.image?.url || "/rural-retreat-landscape.jpg"}
       />
 
       {isHistoirePage && page.acf ? (
-        <HistoireTimeline acf={page.acf as HistoireACF} />
+        <div className="relative z-10"><HistoireTimeline acf={page.acf as HistoireACF} /></div>
       ) : isEquipePage ? (
-        <div className="container mx-auto px-4 py-12">
+        <div className="relative z-10 container mx-auto px-4 py-12">
           {page.content.rendered && (
             <div
               className="prose prose-stone max-w-none mb-12"
@@ -153,9 +153,9 @@ export default async function CatchAllPage({ params }: PageProps) {
           <TeamMasonry members={teamMembers} />
         </div>
       ) : isDevenirSocietairePage ? (
-        <DevenirSocietairePage page={page} />
+        <div className="relative z-10"><DevenirSocietairePage page={page} /></div>
       ) : (
-        <div className="container mx-auto px-4 py-12">
+        <div className="relative z-10 container mx-auto px-4 py-12">
           {page.content.rendered && (
             <div
               className="prose prose-stone max-w-none mb-12"

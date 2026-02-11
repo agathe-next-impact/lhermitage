@@ -1,54 +1,27 @@
 "use client"
 
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState, useRef, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { ExternalLink, Camera } from "lucide-react"
 import Image from "next/image"
 import { sanitizeUrl } from "@/lib/wordpress/sanitize"
-
-interface MapPinPointData {
-  id: number
-  type: string
-  title: string
-  slug: string
-  link: string
-  mapPinPoint: {
-    visibilite: boolean
-    nom?: string
-    images?: Array<{ url: string; alt: string }>
-    descriptif?: string
-    lien?: string | { url: string; title: string }
-    position?: {
-      latitude: number
-      longitude: number
-      altitude: number
-    }
-  }
-}
+import maplibregl from "maplibre-gl"
+import "maplibre-gl/dist/maplibre-gl.css"
+import { IGN_SATELLITE_STYLE, DEFAULT_CENTER, DEFAULT_ZOOM } from "@/lib/map/ign-style"
+import type { MapPinPointData, TourStop } from "@/lib/map/types"
 
 interface GuidedTourProps {
   mapPinPoints: MapPinPointData[]
 }
 
-const PANORAMAX_VIEWER_URL = "https://panoramax.ign.fr"
-
-export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
-  const [currentStop, setCurrentStop] = useState(0)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [isTransitioning, setIsTransitioning] = useState(false)
-  const [showInfoPanel, setShowInfoPanel] = useState(false)
-  const iframeRef = useRef<HTMLIFrameElement>(null)
-  const mapContainerRef = useRef<HTMLDivElement>(null)
-  const [mapReady, setMapReady] = useState(false)
-  const initSentRef = useRef(false)
-
-  const overviewStop = {
+function buildTourStops(mapPinPoints: MapPinPointData[]): TourStop[] {
+  const overviewStop: TourStop = {
     name: "Vue d'ensemble",
     description:
       "Bienvenue dans la visite virtuelle de l'Hermitage Saint-Antoine. Découvrez les différents points d'intérêt en cliquant sur les vignettes.",
-    longitude: 3.128,
-    latitude: 49.437,
-    zoom: 16,
+    longitude: DEFAULT_CENTER.lng,
+    latitude: DEFAULT_CENTER.lat,
+    zoom: DEFAULT_ZOOM,
     image: "/logo-hermitage.webp",
     link: "",
     externalLink: "",
@@ -57,164 +30,212 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
     pointId: 0,
   }
 
-  const dataStops = mapPinPoints.map((point) => ({
+  const dataStops: TourStop[] = mapPinPoints.map((point) => ({
     name: point.mapPinPoint?.nom || point.title || "Point d'intérêt",
     description: point.mapPinPoint?.descriptif || "",
-    longitude: point.mapPinPoint?.position?.longitude || 3.128,
-    latitude: point.mapPinPoint?.position?.latitude || 49.437,
+    longitude: point.mapPinPoint?.position?.longitude || DEFAULT_CENTER.lng,
+    latitude: point.mapPinPoint?.position?.latitude || DEFAULT_CENTER.lat,
     zoom: 19,
     image: point.mapPinPoint?.images?.[0]?.url,
     link: `/${point.type}/${point.slug}`,
-    externalLink: sanitizeUrl(typeof point.mapPinPoint?.lien === "string" ? point.mapPinPoint?.lien : point.mapPinPoint?.lien?.url || ""),
+    externalLink: sanitizeUrl(
+      typeof point.mapPinPoint?.lien === "string"
+        ? point.mapPinPoint?.lien
+        : point.mapPinPoint?.lien?.url || ""
+    ),
     type: point.type,
     slug: point.slug,
     pointId: point.id,
   }))
 
-  const tourStops = [overviewStop, ...dataStops]
-  // </CHANGE>
+  return [overviewStop, ...dataStops]
+}
 
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (!event.data || typeof event.data !== "object") return
-      if (event.data.type === "ready") {
-        setMapReady(true)
-      }
-      if (event.data.type === "markerClick") {
-        const stopIndex = event.data.stopIndex
-        handleStopClick(stopIndex)
-      }
-    }
+function createMarkerElement(isActive: boolean): HTMLDivElement {
+  const el = document.createElement("div")
+  el.style.width = isActive ? "20px" : "14px"
+  el.style.height = isActive ? "20px" : "14px"
+  el.style.borderRadius = "50%"
+  el.style.border = "2px solid white"
+  el.style.backgroundColor = isActive ? "#e75754" : "rgba(231, 87, 84, 0.8)"
+  el.style.boxShadow = isActive
+    ? "0 0 0 3px rgba(231, 87, 84, 0.4), 0 2px 8px rgba(0,0,0,0.3)"
+    : "0 2px 6px rgba(0,0,0,0.3)"
+  el.style.cursor = "pointer"
+  el.style.transition = "all 0.2s ease"
+  return el
+}
 
-    window.addEventListener("message", handleMessage)
+function updateMarkerStyle(el: HTMLElement, isActive: boolean) {
+  el.style.width = isActive ? "20px" : "14px"
+  el.style.height = isActive ? "20px" : "14px"
+  el.style.backgroundColor = isActive ? "#e75754" : "rgba(231, 87, 84, 0.8)"
+  el.style.boxShadow = isActive
+    ? "0 0 0 3px rgba(231, 87, 84, 0.4), 0 2px 8px rgba(0,0,0,0.3)"
+    : "0 2px 6px rgba(0,0,0,0.3)"
+}
 
-    return () => window.removeEventListener("message", handleMessage)
+export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
+  const [currentStop, setCurrentStop] = useState(0)
+  const [isTransitioning, setIsTransitioning] = useState(false)
+  const [showInfoPanel, setShowInfoPanel] = useState(false)
+  const [mapLoaded, setMapLoaded] = useState(false)
+
+  const mapContainerRef = useRef<HTMLDivElement>(null)
+  const mapRef = useRef<maplibregl.Map | null>(null)
+  const markersRef = useRef<maplibregl.Marker[]>([])
+  const tourStopsRef = useRef<TourStop[]>([])
+  const currentStopRef = useRef(0)
+
+  const tourStops = buildTourStops(mapPinPoints)
+  tourStopsRef.current = tourStops
+
+  const handleMarkerClick = useCallback((index: number) => {
+    if (index === currentStopRef.current) return
+
+    setShowInfoPanel(false)
+    setIsTransitioning(true)
+    currentStopRef.current = index
+    setCurrentStop(index)
   }, [])
 
-  const handleIframeLoad = () => {
-    if (initSentRef.current) {
-      return
-    }
-
-    if (iframeRef.current?.contentWindow) {
-      iframeRef.current.contentWindow.postMessage(
-        {
-          type: "init",
-          data: {
-            latitude: tourStops[0].latitude,
-            longitude: tourStops[0].longitude,
-            zoom: tourStops[0].zoom,
-            stops: tourStops,
-          },
-        },
-        "*",
-      )
-      initSentRef.current = true
-    }
-  }
-
+  // Initialize MapLibre GL map
   useEffect(() => {
-    if (mapReady && iframeRef.current?.contentWindow) {
-      const stop = tourStops[currentStop]
-      iframeRef.current.contentWindow.postMessage(
-        {
-          type: "flyTo",
-          data: {
-            latitude: stop.latitude,
-            longitude: stop.longitude,
-            zoom: stop.zoom,
-            duration: 3000,
-          },
-        },
-        "*",
-      )
+    if (!mapContainerRef.current) return
+
+    const map = new maplibregl.Map({
+      container: mapContainerRef.current,
+      style: IGN_SATELLITE_STYLE,
+      center: [DEFAULT_CENTER.lng, DEFAULT_CENTER.lat],
+      zoom: DEFAULT_ZOOM,
+      attributionControl: true,
+    })
+
+    mapRef.current = map
+
+    map.on("load", () => {
+      setMapLoaded(true)
+
+      // Add markers for data stops (skip overview at index 0)
+      tourStopsRef.current.forEach((stop, index) => {
+        if (index === 0) return
+
+        const el = createMarkerElement(index === currentStopRef.current)
+        el.setAttribute("role", "button")
+        el.setAttribute("aria-label", `Point d'intérêt : ${stop.name}`)
+        el.setAttribute("tabindex", "0")
+
+        el.addEventListener("click", () => handleMarkerClick(index))
+        el.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault()
+            handleMarkerClick(index)
+          }
+        })
+        el.addEventListener("mouseenter", () => {
+          el.style.transform = "scale(1.3)"
+        })
+        el.addEventListener("mouseleave", () => {
+          el.style.transform = "scale(1)"
+        })
+
+        const marker = new maplibregl.Marker({ element: el })
+          .setLngLat([stop.longitude, stop.latitude])
+          .addTo(map)
+
+        markersRef.current.push(marker)
+      })
+    })
+
+    return () => {
+      markersRef.current.forEach((m) => m.remove())
+      markersRef.current = []
+      map.remove()
+      mapRef.current = null
     }
-  }, [currentStop, mapReady])
+  }, [handleMarkerClick])
 
-  const handlePlayPause = () => {
-    setIsPlaying(!isPlaying)
-  }
+  // Fly to current stop when it changes
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !mapLoaded) return
 
-  const handleReset = () => {
-    setIsTransitioning(true)
-    setTimeout(() => {
-      setCurrentStop(0)
-      setIsPlaying(false)
+    const stop = tourStops[currentStop]
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+
+    map.flyTo({
+      center: [stop.longitude, stop.latitude],
+      zoom: stop.zoom,
+      duration: prefersReducedMotion ? 0 : 3000,
+      essential: true,
+    })
+
+    // Update marker styles
+    markersRef.current.forEach((marker, i) => {
+      const markerStopIndex = i + 1 // offset: overview has no marker
+      updateMarkerStyle(marker.getElement(), markerStopIndex === currentStop)
+    })
+
+    // Show info panel after flyTo completes
+    map.once("moveend", () => {
       setIsTransitioning(false)
-    }, 300)
-  }
+      setShowInfoPanel(true)
+    })
 
-  const handlePrevious = () => {
-    if (currentStop > 0) {
-      setIsTransitioning(true)
-      setTimeout(() => {
-        setCurrentStop(currentStop - 1)
-        setIsPlaying(false)
-        setIsTransitioning(false)
-      }, 300)
+    // Scroll map into view
+    if (mapContainerRef.current && currentStop > 0) {
+      const headerHeight = 80
+      const elementTop =
+        mapContainerRef.current.getBoundingClientRect().top + window.scrollY
+      window.scrollTo({
+        top: elementTop - headerHeight,
+        behavior: "smooth",
+      })
     }
-  }
+  }, [currentStop, mapLoaded])
 
-  const handleNext = () => {
-    if (currentStop < tourStops.length - 1) {
-      setIsTransitioning(true)
-      setTimeout(() => {
-        setCurrentStop(currentStop + 1)
-        setIsPlaying(false)
-        setIsTransitioning(false)
-      }, 300)
-    }
-  }
+  const handleStopClick = useCallback(
+    (index: number) => {
+      if (index === currentStop || isTransitioning) return
 
-  const handleStopClick = (index: number) => {
-    if (index !== currentStop) {
       setShowInfoPanel(false)
       setIsTransitioning(true)
-      setIsPlaying(false)
-      setTimeout(() => {
-        setCurrentStop(index)
-        setIsTransitioning(false)
-        setTimeout(() => {
-          setShowInfoPanel(true)
-        }, 100)
-        setTimeout(() => {
-          if (mapContainerRef.current) {
-            const headerHeight = 80
-            const elementTop = mapContainerRef.current.getBoundingClientRect().top + window.pageYOffset
-
-            window.scrollTo({
-              top: elementTop - headerHeight,
-              behavior: "smooth",
-            })
-          }
-        }, 50)
-      }, 300)
-    }
-  }
+      currentStopRef.current = index
+      setCurrentStop(index)
+    },
+    [currentStop, isTransitioning]
+  )
 
   const currentStopData = tourStops[currentStop]
 
   return (
     <div className="flex flex-col lg:flex-row gap-6">
-      {/* Main content area - 75% width on large screens */}
+      {/* Zone carte principale — 75% sur grand écran */}
       <div className="flex-1 lg:w-3/4 space-y-6">
-        {/* Main Panoramax viewer */}
-        <div
-          ref={mapContainerRef}
-          className="relative overflow-hidden rounded-xl border-2 border-muted bg-black shadow-2xl"
-        >
+        <div className="relative overflow-hidden rounded-xl border-2 border-muted bg-black shadow-2xl">
           <div className="relative h-[70vh] min-h-[600px] w-full">
-            <iframe
-              ref={iframeRef}
-              src="/satellite-viewer.html"
-              className="absolute inset-0 w-full h-full border-0"
-              title="Vue Satellite IGN"
-              onLoad={handleIframeLoad}
-              loading="eager"
+            <div
+              ref={mapContainerRef}
+              className="absolute inset-0 w-full h-full"
+              role="application"
+              aria-label="Carte satellite interactive - Visite virtuelle de l'Hermitage"
             />
 
+            {/* Loading overlay */}
+            {!mapLoaded && (
+              <div className="absolute inset-0 z-20 flex items-center justify-center bg-gradient-to-br from-muted to-background">
+                <div className="text-center space-y-4 p-8 bg-white rounded-xl shadow-lg border border-muted max-w-xs">
+                  <div className="mx-auto h-12 w-12 rounded-full border-[3px] border-muted border-t-primary animate-spin" />
+                  <div>
+                    <p className="font-semibold text-foreground">Chargement de la carte</p>
+                    <p className="text-xs text-muted-foreground">Images satellite IGN</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none z-[1]" />
 
             {/* Top info bar */}
             <div className="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-none z-10">
@@ -231,7 +252,11 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
               </div>
             </div>
 
+            {/* Info panel */}
             <div
+              role="region"
+              aria-live="polite"
+              aria-label="Informations sur le point d'intérêt"
               className={`absolute bottom-0 left-0 right-0 z-10 transition-all duration-500 ease-out ${
                 showInfoPanel ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
               }`}
@@ -241,7 +266,7 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
                   <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden rounded-l-2xl bg-white p-2">
                     <div className="relative h-full w-full rounded-lg overflow-hidden">
                       <Image
-                        src={currentStopData.image || "/placeholder.svg"}
+                        src={currentStopData.image || "/placeholder.jpg"}
                         alt={currentStopData.name}
                         fill
                         className="object-cover rounded-lg"
@@ -250,7 +275,6 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
                       />
                     </div>
 
-                    {/* Category badge */}
                     {currentStopData.type && (
                       <span className="absolute top-2 left-2 bg-primary text-white text-xs font-semibold px-2 py-0.5 rounded-full shadow-md z-10 capitalize">
                         {currentStopData.type}
@@ -260,14 +284,12 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
                 )}
 
                 <div className="flex-1 p-3 space-y-1.5">
-                  {/* Title */}
                   <div>
                     <h3 className="text-lg font-bold text-foreground text-balance leading-tight">
                       {currentStopData.name}
                     </h3>
                   </div>
 
-                  {/* Description - limited to 2 lines */}
                   {currentStopData.description && (
                     <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
                       {currentStopData.description}
@@ -297,24 +319,27 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
             <div className="text-sm">
               <p className="font-medium mb-1">Vue satellite haute résolution IGN</p>
               <p className="text-muted-foreground text-xs">
-                Explorez chaque point d'intérêt en vue satellite grâce aux orthophotos de l'Institut National de
-                l'Information Géographique et Forestière (IGN).
+                Explorez chaque point d&apos;intérêt en vue satellite grâce aux orthophotos de l&apos;Institut National de
+                l&apos;Information Géographique et Forestière (IGN).
               </p>
             </div>
           </div>
         </div>
       </div>
 
+      {/* Sidebar — vignettes des points d'intérêt */}
       <div className="lg:w-1/4 lg:max-w-sm">
         <div className="sticky top-4 space-y-3">
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-1">
-            Points d'intérêt ({tourStops.length})
+            Points d&apos;intérêt ({tourStops.length})
           </h3>
           <div className="grid grid-cols-2 gap-3 max-h-[80vh] overflow-y-scroll pr-2">
             {tourStops.map((stop, index) => (
               <button
-                key={index}
+                key={stop.pointId}
                 onClick={() => handleStopClick(index)}
+                aria-label={`Voir ${stop.name}`}
+                aria-current={index === currentStop ? "true" : undefined}
                 className={`group relative aspect-video overflow-hidden rounded-lg border-2 transition-all ${
                   index === currentStop
                     ? "border-primary ring-2 ring-primary/50"
@@ -323,7 +348,7 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
               >
                 {stop.image ? (
                   <Image
-                    src={stop.image || "/placeholder.svg"}
+                    src={stop.image || "/placeholder.jpg"}
                     alt={stop.name}
                     fill
                     className="object-cover transition-transform group-hover:scale-110 rounded-lg"

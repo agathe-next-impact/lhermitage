@@ -5,7 +5,7 @@
 
 import { sanitizeUrl } from "./sanitize"
 
-const WP_API_URL = process.env.WP_API_URL || "https://wp-asso.com/wp-json/wp/v2"
+const WP_API_URL = process.env.WP_API_URL || "https://admin.hermitagelelab.com/wp-json/wp/v2"
 
 // Extract the WordPress base URL from the API URL
 const getWordPressBaseUrl = (): string => {

@@ -55,10 +55,10 @@ export default async function ActivitesPage() {
       <PageHeader
         title={page?.title.rendered || "Activités"}
         subtitle={page?.acf?.hero?.["sous-titre"]}
-        image={page?.acf?.hero?.image || "/diverse-outdoor-activities.png"}
+        image={page?.acf?.hero?.image?.url || "/diverse-outdoor-activities.png"}
       />
 
-      <div className="container mx-auto px-4 py-12 pt-24">
+      <div className="relative z-10 container mx-auto px-4 py-12 pt-24">
         {page?.content.rendered && (
           <div
             className="prose prose-stone mb-12 max-w-none"

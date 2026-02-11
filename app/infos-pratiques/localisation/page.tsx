@@ -13,11 +13,11 @@ export default async function LocalisationPage() {
       <PageHeader
         title={page?.title.rendered || "Localisation"}
         subtitle={page?.acf?.hero?.["sous-titre"]}
-        image={page?.acf?.hero?.image || "/placeholder.svg?key=3df6p"}
+        image={page?.acf?.hero?.image?.url || "/rural-retreat-landscape.jpg"}
         color={getColorForPath("/infos-pratiques/localisation")}
       />
 
-      <div className="container mx-auto px-4 py-12">
+      <div className="relative z-10 container mx-auto px-4 py-12">
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">

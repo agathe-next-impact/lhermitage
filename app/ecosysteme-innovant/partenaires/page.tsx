@@ -19,10 +19,10 @@ export default async function PartenairesPage() {
       <PageHeader
         title={page?.title.rendered || "Partenaires"}
         subtitle={page?.acf?.hero?.["sous-titre"]}
-        image={page?.acf?.hero?.image || "/placeholder.svg?key=9wv3x"}
+        image={page?.acf?.hero?.image?.url || "/rural-retreat-landscape.jpg"}
       />
 
-      <div className="py-12">
+      <div className="relative z-10 py-12">
         {page?.content.rendered && (
           <div className="container mx-auto px-4 mb-12">
             <div className="prose prose-stone max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }} />

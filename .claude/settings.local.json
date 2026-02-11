@@ -29,7 +29,14 @@
       "Bash(netstat:*)",
       "Bash(if exist .next rmdir /s /q .next)",
       "Bash(powershell:*)",
-      "WebFetch(domain:data.geopf.fr)"
+      "WebFetch(domain:data.geopf.fr)",
+      "WebFetch(domain:localhost)",
+      "WebFetch(domain:v0-headless-word-press-app.vercel.app)",
+      "Bash(pnpm ls:*)",
+      "Bash(git log:*)",
+      "Bash(npm run build:*)",
+      "Read(//c/Users/agath/Downloads/**)",
+      "Bash(jq:*)"
     ]
   }
 }
