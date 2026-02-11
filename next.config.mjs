@@ -8,6 +8,11 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
+        hostname: 'admin.hermitagelelab.com',
+        pathname: '/wp-content/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'wp-asso.com',
         pathname: '/wp-content/**',
       },
@@ -41,11 +46,12 @@ const nextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://unpkg.com",
               "style-src 'self' 'unsafe-inline' https://unpkg.com",
-              "img-src 'self' data: blob: https://wp-asso.com https://*.wp.com https://secure.gravatar.com https://api.mapbox.com https://data.geopf.fr https://unpkg.com",
+              "img-src 'self' data: blob: https://admin.hermitagelelab.com https://wp-asso.com https://*.wp.com https://secure.gravatar.com https://api.mapbox.com https://data.geopf.fr https://unpkg.com",
               "font-src 'self'",
               "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com",
-              "connect-src 'self' https://wp-asso.com https://api.mapbox.com https://api.panoramax.ign.fr https://data.geopf.fr",
+              "connect-src 'self' https://admin.hermitagelelab.com https://wp-asso.com https://api.mapbox.com https://api.panoramax.ign.fr https://data.geopf.fr",
               "media-src 'self' https: blob:",
+              "object-src 'self' data:",
             ].join('; '),
           },
         ],

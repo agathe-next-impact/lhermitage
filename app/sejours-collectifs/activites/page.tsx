@@ -73,9 +73,13 @@ export default async function ActivitesPage() {
               Les activités n'ont pas pu être chargées depuis WordPress.
               <br />
               Vérifiez que le Custom Post Type "activite" est bien configuré avec "show_in_rest: true".
-              <br />
-              <br />
-              URL de l'API testée: {process.env.NEXT_PUBLIC_WP_API_URL}/activite
+              {process.env.NODE_ENV === 'development' && (
+                <>
+                  <br />
+                  <br />
+                  URL de l'API testée: {process.env.WP_API_URL}/activite
+                </>
+              )}
             </p>
           </div>
         ) : (

@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     template: "%s | L'Hermitage",
   },
   description: "L'Hermitage, tiers-lieu rural dédié aux séjours collectifs, hébergements et activités en pleine nature.",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://lhermitage.fr"),
+  metadataBase: new URL(process.env.SITE_URL || "https://lhermitage.fr"),
   openGraph: {
     type: "website",
     locale: "fr_FR",

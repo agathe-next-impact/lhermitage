@@ -1,4 +1,7 @@
 {
+  "/sejours-collectifs/nos-sejours/page": "app/sejours-collectifs/nos-sejours/page.js",
+  "/sejours-collectifs/activites/page": "app/sejours-collectifs/activites/page.js",
   "/page": "app/page.js",
-  "/(special)/visite-virtuelle/page": "app/(special)/visite-virtuelle/page.js"
+  "/hebergements/page": "app/hebergements/page.js",
+  "/[...slug]/page": "app/[...slug]/page.js"
 }

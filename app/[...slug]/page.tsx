@@ -71,7 +71,7 @@ export async function generateStaticParams() {
 
 
     const filteredPages = pages.filter((page) => {
-      const wpBaseUrl = process.env.NEXT_PUBLIC_WP_API_URL?.replace("/wp-json/wp/v2", "") || "https://wp-asso.com"
+      const wpBaseUrl = process.env.WP_API_URL?.replace("/wp-json/wp/v2", "") || "https://wp-asso.com"
       const pagePath = page.link.replace(wpBaseUrl, "").replace(/^\/+|\/+$/g, "")
 
       // Exclude empty paths and dedicated pages
@@ -86,7 +86,7 @@ export async function generateStaticParams() {
 
 
     return filteredPages.map((page) => {
-      const wpBaseUrl = process.env.NEXT_PUBLIC_WP_API_URL?.replace("/wp-json/wp/v2", "") || "https://wp-asso.com"
+      const wpBaseUrl = process.env.WP_API_URL?.replace("/wp-json/wp/v2", "") || "https://wp-asso.com"
       const pagePath = page.link.replace(wpBaseUrl, "").replace(/^\/+|\/+$/g, "")
       const slugArray = pagePath.split("/").filter(Boolean)
 

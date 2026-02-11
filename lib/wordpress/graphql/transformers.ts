@@ -187,6 +187,13 @@ export function transformPage(gqlPage: GqlPostBase & {
     }
   }
 
+  // "pageDAccueil" — homepage-specific ACF fields (slogan, video)
+  const accueilData = gqlPage.pageDAccueil
+  if (accueilData) {
+    if (accueilData.slogan) pageAcf.slogan = accueilData.slogan
+    if (accueilData.video) pageAcf.video = accueilData.video
+  }
+
   // Try page-specific ACF field groups that may have sous-titre
   if (!pageAcf.hero?.["sous-titre"]) {
     const pageSpecific = gqlPage.pageDevenirSocietaire || gqlPage.pageHistorique || gqlPage.pageServices
