@@ -9,13 +9,12 @@ export default async function LocalisationPage() {
   const page = await wpApi.getPageBySlug("localisation")
 
   return (
-    <div>
-      <PageHeader
-        title={page?.title.rendered || "Localisation"}
-        subtitle={page?.acf?.hero?.["sous-titre"]}
-        image={page?.acf?.hero?.image || "/placeholder.svg?key=3df6p"}
-        color={getColorForPath("/infos-pratiques/localisation")}
-      />
+    <PageHeader
+      title={page?.title.rendered || "Localisation"}
+      subtitle={page?.acf?.hero?.["sous-titre"]}
+      image={page?.acf?.hero?.image || "/placeholder.svg?key=3df6p"}
+      color={getColorForPath("/infos-pratiques/localisation")}
+    >
 
       <div className="container mx-auto px-4 py-12">
         <Card className="mb-8">
@@ -47,6 +46,6 @@ export default async function LocalisationPage() {
           <div className="prose prose-stone max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }} />
         )}
       </div>
-    </div>
+    </PageHeader>
   )
 }

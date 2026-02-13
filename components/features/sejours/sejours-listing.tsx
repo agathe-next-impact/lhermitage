@@ -31,13 +31,12 @@ export async function SejoursListing({
   }
 
   return (
-    <div>
-      <PageHeader
-        title={page?.title?.rendered || fallbackTitle}
-        subtitle={page?.acf?.hero?.["sous-titre"]}
-        image={page?.acf?.hero?.image || "/group-retreat-activities.jpg"}
-        color={getColorForPath(routePath)}
-      />
+    <PageHeader
+      title={page?.title?.rendered || fallbackTitle}
+      subtitle={page?.acf?.hero?.["sous-titre"]}
+      image={page?.acf?.hero?.image || "/group-retreat-activities.jpg"}
+      color={getColorForPath(routePath)}
+    >
 
       <div className="container mx-auto px-4 py-16">
         {page?.acf?.intro && (
@@ -84,6 +83,6 @@ export async function SejoursListing({
           </a>
         </div>
       </div>
-    </div>
+    </PageHeader>
   )
 }

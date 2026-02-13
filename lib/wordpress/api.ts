@@ -48,6 +48,7 @@ import {
 import { GET_SEJOURS, GET_SEJOUR_BY_SLUG } from "./graphql/queries/sejours"
 import { GET_MENU } from "./graphql/queries/menu"
 import { GET_TYPES_DE_PARTENAIRE } from "./graphql/queries/taxonomy"
+import { rewriteWordPressAssetUrl } from "./url-transform"
 import { logger } from "../logger"
 
 export class WordPressAPI {
@@ -244,7 +245,7 @@ export class WordPressAPI {
         // Add featured_media_url for backwards compatibility
         return {
           ...post,
-          featured_media_url: node.featuredImage?.node?.sourceUrl || null,
+          featured_media_url: node.featuredImage?.node?.sourceUrl ? rewriteWordPressAssetUrl(node.featuredImage.node.sourceUrl) : null,
         }
       })
     } catch (error) {

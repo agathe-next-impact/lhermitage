@@ -2,6 +2,7 @@ import { notFound } from "next/navigation"
 import dynamic from "next/dynamic"
 import type { Metadata } from "next"
 import { wpApi, getPageByPath } from "@/lib/wordpress/api"
+import { transformWordPressUrl } from "@/lib/wordpress/url-transform"
 import { PageHeader } from "@/components/layout/page-header"
 import type { HistoireACF } from "@/lib/wordpress/types"
 import { REVALIDATION } from "@/lib/constants"
@@ -71,8 +72,7 @@ export async function generateStaticParams() {
 
 
     const filteredPages = pages.filter((page) => {
-      const wpBaseUrl = process.env.NEXT_PUBLIC_WP_API_URL?.replace("/wp-json/wp/v2", "") || "https://wp-asso.com"
-      const pagePath = page.link.replace(wpBaseUrl, "").replace(/^\/+|\/+$/g, "")
+      const pagePath = transformWordPressUrl(page.link).replace(/^\/+|\/+$/g, "")
 
       // Exclude empty paths and dedicated pages
       if (pagePath === "") return false
@@ -86,8 +86,7 @@ export async function generateStaticParams() {
 
 
     return filteredPages.map((page) => {
-      const wpBaseUrl = process.env.NEXT_PUBLIC_WP_API_URL?.replace("/wp-json/wp/v2", "") || "https://wp-asso.com"
-      const pagePath = page.link.replace(wpBaseUrl, "").replace(/^\/+|\/+$/g, "")
+      const pagePath = transformWordPressUrl(page.link).replace(/^\/+|\/+$/g, "")
       const slugArray = pagePath.split("/").filter(Boolean)
 
       return {
@@ -133,12 +132,11 @@ export default async function CatchAllPage({ params }: PageProps) {
 
 
   return (
-    <div>
-      <PageHeader
-        title={page.title.rendered}
-        subtitle={page.acf?.hero?.["sous-titre"]}
-        image={page.acf?.hero?.image || "/rural-retreat-landscape.jpg"}
-      />
+    <PageHeader
+      title={page.title.rendered}
+      subtitle={page.acf?.hero?.["sous-titre"]}
+      image={page.acf?.hero?.image || "/rural-retreat-landscape.jpg"}
+    >
 
       {isHistoirePage && page.acf ? (
         <HistoireTimeline acf={page.acf as HistoireACF} />
@@ -181,6 +179,6 @@ export default async function CatchAllPage({ params }: PageProps) {
           )}
         </div>
       )}
-    </div>
+    </PageHeader>
   )
 }

@@ -15,12 +15,11 @@ export default async function PartenairesPage() {
   // const outerCirclePartners = partenaires.slice(midPoint)
 
   return (
-    <div>
-      <PageHeader
-        title={page?.title.rendered || "Partenaires"}
-        subtitle={page?.acf?.hero?.["sous-titre"]}
-        image={page?.acf?.hero?.image || "/placeholder.svg?key=9wv3x"}
-      />
+    <PageHeader
+      title={page?.title.rendered || "Partenaires"}
+      subtitle={page?.acf?.hero?.["sous-titre"]}
+      image={page?.acf?.hero?.image || "/placeholder.svg?key=9wv3x"}
+    >
 
       <div className="py-12">
         {page?.content.rendered && (
@@ -31,6 +30,6 @@ export default async function PartenairesPage() {
 
         <PartenairesClient partenaires={partenaires} categories={categories} />
       </div>
-    </div>
+    </PageHeader>
   )
 }

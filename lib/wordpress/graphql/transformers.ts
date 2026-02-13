@@ -16,6 +16,8 @@ import type {
   WPLink,
   WPGoogleMap,
 } from "../types"
+import { transformWordPressUrl, rewriteWordPressAssetUrl } from "../url-transform"
+import { transformContentLinks } from "../transform-content"
 
 // --- Image transformers ---
 
@@ -42,12 +44,12 @@ export function transformImage(gqlImage: GqlMediaItem | null | undefined): WPIma
 
   const sizesMap: Record<string, string> = {}
   gqlImage.mediaDetails?.sizes?.forEach((s) => {
-    sizesMap[s.name] = s.sourceUrl
+    sizesMap[s.name] = rewriteWordPressAssetUrl(s.sourceUrl)
   })
 
   return {
     id: gqlImage.databaseId,
-    url: gqlImage.sourceUrl,
+    url: rewriteWordPressAssetUrl(gqlImage.sourceUrl),
     alt: gqlImage.altText || "",
     width: gqlImage.mediaDetails?.width || 0,
     height: gqlImage.mediaDetails?.height || 0,
@@ -87,7 +89,7 @@ function transformAcfMediaEdge(edge: { node?: GqlMediaItem } | GqlMediaItem | nu
 function transformLink(gqlLink: any): WPLink | undefined {
   if (!gqlLink) return undefined
   return {
-    url: gqlLink.url || "",
+    url: transformWordPressUrl(gqlLink.url || ""),
     title: gqlLink.title || gqlLink.titre || "",
     target: gqlLink.target || "",
   }
@@ -113,14 +115,14 @@ function transformFeaturedMedia(gqlFeaturedImage: { node: GqlMediaItem } | null 
   const media = gqlFeaturedImage.node
   const sizesMap: Record<string, { source_url: string }> = {}
   media.mediaDetails?.sizes?.forEach((s) => {
-    sizesMap[s.name] = { source_url: s.sourceUrl }
+    sizesMap[s.name] = { source_url: rewriteWordPressAssetUrl(s.sourceUrl) }
   })
 
   return {
     "wp:featuredmedia": [
       {
         id: media.databaseId,
-        source_url: media.sourceUrl,
+        source_url: rewriteWordPressAssetUrl(media.sourceUrl),
         alt_text: media.altText || "",
         media_details: {
           width: media.mediaDetails?.width || 0,
@@ -158,10 +160,10 @@ export function transformPost<T = any>(
     slug: gqlPost.slug,
     status: gqlPost.status || "publish",
     type: type || gqlPost.contentTypeName || "post",
-    link: gqlPost.link || "",
+    link: transformWordPressUrl(gqlPost.link || ""),
     title: { rendered: gqlPost.title || "" },
-    content: { rendered: gqlPost.content || "" },
-    excerpt: { rendered: gqlPost.excerpt || "" },
+    content: { rendered: transformContentLinks(gqlPost.content || "") },
+    excerpt: { rendered: transformContentLinks(gqlPost.excerpt || "") },
     acf: acf,
     _embedded: transformFeaturedMedia(gqlPost.featuredImage),
   }
@@ -202,7 +204,7 @@ export function transformPage(gqlPage: GqlPostBase & {
     pageAcf.timeline = historiqueData.timeline.map((item: any) => ({
       titre: item.titre,
       annee: item.annee,
-      descriptif: item.descriptif,
+      descriptif: transformContentLinks(item.descriptif || ""),
       image: item.image ? transformAcfMediaEdge(item.image) : undefined,
     }))
   }
@@ -217,14 +219,14 @@ export function transformPage(gqlPage: GqlPostBase & {
       pageAcf.bandeau = {
         titre: dsData.bandeau.titre,
         cta: dsData.bandeau.cta ? {
-          url: dsData.bandeau.cta.url,
+          url: transformWordPressUrl(dsData.bandeau.cta.url),
           title: dsData.bandeau.cta.title,
           target: dsData.bandeau.cta.target,
         } : undefined,
         galerie: dsData.bandeau.images?.nodes ? {
           images: dsData.bandeau.images.nodes.map((img: any) => ({
             ID: img.databaseId,
-            url: img.sourceUrl,
+            url: rewriteWordPressAssetUrl(img.sourceUrl),
             alt: img.altText || "",
           })),
         } : undefined,
@@ -311,7 +313,7 @@ export function transformHebergementAcf(gqlPost: Record<string, any>): Hebergeme
 
   return {
     nom: merged.nom,
-    descriptif: merged.descriptif,
+    descriptif: transformContentLinks(merged.descriptif || ""),
     photos: transformAcfMediaConnection(merged.photos),
     video: merged.video,
     visibilite: merged.visibilite,
@@ -333,7 +335,7 @@ export function transformActiviteAcf(gqlPost: Record<string, any>): ActiviteACF 
 
   return {
     nom: acf.nom,
-    descriptif: acf.descriptif,
+    descriptif: transformContentLinks(acf.descriptif || ""),
   }
 }
 
@@ -347,7 +349,7 @@ export function transformStructureAcf(gqlPost: Record<string, any>): StructureAC
 
   return {
     nom: merged.nom,
-    descriptif: merged.descriptif,
+    descriptif: transformContentLinks(merged.descriptif || ""),
     photos: transformAcfMediaConnection(merged.photos),
     lien: merged.lien ? transformLink(merged.lien) : undefined,
     video: merged.video,
@@ -370,7 +372,7 @@ export function transformEvenementAcf(gqlPost: Record<string, any>): EvenementAC
 
   return {
     nom: acf.nom || gqlPost.title || "",
-    descriptif: acf.descriptif,
+    descriptif: transformContentLinks(acf.descriptif || ""),
     date_de_debut: acf.dateDeDebut,
     date_de_fin: acf.dateDeFin,
     heure_de_debut: acf.heureDeDebut,
@@ -387,7 +389,7 @@ export function transformPartenaireAcf(gqlPost: Record<string, any>): Partenaire
     nom: acf.nom || "",
     logo: transformAcfMediaEdge(acf.logo),
     lien: acf.lien ? transformLink(acf.lien) : undefined,
-    descriptif: acf.descriptif,
+    descriptif: transformContentLinks(acf.descriptif || ""),
   }
 }
 
@@ -397,7 +399,7 @@ export function transformTeamMemberAcf(gqlPost: Record<string, any>): TeamMember
 
   return {
     binome_seul: acf.binomeSeul,
-    descriptif: acf.descriptif,
+    descriptif: transformContentLinks(acf.descriptif || ""),
     photo: transformAcfMediaEdge(acf.photo),
     activite_principale: acf.activitePrincipale,
   }
@@ -413,7 +415,7 @@ export function transformEspaceDeTravailAcf(gqlPost: Record<string, any>): Espac
 
   return {
     nom: merged.nom,
-    descriptif: merged.descriptif,
+    descriptif: transformContentLinks(merged.descriptif || ""),
     photos: transformAcfMediaConnection(merged.photos),
     video: merged.video,
     visibilite: merged.visibilite,
@@ -437,7 +439,7 @@ export function transformSejourAcf(gqlPost: Record<string, any>): SejourACF {
 
   return {
     nom: acf.nom || gqlPost.title || "",
-    descriptif: acf.descriptif,
+    descriptif: transformContentLinks(acf.descriptif || ""),
   }
 }
 
@@ -456,7 +458,7 @@ export function transformMenuItems(
   const flat: WPMenuItem[] = gqlMenuItems.map((item) => ({
     id: item.databaseId,
     title: item.label,
-    url: item.url,
+    url: transformWordPressUrl(item.url),
     parent: item.parentDatabaseId || 0,
     order: item.order || 0,
   }))

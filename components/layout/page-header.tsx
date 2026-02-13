@@ -10,6 +10,7 @@ interface PageHeaderProps {
   image?: unknown
   className?: string
   color?: string
+  children?: React.ReactNode
 }
 
 const brandColors = [
@@ -30,7 +31,7 @@ function getMainBlobColor(title: string): string {
   return brandColors[index]
 }
 
-export function PageHeader({ title, subtitle, className = "", color }: PageHeaderProps) {
+export function PageHeader({ title, subtitle, className = "", color, children }: PageHeaderProps) {
   const pathname = usePathname()
   const colorFromPath = useMemo(() => {
     if (color) return color
@@ -41,8 +42,8 @@ export function PageHeader({ title, subtitle, className = "", color }: PageHeade
 
 
   return (
-    <div className={`relative h-[40vh] md:h-[50vh] w-full overflow-visible -mt-16 ${className}`}>
-      {/* Animated SVG Background */}
+    <div className={`relative w-full -mt-16 ${className}`}>
+      {/* Animated SVG Background - covers entire page */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         {/* Base background color */}
         <motion.div
@@ -92,57 +93,67 @@ export function PageHeader({ title, subtitle, className = "", color }: PageHeade
         </motion.div>
       </div>
 
-      {/* Title blob */}
-      <motion.div
-        key={`blob-container-${title}`}
-        className="absolute left-[5%] sm:left-[8%] md:left-[13%] lg:left-[15%] z-20"
-        style={{
-          bottom: "-60px",
-          width: "clamp(280px, 80vw, 500px)",
-          height: "clamp(120px, 25vw, 200px)",
-        }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-      >
+      {/* Header area with title blob */}
+      <div className="relative h-[40vh] md:h-[50vh] overflow-visible">
+        {/* Title blob */}
         <motion.div
-          className="absolute left-0 top-0 w-full h-full"
+          key={`blob-container-${title}`}
+          className="absolute left-[5%] sm:left-[8%] md:left-[13%] lg:left-[15%] z-20"
           style={{
-            maskImage: "url(/images/titre-page-blob.svg)",
-            maskSize: "contain",
-            maskRepeat: "no-repeat",
-            maskPosition: "left center",
-            WebkitMaskImage: "url(/images/titre-page-blob.svg)",
-            WebkitMaskSize: "contain",
-            WebkitMaskRepeat: "no-repeat",
-            WebkitMaskPosition: "left center",
-            backgroundColor: mainBlobColor,
+            bottom: "-60px",
+            width: "clamp(280px, 80vw, 500px)",
+            height: "clamp(120px, 25vw, 200px)",
           }}
-          initial={{ clipPath: "circle(0% at 50% 50%)" }}
-          animate={{ clipPath: "circle(100% at 50% 50%)" }}
-          transition={{ duration: 1.15, ease: "easeOut", delay: 0.3 }}
-        />
-
-        <motion.div
-          key={`blob-text-${title}`}
-          className="absolute top-0 left-0 flex h-full items-center pl-4 sm:pl-6 md:pl-12 lg:pl-16 pr-2 overflow-visible"
-          style={{ width: "100%" }}
-          initial={{ opacity: 0, x: -30, clipPath: "circle(0% at 50% 50%)" }}
-          animate={{ opacity: 1, x: 0, clipPath: "circle(100% at 50% 50%)" }}
-          transition={{ duration: 1.15, ease: "easeOut", delay: 0.3 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <div className="w-full">
-            <h1 className="mb-1 font-sans text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-extrabold uppercase text-white leading-tight drop-shadow-sm">
-              {title}
-            </h1>
-            {subtitle && (
-              <p className="text-[10px] sm:text-xs md:text-sm lg:text-base text-white leading-snug line-clamp-2 md:line-clamp-none">
-                {subtitle}
-              </p>
-            )}
-          </div>
+          <motion.div
+            className="absolute left-0 top-0 w-full h-full"
+            style={{
+              maskImage: "url(/images/titre-page-blob.svg)",
+              maskSize: "contain",
+              maskRepeat: "no-repeat",
+              maskPosition: "left center",
+              WebkitMaskImage: "url(/images/titre-page-blob.svg)",
+              WebkitMaskSize: "contain",
+              WebkitMaskRepeat: "no-repeat",
+              WebkitMaskPosition: "left center",
+              backgroundColor: mainBlobColor,
+            }}
+            initial={{ clipPath: "circle(0% at 50% 50%)" }}
+            animate={{ clipPath: "circle(100% at 50% 50%)" }}
+            transition={{ duration: 1.15, ease: "easeOut", delay: 0.3 }}
+          />
+
+          <motion.div
+            key={`blob-text-${title}`}
+            className="absolute top-0 left-0 flex h-full items-center pl-4 sm:pl-6 md:pl-12 lg:pl-16 pr-2 overflow-visible"
+            style={{ width: "100%" }}
+            initial={{ opacity: 0, x: -30, clipPath: "circle(0% at 50% 50%)" }}
+            animate={{ opacity: 1, x: 0, clipPath: "circle(100% at 50% 50%)" }}
+            transition={{ duration: 1.15, ease: "easeOut", delay: 0.3 }}
+          >
+            <div className="w-full">
+              <h1 className="mb-1 font-sans text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-extrabold uppercase text-white leading-tight drop-shadow-sm">
+                {title}
+              </h1>
+              {subtitle && (
+                <p className="text-[10px] sm:text-xs md:text-sm lg:text-base text-white leading-snug line-clamp-2 md:line-clamp-none">
+                  {subtitle}
+                </p>
+              )}
+            </div>
+          </motion.div>
         </motion.div>
-      </motion.div>
+      </div>
+
+      {/* Page content - transparent, over the background */}
+      {children && (
+        <div className="relative z-10">
+          {children}
+        </div>
+      )}
     </div>
   )
 }

@@ -13,12 +13,11 @@ export default async function SejoursIndividuelsPage() {
   const [page, hebergements] = await Promise.all([wpApi.getPageBySlug("sejours-individuels"), wpApi.getHebergements()])
 
   return (
-    <div>
-      <PageHeader
-        title={page?.title.rendered || "Séjours Individuels"}
-        subtitle={page?.acf?.hero?.["sous-titre"]}
-        image={page?.acf?.hero?.image || "/placeholder.svg?key=8xk2p"}
-      />
+    <PageHeader
+      title={page?.title.rendered || "Séjours Individuels"}
+      subtitle={page?.acf?.hero?.["sous-titre"]}
+      image={page?.acf?.hero?.image || "/placeholder.svg?key=8xk2p"}
+    >
 
       <div className="container mx-auto px-4 py-12">
         {page?.content.rendered && (
@@ -57,6 +56,6 @@ export default async function SejoursIndividuelsPage() {
           </Button>
         </section>
       </div>
-    </div>
+    </PageHeader>
   )
 }

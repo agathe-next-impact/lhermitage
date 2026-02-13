@@ -62,8 +62,7 @@ export default async function ActivitePage({ params }: ActivitePageProps) {
   const featuredImage = activite._embedded?.["wp:featuredmedia"]?.[0]
 
   return (
-    <>
-      <PageHeader title={title} image={featuredImage?.source_url || "/diverse-outdoor-activities.png"} />
+    <PageHeader title={title} image={featuredImage?.source_url || "/diverse-outdoor-activities.png"} >
 
       <div className="container mx-auto px-4 py-12">
         {description && (
@@ -79,6 +78,6 @@ export default async function ActivitePage({ params }: ActivitePageProps) {
           </Button>
         </section>
       </div>
-    </>
+    </PageHeader>
   )
 }

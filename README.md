@@ -23,7 +23,7 @@ Application Next.js headless connectée à WordPress pour présenter un lieu rur
 1. Créer un fichier `.env.local` à la racine du projet :
 
 ```bash
-NEXT_PUBLIC_WP_API_URL=https://wp-asso.com/wp-json/wp/v2
+NEXT_PUBLIC_WP_API_URL=https://admin.hermitagelelab.com/wp-json/wp/v2
 MAPBOX_TOKEN=your_mapbox_token_here
 ```
 

@@ -5,6 +5,7 @@ import { Open_Sans, Inter } from 'next/font/google'
 import "./globals.css"
 import { SiteHeader } from "@/components/layout/site-header"
 import { Providers } from "@/components/providers"
+import { getWpOrigin } from "@/lib/wordpress/config"
 
 const openSans = Open_Sans({
   subsets: ["latin"],
@@ -38,11 +39,13 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const wpOrigin = getWpOrigin()
+
   return (
     <html lang="fr" className={`${openSans.variable} ${inter.variable}`}>
       <head>
-        <link rel="preconnect" href="https://wp-asso.com" />
-        <link rel="dns-prefetch" href="https://wp-asso.com" />
+        <link rel="preconnect" href={wpOrigin} />
+        <link rel="dns-prefetch" href={wpOrigin} />
       </head>
       <body className="min-h-screen bg-background font-sans antialiased">
         <Providers>

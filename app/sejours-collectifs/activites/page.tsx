@@ -51,12 +51,11 @@ export default async function ActivitesPage() {
   })
 
   return (
-    <div>
-      <PageHeader
-        title={page?.title.rendered || "Activités"}
-        subtitle={page?.acf?.hero?.["sous-titre"]}
-        image={page?.acf?.hero?.image || "/diverse-outdoor-activities.png"}
-      />
+    <PageHeader
+      title={page?.title.rendered || "Activités"}
+      subtitle={page?.acf?.hero?.["sous-titre"]}
+      image={page?.acf?.hero?.image || "/diverse-outdoor-activities.png"}
+    >
 
       <div className="container mx-auto px-4 py-12 pt-24">
         {page?.content.rendered && (
@@ -82,6 +81,6 @@ export default async function ActivitesPage() {
           <ActivitiesClient categories={categories} activities={activitiesData} />
         )}
       </div>
-    </div>
+    </PageHeader>
   )
 }

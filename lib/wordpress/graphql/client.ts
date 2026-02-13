@@ -2,8 +2,13 @@ import { GraphQLClient } from "graphql-request"
 import { decodeObjectEntities } from "../decode"
 import { logger } from "../../logger"
 
-const GRAPHQL_URL =
-  process.env.NEXT_PUBLIC_WP_GRAPHQL_URL || "https://wp-asso.com/graphql"
+function getGraphQLUrl(): string {
+  const url = process.env.WP_GRAPHQL_URL
+  if (!url) throw new Error("WP_GRAPHQL_URL environment variable is required")
+  return url
+}
+
+const GRAPHQL_URL = getGraphQLUrl()
 
 function createClient(revalidate: number = 900): GraphQLClient {
   return new GraphQLClient(GRAPHQL_URL, {

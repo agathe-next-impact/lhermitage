@@ -9,13 +9,12 @@ export default async function ContactsPage() {
   const page = await wpApi.getPageBySlug("contacts")
 
   return (
-    <div>
-      <PageHeader
-        title={page?.title.rendered || "Contacts"}
-        subtitle={page?.acf?.hero?.["sous-titre"]}
-        image={page?.acf?.hero?.image || "/placeholder.svg?key=2bc5n"}
-        color={getColorForPath("/infos-pratiques/contacts")}
-      />
+    <PageHeader
+      title={page?.title.rendered || "Contacts"}
+      subtitle={page?.acf?.hero?.["sous-titre"]}
+      image={page?.acf?.hero?.image || "/placeholder.svg?key=2bc5n"}
+      color={getColorForPath("/infos-pratiques/contacts")}
+    >
 
       <div className="container mx-auto px-4 py-12">
         <div className="grid gap-6 max-w-md mx-auto mb-12">
@@ -60,6 +59,6 @@ export default async function ContactsPage() {
           <div className="prose prose-stone max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }} />
         )}
       </div>
-    </div>
+    </PageHeader>
   )
 }

@@ -3410,7 +3410,7 @@
         "publicly_queryable": true,
         "show_ui": true,
         "show_in_menu": true,
-        "admin_menu_parent": "https:\/\/wp-asso.com\/wp-admin\/edit.php?post_type=sejour",
+        "admin_menu_parent": "https:\/\/admin.hermitagelelab.com\/wp-admin\/edit.php?post_type=sejour",
         "show_in_admin_bar": true,
         "show_in_nav_menus": true,
         "show_in_rest": false,

@@ -15,16 +15,15 @@ export default async function VisiteVirtuellePage() {
   }
 
   return (
-    <div>
-      <PageHeader
-        title="Découvrir le lieu"
-        subtitle="Explorez l'Hermitage à travers un parcours virtuel immersif"
-        image="/rural-retreat-landscape.jpg"
-      />
+    <PageHeader
+      title="Découvrir le lieu"
+      subtitle="Explorez l'Hermitage à travers un parcours virtuel immersif"
+      image="/rural-retreat-landscape.jpg"
+    >
 
       <div className="container mx-auto px-4 py-12">
         <GuidedTourClient mapPinPoints={mapPinPoints} />
       </div>
-    </div>
+    </PageHeader>
   )
 }

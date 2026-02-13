@@ -10,13 +10,12 @@ export default async function SejoursCollectifsPage() {
   const page = await wpApi.getPageBySlug("sejours-collectifs")
 
   return (
-    <div>
-      <PageHeader
-        title={page?.title.rendered || "Séjours Collectifs"}
-        subtitle={page?.acf?.hero?.["sous-titre"]}
-        image={page?.acf?.hero?.image || "/group-retreat-activities.jpg"}
-        color={getColorForPath("/sejours-collectifs")}
-      />
+    <PageHeader
+      title={page?.title.rendered || "Séjours Collectifs"}
+      subtitle={page?.acf?.hero?.["sous-titre"]}
+      image={page?.acf?.hero?.image || "/group-retreat-activities.jpg"}
+      color={getColorForPath("/sejours-collectifs")}
+    >
 
       <div className="container mx-auto px-4 py-16">
         {page?.content.rendered && (
@@ -26,6 +25,6 @@ export default async function SejoursCollectifsPage() {
           />
         )}
       </div>
-    </div>
+    </PageHeader>
   )
 }
