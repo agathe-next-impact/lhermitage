@@ -44,24 +44,24 @@ export function PageHeader({ title, subtitle, image, className = "", color }: Pa
       {/* Bento grid 4 colonnes × 3 lignes */}
       <div
         className="grid grid-cols-4 grid-rows-2 relative"
-        style={{ height: 'clamp(160px, 35vh, 480px)' }}
+        style={{ height: "clamp(160px, 35vh, 480px)" }}
       >
         {/* Fond image : couvre toute la grille, reveal latéral */}
         <motion.div
           className="col-start-1 col-end-5 row-start-1 row-end-3 relative overflow-hidden"
           style={{
-            borderRadius: '15px',
+            borderRadius: "15px",
             backgroundColor: mainBlobColor,
             ...(image && {
               backgroundImage: `url(${image})`,
-              backgroundAttachment: 'fixed',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
+              backgroundAttachment: "fixed",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
             }),
           }}
-          initial={{ clipPath: 'inset(0 100% 0 0)' }}
-          animate={{ clipPath: 'inset(0 0% 0 0)' }}
-          transition={{ duration: 1.15, ease: 'easeOut', delay: 0.2 }}
+          initial={{ clipPath: "inset(0 100% 0 0)" }}
+          animate={{ clipPath: "inset(0 0% 0 0)" }}
+          transition={{ duration: 1.15, ease: "easeOut", delay: 0.2 }}
         />
 
         {/* Encoche titre : col 4, ligne 1 (mobile: cols 3-4) */}
@@ -83,30 +83,23 @@ export function PageHeader({ title, subtitle, image, className = "", color }: Pa
           <div
             className="absolute top-0 -left-[15px]"
             style={{
-              width: '15px',
-              height: '15px',
-              background: 'radial-gradient(circle at 0% 100%, transparent 15px, var(--background) 15px)',
+              width: "15px",
+              height: "15px",
+              background:
+                "radial-gradient(circle at 0% 100%, transparent 15px, var(--background) 15px)",
             }}
           />
           {/* Arrondi convexe – bas droite, transition vers ligne 2 */}
           <div
             className="absolute bottom-0 right-0 translate-y-full"
             style={{
-              width: '15px',
-              height: '15px',
-              background: 'radial-gradient(circle at 0% 100%, transparent 15px, var(--background) 15px)',
+              width: "15px",
+              height: "15px",
+              background:
+                "radial-gradient(circle at 0% 100%, transparent 15px, var(--background) 15px)",
             }}
           />
         </div>
-      </div>
-      <div className="relative z-10 mx-auto my-2 px-4 py-2 rounded-xl py-8"
-        style={{ backgroundColor: mainBlobColor }}
-      >
-        {subtitle && (
-          <p className="text-xl text-center text-white mx-auto">
-            {subtitle}
-          </p>
-        )}
       </div>
     </div>
   )

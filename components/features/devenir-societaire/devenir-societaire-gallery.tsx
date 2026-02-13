@@ -32,7 +32,7 @@ export function DevenirSocietaireGallery({ images }: DevenirSocietaireGalleryPro
       y: 0,
       transition: {
         duration: 0.8,
-        ease: "easeOut",
+        ease: "easeOut" as const,
       },
     },
   }
@@ -40,7 +40,7 @@ export function DevenirSocietaireGallery({ images }: DevenirSocietaireGalleryPro
   const hoverVariants = {
     hover: {
       scale: 1.05,
-      transition: { duration: 0.3, ease: "easeOut" },
+      transition: { duration: 0.3, ease: "easeOut" as const },
     },
   }
 

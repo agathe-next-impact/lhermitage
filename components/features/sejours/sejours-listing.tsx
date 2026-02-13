@@ -35,7 +35,11 @@ export async function SejoursListing({
       <PageHeader
         title={page?.title?.rendered || fallbackTitle}
         subtitle={page?.acf?.hero?.["sous-titre"]}
-        image={page?.acf?.hero?.image || "/group-retreat-activities.jpg"}
+        image={
+          typeof page?.acf?.hero?.image === "string"
+            ? page.acf.hero.image
+            : page?.acf?.hero?.image?.url || "/group-retreat-activities.jpg"
+        }
         color={getColorForPath(routePath)}
       />
 
@@ -57,7 +61,11 @@ export async function SejoursListing({
         {sejours.length > 0 ? (
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {sejours.map((sejour, index) => (
-              <SejourPricingCard key={sejour.id} sejour={sejour} featured={index === featuredIndex} />
+              <SejourPricingCard
+                key={sejour.id}
+                sejour={sejour}
+                featured={index === featuredIndex}
+              />
             ))}
           </div>
         ) : (

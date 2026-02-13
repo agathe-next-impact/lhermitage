@@ -6,7 +6,7 @@ import { REVALIDATION } from "@/lib/constants"
 export const revalidate = REVALIDATION.listing
 
 export default async function VisiteVirtuellePage() {
-  let mapPinPoints = []
+  let mapPinPoints: Awaited<ReturnType<typeof wpApi.getMapPinPoints>> = []
 
   try {
     mapPinPoints = await wpApi.getMapPinPoints()

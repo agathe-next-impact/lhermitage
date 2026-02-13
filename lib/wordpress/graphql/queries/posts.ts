@@ -183,6 +183,7 @@ export const GET_STRUCTURES = gql`
         }
         structures {
           nom
+          typeDeStructure
           descriptif
           photos {
             nodes {
@@ -239,6 +240,7 @@ export const GET_STRUCTURE_BY_SLUG = gql`
       }
       structures {
         nom
+        typeDeStructure
         descriptif
         photos {
           nodes {

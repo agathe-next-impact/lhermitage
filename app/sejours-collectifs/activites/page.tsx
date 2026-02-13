@@ -16,7 +16,10 @@ function getCategoryColor(slug: string): string {
 }
 
 export default async function ActivitesPage() {
-  const [page, activites] = await Promise.all([wpApi.getPageBySlug("activites"), wpApi.getActivites()])
+  const [page, activites] = await Promise.all([
+    wpApi.getPageBySlug("activites"),
+    wpApi.getActivites(),
+  ])
 
   const categoriesMap = new Map()
   activites.forEach((activite) => {
@@ -27,7 +30,8 @@ export default async function ActivitesPage() {
           id: categoryData.id.toString(),
           name: categoryData.name,
           slug: categoryData.slug,
-          description: categoryData.description || `Découvrez nos activités de type ${categoryData.name}`,
+          description:
+            categoryData.description || `Découvrez nos activités de type ${categoryData.name}`,
           color: getCategoryColor(categoryData.slug),
         })
       }
@@ -70,14 +74,15 @@ export default async function ActivitesPage() {
           <div className="rounded-lg border border-muted bg-muted/50 p-8 text-center">
             <h3 className="mb-2 text-lg font-semibold">Aucune activité trouvée</h3>
             <p className="text-muted-foreground">
-              Les activités n'ont pas pu être chargées depuis WordPress.
+              Les activités n&apos;ont pas pu être chargées depuis WordPress.
               <br />
-              Vérifiez que le Custom Post Type "activite" est bien configuré avec "show_in_rest: true".
-              {process.env.NODE_ENV === 'development' && (
+              Vérifiez que le Custom Post Type &quot;activite&quot; est bien configuré avec
+              &quot;show_in_rest: true&quot;.
+              {process.env.NODE_ENV === "development" && (
                 <>
                   <br />
                   <br />
-                  URL de l'API testée: {process.env.WP_API_URL}/activite
+                  URL de l&apos;API testée: {process.env.WP_API_URL}/activite
                 </>
               )}
             </p>

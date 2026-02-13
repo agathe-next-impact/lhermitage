@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef } from "react"
 
 interface VideoBackgroundProps {
   videoUrl: string
@@ -11,7 +11,6 @@ interface VideoBackgroundProps {
 export function VideoBackground({ videoUrl, startTime = 0, onPlay }: VideoBackgroundProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const playerRef = useRef<any>(null)
-  const [videoId, setVideoId] = useState<string | null>(null)
 
   // Use a ref for onPlay to avoid re-initializing the player when the callback changes
   const onPlayRef = useRef(onPlay)
@@ -21,22 +20,19 @@ export function VideoBackground({ videoUrl, startTime = 0, onPlay }: VideoBackgr
     onPlayRef.current = onPlay
   }, [onPlay])
 
-  useEffect(() => {
-    // Extract video ID
+  const videoId = useMemo(() => {
     const patterns = [
       /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
       /youtube\.com\/watch\?.*v=([^&\n?#]+)/,
     ]
 
-    let id = null
     for (const pattern of patterns) {
       const match = videoUrl.match(pattern)
       if (match && match[1]) {
-        id = match[1]
-        break
+        return match[1]
       }
     }
-    setVideoId(id)
+    return null
   }, [videoUrl])
 
   useEffect(() => {

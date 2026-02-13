@@ -29,7 +29,7 @@ export default async function LocalisationPage() {
             <div className="space-y-4">
               <div>
                 <h3 className="mb-2 font-semibold">En voiture</h3>
-                <p className="text-muted-foreground">Informations d'accès en voiture</p>
+                <p className="text-muted-foreground">Informations d&apos;accès en voiture</p>
               </div>
               <div>
                 <h3 className="mb-2 font-semibold">En train</h3>
@@ -44,7 +44,10 @@ export default async function LocalisationPage() {
         </Card>
 
         {page?.content.rendered && (
-          <div className="prose prose-stone max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }} />
+          <div
+            className="prose prose-stone max-w-none"
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }}
+          />
         )}
       </div>
     </div>

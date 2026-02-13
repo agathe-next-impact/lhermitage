@@ -5,7 +5,13 @@ import { useCallback, useEffect, useState, type JSX } from "react"
 import Image from "next/image"
 import Autoplay from "embla-carousel-autoplay"
 import { ChevronRight } from "lucide-react"
-import { AnimatePresence, motion, type MotionProps, useAnimation, type Variants } from "motion/react"
+import {
+  AnimatePresence,
+  motion,
+  type MotionProps,
+  useAnimation,
+  type Variants,
+} from "framer-motion"
 
 import { cn } from "@/lib/utils"
 import {
@@ -209,7 +215,7 @@ export function LoadingCarousel({
     (index: number) => {
       api?.scrollTo(index)
     },
-    [api],
+    [api]
   )
 
   return (
@@ -219,7 +225,7 @@ export function LoadingCarousel({
       transition={{ duration: 0.8, ease: "easeOut" }}
       className={cn(
         "w-full max-w-6xl mx-auto rounded-lg bg-muted shadow-[0px_1px_1px_0px_rgba(0,0,0,0.05),0px_1px_1px_0px_rgba(255,252,240,0.5)_inset,0px_0px_0px_1px_hsla(0,0%,100%,0.1)_inset,0px_0px_1px_0px_rgba(28,27,26,0.5)]",
-        className,
+        className
       )}
     >
       <div className="w-full overflow-hidden rounded-lg">
@@ -265,7 +271,11 @@ export function LoadingCarousel({
                         } left-0 right-0 p-4 sm:p-6 md:p-8`}
                       >
                         {displayTips[current]?.url ? (
-                          <a href={displayTips[current]?.url} target="_blank" rel="noopener noreferrer">
+                          <a
+                            href={displayTips[current]?.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
                             <p className="text-white text-center md:text-left text-base sm:text-lg md:text-xl lg:text-2xl lg:font-bold tracking-tight font-medium leading-relaxed">
                               {tip.text}
                             </p>
@@ -289,7 +299,12 @@ export function LoadingCarousel({
             </>
           )}
         </Carousel>
-        <div className={cn("bg-muted p-4 ", showIndicators && !backgroundTips ? "lg:py-2 lg:px-4 " : "")}>
+        <div
+          className={cn(
+            "bg-muted p-4 ",
+            showIndicators && !backgroundTips ? "lg:py-2 lg:px-4 " : ""
+          )}
+        >
           <div className="flex flex-col gap-4">
             {showIndicators && (
               <div className="flex space-x-2 overflow-x-auto pb-2 sm:pb-0 w-full">

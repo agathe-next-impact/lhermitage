@@ -56,6 +56,10 @@ export interface OptimizedMapPinPoint {
 }
 
 export interface PageACF {
+  // Homepage fields
+  slogan?: string
+  video?: string
+  // Hero section
   hero?: {
     "sous-titre"?: string
     image?: WPImage
@@ -86,9 +90,22 @@ export interface PageACF {
   }
   "quest-ce_que_la_scic"?: {
     titre?: string
-    caracteristiques_de_la_scic?: Array<{ caracteristique: { titre?: string; descriptif?: string } }>
+    caracteristiques_de_la_scic?: Array<{
+      caracteristique: { titre?: string; descriptif?: string }
+    }>
   }
   informations_societariat?: Array<{ titre?: string; descriptif?: string }>
+  // Page Structures fields
+  page_structures?: {
+    structures_internes?: {
+      titre_de_section?: string
+      image_de_section?: WPImage
+    }
+    structures_hebergees?: {
+      titre_de_section?: string
+      image_de_section?: WPImage
+    }
+  }
   [key: string]: any
 }
 
@@ -135,11 +152,15 @@ export interface SejourACF {
   descriptif?: string
   hebergements?: {
     titre?: string
-    hebergements?: string[] // Array of page URLs
+    hebergements?: Array<{
+      hebergement: string | WPPost<HebergementACF>
+    }>
   }
   activites?: {
     titre?: string
-    activite?: string[] // Array of page URLs
+    activite?: Array<{
+      activite: string | WPPost<ActiviteACF>
+    }>
   }
 }
 
@@ -216,14 +237,7 @@ export interface WPPost<T = any> {
         sizes: Record<string, { source_url: string }>
       }
     }>
-    "wp:term"?: Array<
-      Array<{
-        id: number
-        name: string
-        slug: string
-        taxonomy: string
-      }>
-    >
+    "wp:term"?: Array<Array<WPTerm>>
   }
 }
 
