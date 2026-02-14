@@ -1,13 +1,8 @@
 "use client"
 
 import Image from "next/image"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
 import { HeroCard } from "@/components/features/home/hero-card"
-import { motion } from "framer-motion"
-import { useState } from "react"
 import { VideoBackground } from "@/components/features/home/video-background"
-import { useIsMounted } from "@/hooks/use-is-mounted"
 
 interface HomePageClientProps {
   homepage: any
@@ -17,121 +12,58 @@ interface HomePageClientProps {
 }
 
 export function HomePageClient({ homepage, sejours, hebergements, evenements }: HomePageClientProps) {
-  const mounted = useIsMounted()
-  const [showContent, setShowContent] = useState(false)
-
-  const handleVideoPlay = () => {
-    // Start delay timer when video starts playing
-    setTimeout(() => {
-      setShowContent(true)
-    }, 3500) // 3.5 seconds delay
-  }
-
-  const videoUrl = homepage.acf?.video || null // Use raw video URL for VideoBackground
-  const slogan = homepage.acf?.slogan || "Bienvenue au Tiers-Lieu Rural"
+  const videoUrl = homepage.acf?.video || null
 
   return (
-    <div className="flex flex-col">
-      {/* Hero Section */}
-      <section className="relative h-screen w-full overflow-hidden bg-black">
-        {videoUrl ? (
-          <VideoBackground videoUrl={videoUrl} onPlay={handleVideoPlay} />
-        ) : (
-          <Image
-            src="/rural-retreat-center-in-nature-with-mountains.jpg"
-            alt="Tiers-Lieu Rural"
-            fill
-            className="object-cover z-0"
-            priority
-            onLoad={() => setShowContent(true)} // Show content immediately if image fallback
-          />
-        )}
-
-        <div className="absolute inset-0 flex items-center justify-start px-8 md:px-16 z-10">
-          {/* Main blob with slogan */}
-          <div className="relative w-full max-w-md aspect-square">
-            {/* Added animation to main blob */}
-            <motion.div
-              className="absolute inset-0 w-full h-full"
-              initial={{ opacity: 0, clipPath: "circle(0% at 50% 50%)" }}
-              animate={
-                showContent
-                  ? { opacity: 1, clipPath: "circle(100% at 50% 50%)" }
-                  : { opacity: 0, clipPath: "circle(0% at 50% 50%)" }
-              }
-              transition={{ duration: 1.15, ease: "easeOut" }}
-            >
-              <svg
-                viewBox="0 0 400 416"
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-full h-full"
-                preserveAspectRatio="xMidYMid meet"
-              >
-                <path
-                  d="M158.151 0C294.644 0 400 115.89 400 252.451C400 366.426 272.07 415.632 158.151 415.632C69.4297 415.632 0 341.217 0 252.451C0 136.098 41.8567 0 158.151 0Z"
-                  fill="white"
-                  opacity="0.9"
-                />
-              </svg>
-            </motion.div>
-            <motion.div
-              className="absolute inset-0 flex items-center justify-center p-6 md:p-8 lg:p-10"
-              initial={{ opacity: 0, x: -30 }}
-              animate={showContent ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
-              transition={{ duration: 1.15, ease: "easeOut" }}
-            >
-              <h1 className="font-serif text-xl md:text-2xl lg:text-3xl font-bold text-center text-[#E75754] leading-tight">
-                {slogan}
-              </h1>
-            </motion.div>
-
-            {/* Added animations to logo icons with staggered delays */}
-            {/* Logo 1 - top right with highest opacity */}
-            <motion.div
-              className="absolute -top-8 -right-8 w-24 h-24 md:w-32 md:h-32 opacity-80"
-              initial={{ opacity: 0, scale: 0 }}
-              animate={showContent ? { opacity: 0.8, scale: 1 } : { opacity: 0, scale: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              <Image src="/logo-arcs-light.png" alt="" fill className="object-contain" />
-            </motion.div>
-
-            {/* Logo 2 - bottom left with medium opacity */}
-            <motion.div
-              className="absolute -bottom-12 -left-12 w-32 h-32 md:w-40 md:h-40 opacity-50"
-              initial={{ opacity: 0, scale: 0 }}
-              animate={showContent ? { opacity: 0.5, scale: 1 } : { opacity: 0, scale: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-            >
-              <Image src="/logo-arcs-light.png" alt="" fill className="object-contain" />
-            </motion.div>
-
-            {/* Logo 3 - right side with lowest opacity */}
-            <motion.div
-              className="absolute top-1/2 -right-6 w-20 h-20 md:w-28 md:h-28 opacity-30"
-              initial={{ opacity: 0, scale: 0 }}
-              animate={showContent ? { opacity: 0.3, scale: 1 } : { opacity: 0, scale: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-            >
-              <Image src="/logo-arcs-light.png" alt="" fill className="object-contain" />
-            </motion.div>
-          </div>
+    <div className="mt-[78px] flex flex-col">
+      {/* Hero Section - Grid 4 colonnes × 5 lignes */}
+      <section className="w-[calc(100%-1rem)] mx-auto relative h-[calc(100vh-82px)] grid grid-cols-4 grid-rows-5">
+        {/* Vidéo : couvre toute la grille en fond */}
+        <div className="col-start-1 col-end-5 row-start-1 row-end-6 relative overflow-hidden bg-black" style={{ borderRadius: '15px' }}>
+          {videoUrl ? (
+            <VideoBackground videoUrl={videoUrl} />
+          ) : (
+            <Image
+              src="/rural-retreat-center-in-nature-with-mountains.jpg"
+              alt="Tiers-Lieu Rural"
+              fill
+              className="object-cover z-0"
+              priority
+            />
+          )}
         </div>
-
-        <div className="container relative mx-auto flex h-full flex-col items-center justify-end px-4 pb-16 z-20">
-          <motion.div
-            className="flex flex-wrap gap-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={showContent ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-          >
-            <Button asChild size="lg">
-              <Link href="/sejours-collectifs">Séjours Collectifs</Link>
-            </Button>
-            <Button asChild size="lg" variant="outline">
-              <Link href="/sejours-individuels">Séjours Individuels</Link>
-            </Button>
-          </motion.div>
+        {/* Masque coin supérieur droit : crée la forme en escalier (3 col haut / 4 col bas) */}
+        <div className="col-start-4 col-end-5 row-start-1 row-end-3 z-10 bg-background relative flex items-end pb-2 pl-2 rounded-bl-2xl">
+          <div className="h-full flex flex-col justify-between p-4 bg-brand-coral backdrop-blur-sm rounded-lg">
+            <Image
+              src="/logo-hermitage-new.png"
+              alt="Logo du Tiers-Lieu Rural"
+              width={300}
+              height={150}
+              className="mb-2 w-full h-full object-contain"
+            />
+            <h1 className="font-heading text-2xl font-bold leading-tight text-white">
+              {homepage.acf?.slogan || "Bienvenue au Tiers-Lieu Rural"}
+            </h1>
+          </div>
+          {/* Arrondi convexe - fin de la 1ère ligne */}
+          <div
+            className="absolute top-0 -left-[15px]"
+            style={{
+              width: '15px',
+              height: '15px',
+              background: 'radial-gradient(circle at 0% 100%, transparent 15px, var(--background) 15px)',
+            }}
+          />
+          {/* Arrondi convexe - début de la 3e ligne (pleine largeur) */}
+          <div
+            className="absolute bottom-0 right-0 translate-y-full"
+            style={{
+              width: '15px',
+              height: '15px',
+              background: 'radial-gradient(circle at 0% 100%, transparent 15px, var(--background) 15px)',
+            }}
+          />
         </div>
       </section>
 

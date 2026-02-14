@@ -4,21 +4,19 @@
  */
 
 import { sanitizeUrl } from "./sanitize"
-import { getWpHostname } from "./config"
 
-/** Known WordPress domains — any URL matching these is treated as internal */
-const WP_DOMAINS = new Set<string>()
+const WP_API_URL = process.env.WP_API_URL || "https://admin.hermitagelelab.com/wp-json/wp/v2"
 
-// Primary hostname derived from env vars (WP_GRAPHQL_URL / NEXT_PUBLIC_WP_API_URL)
-const primary = getWpHostname()
-if (primary !== "localhost") WP_DOMAINS.add(primary)
+// Extract the WordPress base URL from the API URL
+const getWordPressBaseUrl = (): string => WP_API_URL.replace(/\/wp-json\/wp\/v2\/?$/, "")
 
-// Optional: additional legacy domains during migration (comma-separated)
-// e.g. WP_LEGACY_DOMAINS=admin.hermitagelelab.com,old-domain.com
-const legacy = process.env.WP_LEGACY_DOMAINS
-if (legacy) {
-  legacy.split(",").map(d => d.trim()).filter(Boolean).forEach(d => WP_DOMAINS.add(d))
-}
+const primaryHostname = (() => {
+  try {
+    return new URL(getWordPressBaseUrl()).hostname
+  } catch {
+    return "localhost"
+  }
+})()
 
 /**
  * Transform a WordPress URL to a frontend URL.
@@ -37,7 +35,7 @@ export function transformWordPressUrl(url: string): string {
   // Parse the URL to check if it's a known WordPress domain
   try {
     const parsed = new URL(url)
-    if (WP_DOMAINS.has(parsed.hostname)) {
+    if (parsed.hostname === primaryHostname) {
       // Extract just the pathname — works regardless of domain
       return parsed.pathname || "/"
     }
@@ -59,8 +57,8 @@ export function rewriteWordPressAssetUrl(url: string): string {
   if (!url) return url
   try {
     const parsed = new URL(url)
-    if (WP_DOMAINS.has(parsed.hostname) && parsed.hostname !== primary) {
-      parsed.hostname = primary
+    if (parsed.hostname !== primaryHostname) {
+      parsed.hostname = primaryHostname
       return parsed.toString()
     }
   } catch { /* not a valid URL */ }

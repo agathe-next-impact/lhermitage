@@ -90,7 +90,7 @@ export default async function SejourPage({ params }: SejourPageProps) {
                 <Card key={hebergement.id || index} className="overflow-hidden">
                   {imageUrl && (
                     <div className="relative h-48 w-full">
-                      <Image src={imageUrl || "/placeholder.svg"} alt={imageAlt} fill className="object-cover" />
+                      <Image src={imageUrl || "/placeholder.jpg"} alt={imageAlt} fill className="object-cover" />
                     </div>
                   )}
                   <CardHeader>
@@ -129,7 +129,7 @@ export default async function SejourPage({ params }: SejourPageProps) {
                 <Card key={activite.id || index} className="overflow-hidden">
                   {imageUrl && (
                     <div className="relative h-48 w-full">
-                      <Image src={imageUrl || "/placeholder.svg"} alt={imageAlt} fill className="object-cover" />
+                      <Image src={imageUrl || "/placeholder.jpg"} alt={imageAlt} fill className="object-cover" />
                     </div>
                   )}
                   <CardHeader>

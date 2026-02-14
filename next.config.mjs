@@ -1,20 +1,3 @@
-// Derive WordPress hostname from env vars (single source of truth: .env.local)
-const wpHostname = (() => {
-  try {
-    const url = process.env.WP_GRAPHQL_URL || process.env.NEXT_PUBLIC_WP_API_URL
-    if (url) return new URL(url).hostname
-  } catch { /* ignore */ }
-  return 'localhost'
-})()
-
-// Legacy domains (WP may still return image/link URLs with old domain during migration)
-const wpLegacyHostnames = (process.env.WP_LEGACY_DOMAINS || '')
-  .split(',').map(d => d.trim()).filter(Boolean)
-  .filter(d => d !== wpHostname) // avoid duplicates with primary
-
-// All WP hostnames for CSP headers
-const allWpHostnames = [wpHostname, ...wpLegacyHostnames]
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: {
@@ -23,12 +6,16 @@ const nextConfig = {
   },
   images: {
     remotePatterns: [
-      // Primary WP domain + any legacy domains (for images still served from old host)
-      ...allWpHostnames.map(host => ({
+      {
         protocol: 'https',
-        hostname: host,
+        hostname: 'admin.hermitagelelab.com',
         pathname: '/wp-content/**',
-      })),
+      },
+      {
+        protocol: 'https',
+        hostname: 'wp-asso.com',
+        pathname: '/wp-content/**',
+      },
       {
         protocol: 'https',
         hostname: '*.wp.com',
@@ -57,13 +44,15 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://unpkg.com",
-              "style-src 'self' 'unsafe-inline' https://unpkg.com",
-              `img-src 'self' data: blob: ${allWpHostnames.map(h => `https://${h}`).join(' ')} https://*.wp.com https://secure.gravatar.com https://api.mapbox.com https://data.geopf.fr https://unpkg.com`,
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: blob: https://admin.hermitagelelab.com https://wp-asso.com https://*.wp.com https://secure.gravatar.com https://data.geopf.fr",
               "font-src 'self'",
               "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com",
-              `connect-src 'self' ${allWpHostnames.map(h => `https://${h}`).join(' ')} https://api.mapbox.com https://api.panoramax.ign.fr https://data.geopf.fr`,
+              "connect-src 'self' https://admin.hermitagelelab.com https://wp-asso.com https://api.panoramax.ign.fr https://data.geopf.fr",
+              "worker-src 'self' blob:",
               "media-src 'self' https: blob:",
+              "object-src 'self' data:",
             ].join('; '),
           },
         ],

@@ -9,14 +9,15 @@ export default async function HorairesPage() {
   const page = await wpApi.getPageBySlug("jours-et-horaires-douverture")
 
   return (
-    <PageHeader
-      title={page?.title.rendered || "Jours et horaires d'ouverture"}
-      subtitle={page?.acf?.hero?.["sous-titre"]}
-      image={page?.acf?.hero?.image || "/placeholder.svg?key=1gh8q"}
-      color={getColorForPath("/infos-pratiques/jours-et-horaires-douverture")}
-    >
+    <div>
+      <PageHeader
+        title={page?.title.rendered || "Jours et horaires d'ouverture"}
+        subtitle={page?.acf?.hero?.["sous-titre"]}
+        image={page?.acf?.hero?.image?.url || "/rural-retreat-landscape.jpg"}
+        color={getColorForPath("/infos-pratiques/jours-et-horaires-douverture")}
+      />
 
-      <div className="container mx-auto px-4 py-12">
+      <div className="relative z-10 container mx-auto px-4 py-12">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -49,6 +50,6 @@ export default async function HorairesPage() {
           />
         )}
       </div>
-    </PageHeader>
+    </div>
   )
 }

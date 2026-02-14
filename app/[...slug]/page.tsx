@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation"
 import dynamic from "next/dynamic"
 import type { Metadata } from "next"
+import type React from "react"
 import { wpApi, getPageByPath } from "@/lib/wordpress/api"
-import { transformWordPressUrl } from "@/lib/wordpress/url-transform"
 import { PageHeader } from "@/components/layout/page-header"
 import type { HistoireACF } from "@/lib/wordpress/types"
 import { REVALIDATION } from "@/lib/constants"
@@ -65,14 +65,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export async function generateStaticParams() {
-
   try {
     const pages = await wpApi.getPages({ per_page: 100 })
 
-
-
     const filteredPages = pages.filter((page) => {
-      const pagePath = transformWordPressUrl(page.link).replace(/^\/+|\/+$/g, "")
+      const wpBaseUrl = process.env.WP_API_URL?.replace("/wp-json/wp/v2", "") || "https://admin.hermitagelelab.com"
+      const pagePath = page.link.replace(wpBaseUrl, "").replace(/^\/+|\/+$/g, "")
 
       // Exclude empty paths and dedicated pages
       if (pagePath === "") return false
@@ -84,9 +82,9 @@ export async function generateStaticParams() {
       return true
     })
 
-
     return filteredPages.map((page) => {
-      const pagePath = transformWordPressUrl(page.link).replace(/^\/+|\/+$/g, "")
+      const wpBaseUrl = process.env.WP_API_URL?.replace("/wp-json/wp/v2", "") || "https://admin.hermitagelelab.com"
+      const pagePath = page.link.replace(wpBaseUrl, "").replace(/^\/+|\/+$/g, "")
       const slugArray = pagePath.split("/").filter(Boolean)
 
       return {
@@ -130,55 +128,62 @@ export default async function CatchAllPage({ params }: PageProps) {
     notFound()
   }
 
+  let content: React.ReactNode = null
+
+  if (isHistoirePage && page.acf) {
+    content = <div className="relative z-10"><HistoireTimeline acf={page.acf as HistoireACF} /></div>
+  } else if (isEquipePage) {
+    content = (
+      <div className="relative z-10 mx-auto px-4 py-2">
+        {page.content.rendered && (
+          <div
+            className="prose prose-stone max-w-none mb-6"
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }}
+          />
+        )}
+        <TeamMasonry members={teamMembers} />
+      </div>
+    )
+  } else if (isDevenirSocietairePage) {
+    content = <div className="relative z-10"><DevenirSocietairePage page={page} /></div>
+  } else if (isActivitesPage) {
+    content = (
+      <div className="relative z-10 mx-auto px-4 py-2">
+        {activites.length === 0 ? (
+          <div className="rounded-lg border border-muted bg-muted/50 px-8 text-center">
+            <h3 className="mb-2 text-lg font-semibold">Aucune activité trouvée</h3>
+            <p className="text-muted-foreground">
+              Les activités n'ont pas pu être chargées depuis WordPress.
+              <br />
+              Vérifiez que le Custom Post Type "activite" est bien configuré avec "show_in_rest: true".
+            </p>
+          </div>
+        ) : (
+          <ActivitesFilter activites={activites} />
+        )}
+      </div>
+    )
+  } else {
+    content = (
+      <div className="relative z-10 mx-auto px-4 py-2">
+        {page.content.rendered && (
+          <div
+            className="prose prose-stone max-w-none mb-6"
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }}
+          />
+        )}
+      </div>
+    )
+  }
 
   return (
-    <PageHeader
-      title={page.title.rendered}
-      subtitle={page.acf?.hero?.["sous-titre"]}
-      image={page.acf?.hero?.image || "/rural-retreat-landscape.jpg"}
-    >
-
-      {isHistoirePage && page.acf ? (
-        <HistoireTimeline acf={page.acf as HistoireACF} />
-      ) : isEquipePage ? (
-        <div className="container mx-auto px-4 py-12">
-          {page.content.rendered && (
-            <div
-              className="prose prose-stone max-w-none mb-12"
-              dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }}
-            />
-          )}
-          <TeamMasonry members={teamMembers} />
-        </div>
-      ) : isDevenirSocietairePage ? (
-        <DevenirSocietairePage page={page} />
-      ) : (
-        <div className="container mx-auto px-4 py-12">
-          {page.content.rendered && (
-            <div
-              className="prose prose-stone max-w-none mb-12"
-              dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }}
-            />
-          )}
-
-          {isActivitesPage && (
-            <>
-              {activites.length === 0 ? (
-                <div className="rounded-lg border border-muted bg-muted/50 p-8 text-center">
-                  <h3 className="mb-2 text-lg font-semibold">Aucune activité trouvée</h3>
-                  <p className="text-muted-foreground">
-                    Les activités n'ont pas pu être chargées depuis WordPress.
-                    <br />
-                    Vérifiez que le Custom Post Type "activite" est bien configuré avec "show_in_rest: true".
-                  </p>
-                </div>
-              ) : (
-                <ActivitesFilter activites={activites} />
-              )}
-            </>
-          )}
-        </div>
-      )}
-    </PageHeader>
+    <div>
+      <PageHeader
+        title={page.title.rendered}
+        subtitle={page.acf?.hero?.["sous-titre"]}
+        image={page.acf?.hero?.image?.url || "/rural-retreat-landscape.jpg"}
+      />
+      {content}
+    </div>
   )
 }

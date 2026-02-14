@@ -1,35 +1,16 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx tsc:*)",
-      "Bash(git mv:*)",
-      "Bash(git add:*)",
-      "Bash(npx next build:*)",
-      "Bash(find:*)",
-      "Bash(wc:*)",
-      "Bash(xargs:*)",
-      "Bash(ls:*)",
-      "Bash(cat:*)",
-      "Read(//c/dev/lhermitage/**)",
-      "Bash(sort:*)",
-      "Bash(dir:*)",
-      "Bash(npm audit:*)",
-      "Bash(git -C /c/dev/lhermitage log --oneline --all)",
-      "Bash(git -C /c/dev/lhermitage log --all --full-history -S \".env.local\" -- .env.local)",
-      "WebFetch(domain:admin.hermitagelelab.com)",
-      "Bash(curl:*)",
-      "Bash(python -m json.tool:*)",
-      "Bash(findstr:*)",
-      "Bash(python:*)",
-      "Bash(node -e:*)",
-      "Bash(node:*)",
-      "Bash(del:*)",
-      "Bash(npx ts-node:*)",
-      "Bash(npx next dev:*)",
-      "Bash(netstat:*)",
-      "Bash(\"c:\\\\dev\\\\lhermitage\\\\update-pageheader.ps1\" << 'PSEOF'\n$files = @\\(\n    'c:\\\\dev\\\\lhermitage\\\\app\\\\hebergements\\\\page.tsx',\n    'c:\\\\dev\\\\lhermitage\\\\app\\\\sejours-collectifs\\\\page.tsx',\n    'c:\\\\dev\\\\lhermitage\\\\app\\\\ecosysteme-innovant\\\\partenaires\\\\page.tsx',\n    'c:\\\\dev\\\\lhermitage\\\\app\\\\infos-pratiques\\\\jours-et-horaires-douverture\\\\page.tsx',\n    'c:\\\\dev\\\\lhermitage\\\\app\\\\ecosysteme-innovant\\\\structures-hebergees\\\\page.tsx',\n    'c:\\\\dev\\\\lhermitage\\\\app\\\\infos-pratiques\\\\localisation\\\\page.tsx',\n    'c:\\\\dev\\\\lhermitage\\\\app\\\\ecosysteme-innovant\\\\evenements\\\\page.tsx',\n    'c:\\\\dev\\\\lhermitage\\\\app\\\\sejours-collectifs\\\\activites\\\\page.tsx',\n    'c:\\\\dev\\\\lhermitage\\\\app\\\\sejours-individuels\\\\page.tsx',\n    'c:\\\\dev\\\\lhermitage\\\\app\\\\infos-pratiques\\\\contacts\\\\page.tsx',\n    'c:\\\\dev\\\\lhermitage\\\\app\\\\services\\\\page.tsx',\n    'c:\\\\dev\\\\lhermitage\\\\app\\\\\\(special\\)\\\\visite-virtuelle\\\\page.tsx',\n    'c:\\\\dev\\\\lhermitage\\\\components\\\\features\\\\sejours\\\\sejours-listing.tsx',\n    'c:\\\\dev\\\\lhermitage\\\\app\\\\[...slug]\\\\page.tsx'\n\\)\n\nforeach \\($file in $files\\) {\n    Write-Host \"Processing: $file\"\n    $content = Get-Content -Path $file -Raw\n    \n    # Step 1: Remove the opening <div> wrapper before PageHeader\n    $content = $content -replace '\\(\\\\r?\\\\n\\)\\([ \\\\t]*\\)<div>\\\\s*\\\\r?\\\\n\\([ \\\\t]*<PageHeader\\)', \"`$1`$3\"\n    \n    # Step 2: Find the self-closing /> on the PageHeader tag and change to >\n    $lines = $content -split \"`n\"\n    $inPageHeader = $false\n    $newLines = @\\(\\)\n    foreach \\($line in $lines\\) {\n        if \\($line -match '<PageHeader'\\) {\n            $inPageHeader = $true\n        }\n        if \\($inPageHeader -and \\($line -match '/>\\\\s* -or $line -match '/>\\\\s*\\\\r\\)\\) {\n            $line = $line -replace '/>\\\\s*, '>'\n            $line = $line -replace '/>\\\\s*\\\\r, '>'\n            $inPageHeader = $false\n        }\n        $newLines += $line\n    }\n    $content = $newLines -join \"`n\"\n    \n    # Step 3: Replace the LAST </div> before the closing \\) of the return/function\n    # Pattern: </div>\\\\n  \\)\\\\n}  at the very end\n    $content = $content -replace '\\([ \\\\t]*\\)</div>\\(\\\\s*\\\\n\\\\s*\\\\\\)\\\\s*\\\\n\\\\}\\)', \"`$1</PageHeader>`$2\"\n    \n    Set-Content -Path $file -Value $content -NoNewline\n    Write-Host \"  Done.\"\n}\n\nWrite-Host \"---\"\nWrite-Host \"All div-wrapper files processed.\"\nPSEOF)",
+      "Bash(if exist .next rmdir /s /q .next)",
       "Bash(powershell:*)",
-      "Bash(\"c:\\\\dev\\\\lhermitage\\\\fix-remaining.mjs\" << 'NODEOF'\nimport fs from 'fs';\n\n// Fix [...slug]/page.tsx - has <div> wrapper with \\\\r\\\\n line endings\nconst slugFile = 'c:/dev/lhermitage/app/[...slug]/page.tsx';\nlet content1 = fs.readFileSync\\(slugFile, 'utf-8'\\);\n\n// Step 1: Remove opening <div> wrapper before PageHeader\ncontent1 = content1.replace\\(/\\(\\\\r?\\\\n\\)\\([ \\\\t]*\\)<div>\\\\s*\\\\r?\\\\n\\([ \\\\t]*<PageHeader\\)/g, '$1$3'\\);\n\n// Step 2: Change self-closing /> on PageHeader to >\nconst lines1 = content1.split\\('\\\\n'\\);\nlet inPH1 = false;\nfor \\(let i = 0; i < lines1.length; i++\\) {\n    if \\(lines1[i].includes\\('<PageHeader'\\)\\) {\n        inPH1 = true;\n    }\n    if \\(inPH1 && lines1[i].match\\(/\\\\/>\\\\s*\\\\r?$/\\)\\) {\n        lines1[i] = lines1[i].replace\\(/\\\\/>\\\\s*\\\\r?$/, '>'\\);\n        // Preserve \\\\r if it was there\n        inPH1 = false;\n    }\n}\ncontent1 = lines1.join\\('\\\\n'\\);\n\n// Step 3: Replace the LAST </div> with </PageHeader>\nconst lastDivIdx1 = content1.lastIndexOf\\('</div>'\\);\nif \\(lastDivIdx1 !== -1\\) {\n    content1 = content1.substring\\(0, lastDivIdx1\\) + '</PageHeader>' + content1.substring\\(lastDivIdx1 + '</div>'.length\\);\n}\n\nfs.writeFileSync\\(slugFile, content1, 'utf-8'\\);\nconsole.log\\('Fixed: ' + slugFile\\);\n\n// Fix activite/[slug]/page.tsx - has <> fragment wrapper\nconst activiteFile = 'c:/dev/lhermitage/app/activite/[slug]/page.tsx';\nlet content2 = fs.readFileSync\\(activiteFile, 'utf-8'\\);\n\n// Step 1: Remove opening <> fragment before PageHeader\ncontent2 = content2.replace\\(/\\(\\\\r?\\\\n\\)\\([ \\\\t]*\\)<>\\\\s*\\\\r?\\\\n\\([ \\\\t]*<PageHeader\\)/g, '$1$3'\\);\n\n// Step 2: Change self-closing /> on PageHeader to >\nconst lines2 = content2.split\\('\\\\n'\\);\nlet inPH2 = false;\nfor \\(let i = 0; i < lines2.length; i++\\) {\n    if \\(lines2[i].includes\\('<PageHeader'\\)\\) {\n        inPH2 = true;\n    }\n    if \\(inPH2 && lines2[i].match\\(/\\\\/>\\\\s*\\\\r?$/\\)\\) {\n        lines2[i] = lines2[i].replace\\(/\\\\/>\\\\s*\\\\r?$/, '>'\\);\n        inPH2 = false;\n    }\n}\ncontent2 = lines2.join\\('\\\\n'\\);\n\n// Step 3: Replace the LAST </> with </PageHeader>\nconst lastFragIdx = content2.lastIndexOf\\('</>'\\);\nif \\(lastFragIdx !== -1\\) {\n    content2 = content2.substring\\(0, lastFragIdx\\) + '</PageHeader>' + content2.substring\\(lastFragIdx + '</>'.length\\);\n}\n\nfs.writeFileSync\\(activiteFile, content2, 'utf-8'\\);\nconsole.log\\('Fixed: ' + activiteFile\\);\n\nconsole.log\\('Done.'\\);\nNODEOF)"
+      "WebFetch(domain:data.geopf.fr)",
+      "WebFetch(domain:localhost)",
+      "WebFetch(domain:v0-headless-word-press-app.vercel.app)",
+      "Bash(pnpm ls:*)",
+      "Bash(git log:*)",
+      "Bash(npm run build:*)",
+      "Read(//c/Users/agath/Downloads/**)",
+      "Bash(jq:*)"
     ]
   }
 }

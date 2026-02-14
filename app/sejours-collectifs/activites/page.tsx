@@ -51,13 +51,14 @@ export default async function ActivitesPage() {
   })
 
   return (
-    <PageHeader
-      title={page?.title.rendered || "Activités"}
-      subtitle={page?.acf?.hero?.["sous-titre"]}
-      image={page?.acf?.hero?.image || "/diverse-outdoor-activities.png"}
-    >
+    <div>
+      <PageHeader
+        title={page?.title.rendered || "Activités"}
+        subtitle={page?.acf?.hero?.["sous-titre"]}
+        image={page?.acf?.hero?.image?.url || "/diverse-outdoor-activities.png"}
+      />
 
-      <div className="container mx-auto px-4 py-12 pt-24">
+      <div className="relative z-10 container mx-auto px-4 py-12 pt-24">
         {page?.content.rendered && (
           <div
             className="prose prose-stone mb-12 max-w-none"
@@ -72,15 +73,19 @@ export default async function ActivitesPage() {
               Les activités n'ont pas pu être chargées depuis WordPress.
               <br />
               Vérifiez que le Custom Post Type "activite" est bien configuré avec "show_in_rest: true".
-              <br />
-              <br />
-              URL de l'API testée: {process.env.NEXT_PUBLIC_WP_API_URL}/activite
+              {process.env.NODE_ENV === 'development' && (
+                <>
+                  <br />
+                  <br />
+                  URL de l'API testée: {process.env.WP_API_URL}/activite
+                </>
+              )}
             </p>
           </div>
         ) : (
           <ActivitiesClient categories={categories} activities={activitiesData} />
         )}
       </div>
-    </PageHeader>
+    </div>
   )
 }

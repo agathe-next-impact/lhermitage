@@ -5,7 +5,6 @@ import { Open_Sans, Inter } from 'next/font/google'
 import "./globals.css"
 import { SiteHeader } from "@/components/layout/site-header"
 import { Providers } from "@/components/providers"
-import { getWpOrigin } from "@/lib/wordpress/config"
 
 const openSans = Open_Sans({
   subsets: ["latin"],
@@ -26,7 +25,7 @@ export const metadata: Metadata = {
     template: "%s | L'Hermitage",
   },
   description: "L'Hermitage, tiers-lieu rural dédié aux séjours collectifs, hébergements et activités en pleine nature.",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://lhermitage.fr"),
+  metadataBase: new URL(process.env.SITE_URL || "https://lhermitage.fr"),
   openGraph: {
     type: "website",
     locale: "fr_FR",
@@ -39,13 +38,11 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const wpOrigin = getWpOrigin()
-
   return (
     <html lang="fr" className={`${openSans.variable} ${inter.variable}`}>
       <head>
-        <link rel="preconnect" href={wpOrigin} />
-        <link rel="dns-prefetch" href={wpOrigin} />
+        <link rel="preconnect" href="https://admin.hermitagelelab.com" />
+        <link rel="dns-prefetch" href="https://admin.hermitagelelab.com" />
       </head>
       <body className="min-h-screen bg-background font-sans antialiased">
         <Providers>

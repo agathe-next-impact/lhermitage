@@ -22,7 +22,7 @@ export function MenuButton({ isScrolled = false }: { isScrolled?: boolean }) {
         transition={{ delay: 0.3, type: "spring", stiffness: 200, damping: 20 }}
         key={isOpen ? "open" : "closed"}
         onClick={toggleMenu}
-        className="rounded-full bg-white p-3 shadow-[0_4px_12px_rgba(0,0,0,0.15),0_2px_4px_rgba(0,0,0,0.1)] transition-all hover:scale-110 hover:shadow-[0_6px_16px_rgba(0,0,0,0.2),0_3px_6px_rgba(0,0,0,0.15)] focus:outline-none focus:ring-2 focus:ring-[#E75754] focus:ring-offset-2"
+        className="rounded-full bg-white p-3 shadow-[0_4px_12px_rgba(0,0,0,0.15),0_2px_4px_rgba(0,0,0,0.1)] transition-all hover:scale-110 hover:shadow-[0_6px_16px_rgba(0,0,0,0.2),0_3px_6px_rgba(0,0,0,0.15)]"
         aria-label="Toggle menu"
       >
         <svg

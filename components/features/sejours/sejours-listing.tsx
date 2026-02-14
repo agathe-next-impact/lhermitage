@@ -38,7 +38,7 @@ export async function SejoursListing({
       color={getColorForPath(routePath)}
     >
 
-      <div className="container mx-auto px-4 py-16">
+      <div className="relative z-10 container mx-auto px-4 py-16">
         {page?.acf?.intro && (
           <div
             className="prose prose-stone mx-auto mb-12 max-w-4xl"

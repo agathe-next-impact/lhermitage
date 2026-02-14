@@ -10,13 +10,14 @@ export default async function HebergementsPage() {
   const [page, hebergements] = await Promise.all([wpApi.getPageBySlug("hebergements"), wpApi.getHebergements()])
 
   return (
-    <PageHeader
-      title={page?.title.rendered || "Hébergements"}
-      subtitle={page?.acf?.hero?.["sous-titre"]}
-      image={page?.acf?.hero?.image || "/rural-accommodation-rooms.jpg"}
-    >
+    <div>
+      <PageHeader
+        title={page?.title.rendered || "Hébergements"}
+        subtitle={page?.acf?.hero?.["sous-titre"]}
+        image={page?.acf?.hero?.image?.url || "/rural-accommodation-rooms.jpg"}
+      />
 
-      <div className="container mx-auto px-4 py-12">
+      <div className="relative z-10 container mx-auto px-4 py-12">
         {page?.content.rendered && (
           <div
             className="prose prose-stone mb-12 max-w-none"
@@ -32,6 +33,6 @@ export default async function HebergementsPage() {
 
         <HebergementsGrid hebergements={hebergements} />
       </div>
-    </PageHeader>
+    </div>
   )
 }
