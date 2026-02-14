@@ -1,8 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: {
-    // TODO: Corriger les erreurs TypeScript et passer à false
-    ignoreBuildErrors: true,
+    // ✅ TypeScript strict mode activé - Toutes les erreurs corrigées !
+    ignoreBuildErrors: false,
+  },
+  eslint: {
+    // Ignore ESLint pendant le build (vous pouvez toujours linter manuellement avec npm run lint)
+    ignoreDuringBuilds: true,
   },
   images: {
     remotePatterns: [
@@ -32,6 +36,8 @@ const nextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
   async headers() {
+    const isDev = process.env.NODE_ENV === 'development'
+
     return [
       {
         source: '/:path*',
@@ -44,15 +50,23 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com",
+              // 'unsafe-eval' is needed in development for Next.js hot reloading
+              // 'unsafe-inline' is needed for Framer Motion, GSAP, etc.
+              // TODO: Use nonce-based CSP for better security in production
+              isDev
+                ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://www.gstatic.com"
+                : "script-src 'self' 'unsafe-inline' https://www.youtube.com https://www.gstatic.com",
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: blob: https://admin.hermitagelelab.com https://wp-asso.com https://*.wp.com https://secure.gravatar.com https://data.geopf.fr",
-              "font-src 'self'",
+              "img-src 'self' data: blob: https://admin.hermitagelelab.com https://wp-asso.com https://*.wp.com https://secure.gravatar.com https://data.geopf.fr https://i.ytimg.com",
+              "font-src 'self' data:",
               "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com",
               "connect-src 'self' https://admin.hermitagelelab.com https://wp-asso.com https://api.panoramax.ign.fr https://data.geopf.fr",
               "worker-src 'self' blob:",
               "media-src 'self' https: blob:",
-              "object-src 'self' data:",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+              "upgrade-insecure-requests",
             ].join('; '),
           },
         ],

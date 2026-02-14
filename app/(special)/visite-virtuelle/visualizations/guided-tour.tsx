@@ -88,7 +88,10 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
   const currentStopRef = useRef(0)
 
   const tourStops = buildTourStops(mapPinPoints)
-  tourStopsRef.current = tourStops
+
+  useEffect(() => {
+    tourStopsRef.current = tourStops
+  }, [tourStops])
 
   const handleMarkerClick = useCallback((index: number) => {
     if (index === currentStopRef.current) return
@@ -108,7 +111,7 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
       style: IGN_SATELLITE_STYLE,
       center: [DEFAULT_CENTER.lng, DEFAULT_CENTER.lat],
       zoom: DEFAULT_ZOOM,
-      attributionControl: true,
+      attributionControl: {} as const,
     })
 
     mapRef.current = map
@@ -185,14 +188,13 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
     // Scroll map into view
     if (mapContainerRef.current && currentStop > 0) {
       const headerHeight = 80
-      const elementTop =
-        mapContainerRef.current.getBoundingClientRect().top + window.scrollY
+      const elementTop = mapContainerRef.current.getBoundingClientRect().top + window.scrollY
       window.scrollTo({
         top: elementTop - headerHeight,
         behavior: "smooth",
       })
     }
-  }, [currentStop, mapLoaded])
+  }, [currentStop, mapLoaded, tourStops])
 
   const handleStopClick = useCallback(
     (index: number) => {
@@ -319,8 +321,8 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
             <div className="text-sm">
               <p className="font-medium mb-1">Vue satellite haute résolution IGN</p>
               <p className="text-muted-foreground text-xs">
-                Explorez chaque point d&apos;intérêt en vue satellite grâce aux orthophotos de l&apos;Institut National de
-                l&apos;Information Géographique et Forestière (IGN).
+                Explorez chaque point d&apos;intérêt en vue satellite grâce aux orthophotos de
+                l&apos;Institut National de l&apos;Information Géographique et Forestière (IGN).
               </p>
             </div>
           </div>
@@ -362,7 +364,9 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-2">
-                  <p className="text-xs font-medium text-white line-clamp-2 text-balance">{stop.name}</p>
+                  <p className="text-xs font-medium text-white line-clamp-2 text-balance">
+                    {stop.name}
+                  </p>
                 </div>
                 {index === currentStop && (
                   <div className="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary animate-pulse" />

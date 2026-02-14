@@ -67,7 +67,9 @@ export function transformImages(gqlImages: GqlMediaItem[] | null | undefined): W
 }
 
 // Transform AcfMediaItemConnection { nodes: MediaItem[] } → WPImage[]
-function transformAcfMediaConnection(conn: { nodes?: GqlMediaItem[] } | GqlMediaItem[] | null | undefined): WPImage[] {
+function transformAcfMediaConnection(
+  conn: { nodes?: GqlMediaItem[] } | GqlMediaItem[] | null | undefined
+): WPImage[] {
   if (!conn) return []
   // Handle both { nodes: [...] } and raw array formats
   const items = Array.isArray(conn) ? conn : conn.nodes
@@ -76,7 +78,9 @@ function transformAcfMediaConnection(conn: { nodes?: GqlMediaItem[] } | GqlMedia
 }
 
 // Transform AcfMediaItemConnectionEdge { node: MediaItem } → WPImage | undefined
-function transformAcfMediaEdge(edge: { node?: GqlMediaItem } | GqlMediaItem | null | undefined): WPImage | undefined {
+function transformAcfMediaEdge(
+  edge: { node?: GqlMediaItem } | GqlMediaItem | null | undefined
+): WPImage | undefined {
   if (!edge) return undefined
   // Handle both { node: {...} } and raw MediaItem formats
   const item = (edge as any).node || edge
@@ -171,11 +175,13 @@ export function transformPost<T = any>(
 
 // --- Page transformer ---
 
-export function transformPage(gqlPage: GqlPostBase & {
-  parentDatabaseId?: number
-  menuOrder?: number
-  [key: string]: any
-}): WPPage {
+export function transformPage(
+  gqlPage: GqlPostBase & {
+    parentDatabaseId?: number
+    menuOrder?: number
+    [key: string]: any
+  }
+): WPPage {
   const pageAcf: PageACF = {}
 
   // "elementsDePage" ACF field group — hero image + subtitle for all pages
@@ -196,7 +202,8 @@ export function transformPage(gqlPage: GqlPostBase & {
 
   // Try page-specific ACF field groups that may have sous-titre
   if (!pageAcf.hero?.["sous-titre"]) {
-    const pageSpecific = gqlPage.pageDevenirSocietaire || gqlPage.pageHistorique || gqlPage.pageServices
+    const pageSpecific =
+      gqlPage.pageDevenirSocietaire || gqlPage.pageHistorique || gqlPage.pageServices
     if (pageSpecific?.sousTitre) {
       if (!pageAcf.hero) pageAcf.hero = {}
       pageAcf.hero["sous-titre"] = pageSpecific.sousTitre
@@ -268,6 +275,25 @@ export function transformPage(gqlPage: GqlPostBase & {
     }
   }
 
+  // "pageStructures" — structures page section titles & images
+  const psData = gqlPage.pageStructures
+  if (psData) {
+    pageAcf.page_structures = {
+      structures_internes: psData.structuresInternes
+        ? {
+            titre_de_section: psData.structuresInternes.titreDeSection,
+            image_de_section: transformAcfMediaEdge(psData.structuresInternes.imageDeSection),
+          }
+        : undefined,
+      structures_hebergees: psData.structuresHebergees
+        ? {
+            titre_de_section: psData.structuresHebergees.titreDeSection,
+            image_de_section: transformAcfMediaEdge(psData.structuresHebergees.imageDeSection),
+          }
+        : undefined,
+    }
+  }
+
   const post = transformPost(gqlPage, pageAcf, "page")
   return {
     ...post,
@@ -299,7 +325,8 @@ function mergeMainAndMapPinPoints(
   // MapPinPoints fields (visibilite, position, images override)
   if (mapPinPoints) {
     if (result.nom === undefined && mapPinPoints.nom) result.nom = mapPinPoints.nom
-    if (result.descriptif === undefined && mapPinPoints.descriptif) result.descriptif = mapPinPoints.descriptif
+    if (result.descriptif === undefined && mapPinPoints.descriptif)
+      result.descriptif = mapPinPoints.descriptif
     if (mapPinPoints.visibilite !== undefined) result.visibilite = mapPinPoints.visibilite
     if (mapPinPoints.position) result.position = mapPinPoints.position
     if (mapPinPoints.images) result.images = mapPinPoints.images
@@ -354,6 +381,7 @@ export function transformStructureAcf(gqlPost: Record<string, any>): StructureAC
 
   return {
     nom: merged.nom,
+    type_de_structure: mainAcf?.typeDeStructure || undefined,
     descriptif: transformContentLinks(merged.descriptif || ""),
     photos: transformAcfMediaConnection(merged.photos),
     lien: merged.lien ? transformLink(merged.lien) : undefined,

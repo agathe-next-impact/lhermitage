@@ -28,11 +28,7 @@ import {
   transformMenuItems,
   transformTerm,
 } from "./graphql/transformers"
-import {
-  GET_PAGE_BY_SLUG,
-  GET_PAGE_BY_ID,
-  GET_ALL_PAGES,
-} from "./graphql/queries/pages"
+import { GET_PAGE_BY_SLUG, GET_PAGE_BY_ID, GET_ALL_PAGES } from "./graphql/queries/pages"
 import {
   GET_HEBERGEMENTS,
   GET_HEBERGEMENT_BY_SLUG,
@@ -59,13 +55,18 @@ export class WordPressAPI {
     let hasMore = true
     let after: string | null = null
 
+    type PagesResponse = {
+      pages: {
+        pageInfo: { hasNextPage: boolean; endCursor: string }
+        nodes: any[]
+      }
+    }
+
     while (hasMore) {
-      const data = await gqlRequestList<{
-        pages: {
-          pageInfo: { hasNextPage: boolean; endCursor: string }
-          nodes: any[]
-        }
-      }>(GET_ALL_PAGES, { first: 100, after })
+      const data: PagesResponse = await gqlRequestList<PagesResponse>(GET_ALL_PAGES, {
+        first: 100,
+        after,
+      })
 
       const nodes = data.pages?.nodes || []
       allPages.push(...nodes.map(transformPage))
@@ -111,7 +112,7 @@ export class WordPressAPI {
 
   async getPosts<T = any>(
     postType: string,
-    _params?: { per_page?: number; orderby?: string; order?: string },
+    _params?: { per_page?: number; orderby?: string; order?: string }
   ): Promise<WPPost<T>[]> {
     // Route to specific typed methods
     switch (postType) {
@@ -310,10 +311,16 @@ export class WordPressAPI {
 
   async getEspacesDeTravail(): Promise<WPPost<EspaceDeTravailACF>[]> {
     try {
-      const data = await gqlRequestList<{ espacesDeTravail: { nodes: any[] } }>(GET_ESPACES_DE_TRAVAIL)
+      const data = await gqlRequestList<{ espacesDeTravail: { nodes: any[] } }>(
+        GET_ESPACES_DE_TRAVAIL
+      )
       const nodes = data.espacesDeTravail?.nodes || []
       return nodes.map((node) =>
-        transformPost<EspaceDeTravailACF>(node, transformEspaceDeTravailAcf(node), "espace-de-travail")
+        transformPost<EspaceDeTravailACF>(
+          node,
+          transformEspaceDeTravailAcf(node),
+          "espace-de-travail"
+        )
       )
     } catch (error) {
       logger.error("Failed to fetch espaces de travail:", error)
@@ -340,9 +347,7 @@ export class WordPressAPI {
     try {
       const data = await gqlRequestList<{ sJours: { nodes: any[] } }>(GET_SEJOURS)
       const nodes = data.sJours?.nodes || []
-      return nodes.map((node) =>
-        transformPost<SejourACF>(node, transformSejourAcf(node), "sejour")
-      )
+      return nodes.map((node) => transformPost<SejourACF>(node, transformSejourAcf(node), "sejour"))
     } catch (error) {
       logger.error("Error in getSejours():", error instanceof Error ? error.message : error)
       return []
@@ -353,11 +358,7 @@ export class WordPressAPI {
     try {
       const data = await gqlRequest<{ sJour: any | null }>(GET_SEJOUR_BY_SLUG, { slug })
       if (!data.sJour) return null
-      return transformPost<SejourACF>(
-        data.sJour,
-        transformSejourAcf(data.sJour),
-        "sejour"
-      )
+      return transformPost<SejourACF>(data.sJour, transformSejourAcf(data.sJour), "sejour")
     } catch {
       return null
     }
@@ -420,7 +421,8 @@ export class WordPressAPI {
   // --- Homepage ---
 
   async getHomepage(): Promise<WPPage> {
-    return this.getPageById(138)
+    const homepageId = process.env.HOMEPAGE_ID ? parseInt(process.env.HOMEPAGE_ID, 10) : 138
+    return this.getPageById(homepageId)
   }
 
   // --- Global options ---
@@ -429,10 +431,11 @@ export class WordPressAPI {
     // NOTE: OptionsGlobales ACF Options Page exists in GraphQL but the "menu" field group
     // is not yet properly attached. Using fallback values until WordPress ACF configuration
     // exposes the menu field group on the optionsGlobales query.
+    const defaultCtaUrl = process.env.DEFAULT_CTA_URL || "/contact"
     return {
       lien_du_cta_de_barre_superieure: {
         title: "Réserver",
-        url: "/contact",
+        url: defaultCtaUrl,
         target: "",
       },
       miniature_du_megamenu: {
@@ -443,8 +446,11 @@ export class WordPressAPI {
           target: "",
         },
         image: {
+          id: 0,
           url: "/rural-retreat-hermitage-building-nature.jpg",
           alt: "Vue de l'Hermitage",
+          width: 1920,
+          height: 1080,
         },
       },
     }

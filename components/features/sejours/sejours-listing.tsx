@@ -31,12 +31,13 @@ export async function SejoursListing({
   }
 
   return (
-    <PageHeader
-      title={page?.title?.rendered || fallbackTitle}
-      subtitle={page?.acf?.hero?.["sous-titre"]}
-      image={page?.acf?.hero?.image || "/group-retreat-activities.jpg"}
-      color={getColorForPath(routePath)}
-    >
+    <div>
+      <PageHeader
+        title={page?.title?.rendered || fallbackTitle}
+        subtitle={page?.acf?.hero?.["sous-titre"]}
+        image={page?.acf?.hero?.image || "/group-retreat-activities.jpg"}
+        color={getColorForPath(routePath)}
+      />
 
       <div className="relative z-10 container mx-auto px-4 py-16">
         {page?.acf?.intro && (
@@ -56,7 +57,11 @@ export async function SejoursListing({
         {sejours.length > 0 ? (
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {sejours.map((sejour, index) => (
-              <SejourPricingCard key={sejour.id} sejour={sejour} featured={index === featuredIndex} />
+              <SejourPricingCard
+                key={sejour.id}
+                sejour={sejour}
+                featured={index === featuredIndex}
+              />
             ))}
           </div>
         ) : (
@@ -83,6 +88,6 @@ export async function SejoursListing({
           </a>
         </div>
       </div>
-    </PageHeader>
+    </div>
   )
 }

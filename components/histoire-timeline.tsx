@@ -15,8 +15,10 @@ export function HistoireTimeline({ acf }: HistoireTimelineProps) {
     return (
       <div className="container mx-auto px-4 py-12">
         <div className="rounded-lg border border-muted bg-muted/50 p-8 text-center">
-          <h3 className="mb-2 text-lg font-semibold">Aucun élément d'historique trouvé</h3>
-          <p className="text-muted-foreground">La timeline de l'historique n'a pas pu être chargée.</p>
+          <h3 className="mb-2 text-lg font-semibold">Aucun élément d&apos;historique trouvé</h3>
+          <p className="text-muted-foreground">
+            La timeline de l&apos;historique n&apos;a pas pu être chargée.
+          </p>
         </div>
       </div>
     )

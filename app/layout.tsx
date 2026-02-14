@@ -1,7 +1,7 @@
 import type React from "react"
 
 import type { Metadata } from "next"
-import { Open_Sans, Inter } from 'next/font/google'
+import { Open_Sans, Inter } from "next/font/google"
 import "./globals.css"
 import { SiteHeader } from "@/components/layout/site-header"
 import { Providers } from "@/components/providers"
@@ -24,7 +24,8 @@ export const metadata: Metadata = {
     default: "L'Hermitage - Tiers-Lieu Rural",
     template: "%s | L'Hermitage",
   },
-  description: "L'Hermitage, tiers-lieu rural dédié aux séjours collectifs, hébergements et activités en pleine nature.",
+  description:
+    "L'Hermitage, tiers-lieu rural dédié aux séjours collectifs, hébergements et activités en pleine nature.",
   metadataBase: new URL(process.env.SITE_URL || "https://lhermitage.fr"),
   openGraph: {
     type: "website",
@@ -33,11 +34,7 @@ export const metadata: Metadata = {
   },
 }
 
-export default async function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr" className={`${openSans.variable} ${inter.variable}`}>
       <head>
@@ -47,12 +44,7 @@ export default async function RootLayout({
       <body className="min-h-screen bg-background font-sans antialiased">
         <Providers>
           <SiteHeader />
-          <main>{children}</main>
-          <footer className="border-t border-border bg-muted/50 py-12">
-            <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-              <p>&copy; {new Date().getFullYear()} Tiers-Lieu Rural. Tous droits réservés.</p>
-            </div>
-          </footer>
+          <main className="mb-12">{children}</main>
         </Providers>
       </body>
     </html>

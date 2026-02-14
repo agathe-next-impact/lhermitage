@@ -10,7 +10,13 @@
       "Bash(git log:*)",
       "Bash(npm run build:*)",
       "Read(//c/Users/agath/Downloads/**)",
-      "Bash(jq:*)"
+      "Bash(jq:*)",
+      "Bash(npx husky init:*)",
+      "Bash(npx shadcn@latest add:*)",
+      "Bash(timeout 10 npm run dev:*)",
+      "Bash(timeout 15 npm run dev:*)",
+      "Bash(npx lint-staged:*)",
+      "Bash(npx eslint:*)"
     ]
   }
 }

@@ -44,7 +44,7 @@ export function HebergementsGrid({ hebergements }: HebergementsGridProps) {
       <div className="text-center py-12 border-2 border-dashed border-muted rounded-lg">
         <p className="text-muted-foreground mb-2">Aucun hébergement trouvé.</p>
         <p className="text-sm text-muted-foreground">
-          Vérifiez que des posts de type "hebergement" existent dans WordPress.
+          Vérifiez que des posts de type &quot;hebergement&quot; existent dans WordPress.
         </p>
       </div>
     )
@@ -78,7 +78,8 @@ export function HebergementsGrid({ hebergements }: HebergementsGridProps) {
               }
             >
               {/* Background Image */}
-              {(hebergement.acf?.photos?.[0]?.url || hebergement._embedded?.["wp:featuredmedia"]?.[0]) && (
+              {(hebergement.acf?.photos?.[0]?.url ||
+                hebergement._embedded?.["wp:featuredmedia"]?.[0]) && (
                 <div className="absolute inset-0">
                   <Image
                     src={

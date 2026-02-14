@@ -109,6 +109,24 @@ export const PAGE_FIELDS = gql`
         descriptif
       }
     }
+    pageStructures {
+      structuresInternes {
+        titreDeSection
+        imageDeSection {
+          node {
+            ...ImageFields
+          }
+        }
+      }
+      structuresHebergees {
+        titreDeSection
+        imageDeSection {
+          node {
+            ...ImageFields
+          }
+        }
+      }
+    }
   }
   ${FEATURED_IMAGE_FRAGMENT}
 `

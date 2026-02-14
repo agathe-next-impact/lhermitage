@@ -4,15 +4,23 @@ import type { Metadata } from "next"
 import type React from "react"
 import { wpApi, getPageByPath } from "@/lib/wordpress/api"
 import { PageHeader } from "@/components/layout/page-header"
-import type { HistoireACF } from "@/lib/wordpress/types"
+import type { HistoireACF, ActiviteACF, TeamMemberACF, WPPost } from "@/lib/wordpress/types"
 import { REVALIDATION } from "@/lib/constants"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 
 // Code-split: ces composants lourds ne sont chargés que pour leur page spécifique
-const ActivitesFilter = dynamic(() => import("@/components/activites-filter").then((m) => m.ActivitesFilter))
-const HistoireTimeline = dynamic(() => import("@/components/histoire-timeline").then((m) => m.HistoireTimeline))
+const ActivitesFilter = dynamic(() =>
+  import("@/components/activites-filter").then((m) => m.ActivitesFilter)
+)
+const HistoireTimeline = dynamic(() =>
+  import("@/components/histoire-timeline").then((m) => m.HistoireTimeline)
+)
 const TeamMasonry = dynamic(() => import("@/components/team-masonry").then((m) => m.TeamMasonry))
-const DevenirSocietairePage = dynamic(() => import("@/components/features/devenir-societaire/devenir-societaire-page").then((m) => m.DevenirSocietairePage))
+const DevenirSocietairePage = dynamic(() =>
+  import("@/components/features/devenir-societaire/devenir-societaire-page").then(
+    (m) => m.DevenirSocietairePage
+  )
+)
 
 export const revalidate = REVALIDATION.listing
 
@@ -24,10 +32,10 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
   const fullPath = slug.join("/")
-  
+
   try {
     const page = await getPageByPath(fullPath)
-    
+
     if (!page) {
       return {
         title: "Page non trouvée",
@@ -35,7 +43,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     }
 
     const title = page.title?.rendered || "L'Hermitage"
-    const description = page.acf?.hero?.["sous-titre"] || 
+    const description =
+      page.acf?.hero?.["sous-titre"] ||
       page.excerpt?.rendered?.replace(/<[^>]*>/g, "").substring(0, 160) ||
       "Découvrez L'Hermitage, tiers-lieu rural dédié aux séjours et hébergements"
     const image = page.acf?.hero?.image?.url || "/rural-retreat-hermitage-building-nature.jpg"
@@ -69,7 +78,8 @@ export async function generateStaticParams() {
     const pages = await wpApi.getPages({ per_page: 100 })
 
     const filteredPages = pages.filter((page) => {
-      const wpBaseUrl = process.env.WP_API_URL?.replace("/wp-json/wp/v2", "") || "https://admin.hermitagelelab.com"
+      const wpBaseUrl =
+        process.env.WP_API_URL?.replace("/wp-json/wp/v2", "") || "https://admin.hermitagelelab.com"
       const pagePath = page.link.replace(wpBaseUrl, "").replace(/^\/+|\/+$/g, "")
 
       // Exclude empty paths and dedicated pages
@@ -83,7 +93,8 @@ export async function generateStaticParams() {
     })
 
     return filteredPages.map((page) => {
-      const wpBaseUrl = process.env.WP_API_URL?.replace("/wp-json/wp/v2", "") || "https://admin.hermitagelelab.com"
+      const wpBaseUrl =
+        process.env.WP_API_URL?.replace("/wp-json/wp/v2", "") || "https://admin.hermitagelelab.com"
       const pagePath = page.link.replace(wpBaseUrl, "").replace(/^\/+|\/+$/g, "")
       const slugArray = pagePath.split("/").filter(Boolean)
 
@@ -108,8 +119,8 @@ export default async function CatchAllPage({ params }: PageProps) {
   const isDevenirSocietairePage = fullPath === "participer/devenir-societaire"
 
   let page = null
-  let activites: any[] = []
-  let teamMembers: any[] = []
+  let activites: WPPost<ActiviteACF>[] = []
+  let teamMembers: WPPost<TeamMemberACF>[] = []
 
   try {
     const [fetchedPage, fetchedActivites, fetchedTeamMembers] = await Promise.all([
@@ -153,9 +164,9 @@ export default async function CatchAllPage({ params }: PageProps) {
           <div className="rounded-lg border border-muted bg-muted/50 px-8 text-center">
             <h3 className="mb-2 text-lg font-semibold">Aucune activité trouvée</h3>
             <p className="text-muted-foreground">
-              Les activités n'ont pas pu être chargées depuis WordPress.
+              Les activités n&apos;ont pas pu être chargées depuis WordPress.
               <br />
-              Vérifiez que le Custom Post Type "activite" est bien configuré avec "show_in_rest: true".
+              Vérifiez que le Custom Post Type &quot;activite&quot; est bien configuré avec &quot;show_in_rest: true&quot;.
             </p>
           </div>
         ) : (

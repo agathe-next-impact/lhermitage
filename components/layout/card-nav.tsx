@@ -74,64 +74,6 @@ const CardNav: React.FC<CardNavProps> = ({
 
   const isClosingRef = useRef(false)
 
-  const closeMenu = () => {
-    if (isClosingRef.current) return
-    isClosingRef.current = true
-
-    setIsHamburgerOpen(false)
-    // Keep isExpanded true so .open class stays → visibility: visible during animation
-
-    const navEl = navRef.current
-    if (!navEl) {
-      setIsExpanded(false)
-      isClosingRef.current = false
-      return
-    }
-
-    if (tlRef.current) {
-      tlRef.current.pause()
-    }
-
-    const closeTl = gsap.timeline({
-      onComplete: () => {
-        setIsExpanded(false)
-        isClosingRef.current = false
-        gsap.set(navEl, { overflow: "hidden" })
-        if (tlRef.current) {
-          tlRef.current.kill()
-          const newTl = createTimeline()
-          tlRef.current = newTl
-        }
-      },
-    })
-
-    closeTl.to(cardsRef.current, {
-      y: 30,
-      opacity: 0,
-      duration: 0.12,
-      stagger: 0.008,
-      ease: "power2.in",
-      overwrite: true,
-    })
-
-    closeTl.to(
-      navEl,
-      {
-        height: 60,
-        duration: 0.2,
-        ease: "power3.inOut",
-        overwrite: true,
-      },
-      "<0.05",
-    )
-  }
-
-  useEffect(() => {
-    if (isExpanded || isHamburgerOpen) {
-      closeMenu()
-    }
-  }, [pathname])
-
   const calculateHeight = () => {
     const navEl = navRef.current
     if (!navEl) return 320
@@ -176,10 +118,21 @@ const CardNav: React.FC<CardNavProps> = ({
 
   const createTimeline = () => {
     const navEl = navRef.current
-    if (!navEl) return null
+    if (!navEl) {
+      console.warn("createTimeline: navRef.current is null")
+      return null
+    }
+
+    const validCards = cardsRef.current.filter((card) => card !== null)
+    if (validCards.length === 0) {
+      console.warn("createTimeline: no valid cards found")
+      return null
+    }
+
+    console.log(`createTimeline: Found ${validCards.length} cards`)
 
     gsap.set(navEl, { height: 60, overflow: "hidden" })
-    gsap.set(cardsRef.current, { y: 50, opacity: 0 })
+    gsap.set(validCards, { y: 50, opacity: 0 })
 
     const tl = gsap.timeline({ paused: true })
 
@@ -189,19 +142,120 @@ const CardNav: React.FC<CardNavProps> = ({
       ease,
     })
 
-    tl.to(cardsRef.current, { y: 0, opacity: 1, duration: 0.4, ease, stagger: 0.08 }, "-=0.1")
+    tl.to(validCards, { y: 0, opacity: 1, duration: 0.4, ease, stagger: 0.08 }, "-=0.1")
 
     return tl
   }
 
+  const closeMenu = () => {
+    if (isClosingRef.current) return
+    isClosingRef.current = true
+
+    setIsHamburgerOpen(false)
+    // Keep isExpanded true so .open class stays → visibility: visible during animation
+
+    const navEl = navRef.current
+    if (!navEl) {
+      setIsExpanded(false)
+      isClosingRef.current = false
+      return
+    }
+
+    if (tlRef.current) {
+      tlRef.current.pause()
+    }
+
+    // Safety timeout to reset closing ref in case animation fails
+    const safetyTimeout = setTimeout(() => {
+      if (isClosingRef.current) {
+        console.warn("Force resetting isClosingRef after timeout")
+        isClosingRef.current = false
+        setIsExpanded(false)
+      }
+    }, 1000)
+
+    const closeTl = gsap.timeline({
+      onComplete: () => {
+        clearTimeout(safetyTimeout)
+        setIsExpanded(false)
+        isClosingRef.current = false
+        gsap.set(navEl, { overflow: "hidden" })
+        if (tlRef.current) {
+          tlRef.current.kill()
+          const newTl = createTimeline()
+          tlRef.current = newTl
+        }
+      },
+    })
+
+    closeTl.to(cardsRef.current, {
+      y: 30,
+      opacity: 0,
+      duration: 0.12,
+      stagger: 0.008,
+      ease: "power2.in",
+      overwrite: true,
+    })
+
+    closeTl.to(
+      navEl,
+      {
+        height: 60,
+        duration: 0.2,
+        ease: "power3.inOut",
+        overwrite: true,
+      },
+      "<0.05"
+    )
+  }
+
+  useEffect(() => {
+    if (isExpanded || isHamburgerOpen) {
+      closeMenu() // eslint-disable-line react-hooks/set-state-in-effect -- close menu on route change
+    }
+  }, [pathname]) // eslint-disable-line react-hooks/exhaustive-deps -- intentionally only react to pathname
+
   useLayoutEffect(() => {
-    const tl = createTimeline()
-    tlRef.current = tl
+    // Small delay to ensure DOM is ready
+    const timeoutId = setTimeout(() => {
+      const tl = createTimeline()
+      if (!tl) {
+        console.error("Failed to create timeline - navRef might not be ready")
+      } else {
+        console.log("Timeline created successfully")
+      }
+      tlRef.current = tl
+    }, 0)
 
     return () => {
-      tl?.kill()
+      clearTimeout(timeoutId)
+      tlRef.current?.kill()
       tlRef.current = null
     }
+  }, [ease, items])
+
+  // Ensure timeline is created after mount if it failed initially
+  useEffect(() => {
+    const checkAndRetry = () => {
+      if (!tlRef.current && navRef.current) {
+        console.log("Retrying timeline creation after mount")
+        const tl = createTimeline()
+        if (tl) {
+          console.log("Timeline retry successful")
+          tlRef.current = tl
+        } else {
+          console.error("Timeline retry failed")
+        }
+      }
+    }
+
+    // Try immediately
+    checkAndRetry()
+
+    // And try again after a delay if still failed
+    const timeoutId = setTimeout(checkAndRetry, 100)
+
+    return () => clearTimeout(timeoutId)
   }, [ease, items])
 
   useLayoutEffect(() => {
@@ -250,12 +304,37 @@ const CardNav: React.FC<CardNavProps> = ({
   }, [])
 
   const toggleMenu = () => {
+    console.log(
+      "toggleMenu called, isExpanded:",
+      isExpanded,
+      "tlRef.current:",
+      !!tlRef.current,
+      "isClosingRef:",
+      isClosingRef.current
+    )
+
     const tl = tlRef.current
-    if (!tl || isClosingRef.current) {
+    if (!tl) {
+      console.error("Timeline not initialized - trying to recreate")
+      const newTl = createTimeline()
+      if (newTl) {
+        tlRef.current = newTl
+        console.log("Timeline recreated successfully")
+      } else {
+        console.error("Failed to recreate timeline")
+        return
+      }
+    }
+
+    if (isClosingRef.current) {
+      console.warn("Menu is closing, please wait")
       return
     }
 
     if (!isExpanded) {
+      console.log("Opening menu")
+      // Reset closing ref just in case
+      isClosingRef.current = false
       setShouldLoadImages(true)
       setIsHamburgerOpen(true)
       setIsExpanded(true)
@@ -263,8 +342,9 @@ const CardNav: React.FC<CardNavProps> = ({
       if (isMobile) {
         setCollapsedCards(new Set(items.map((_, idx) => idx)))
       }
-      tl.play(0)
+      tlRef.current?.play(0)
     } else {
+      console.log("Closing menu")
       closeMenu()
     }
   }
@@ -301,7 +381,11 @@ const CardNav: React.FC<CardNavProps> = ({
     <div
       className={`card-nav-container ${className} ${hasBeenHovered ? "expanded" : ""} ${isScrolled ? "scrolled" : ""}`}
     >
-      <nav ref={navRef} className={`card-nav ${isExpanded ? "open" : ""}`} style={{ backgroundColor: baseColor }}>
+      <nav
+        ref={navRef}
+        className={`card-nav ${isExpanded ? "open" : ""}`}
+        style={{ backgroundColor: baseColor }}
+      >
         <div className="card-nav-top">
           <div
             className={`hamburger-menu ${isHamburgerOpen ? "open" : ""}`}
