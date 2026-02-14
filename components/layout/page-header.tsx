@@ -100,16 +100,7 @@ export function PageHeader({ title, subtitle, image, className = "", color, chil
           />
         </div>
       </div>
-      {subtitle && (
-        <div
-          className="relative z-10 mx-auto my-2 px-4 py-8 rounded-xl"
-          style={{ backgroundColor: mainBlobColor }}
-        >
-          <p className="text-xl text-center text-white mx-auto">
-            {subtitle}
-          </p>
-        </div>
-      )}
+    
       {children}
     </div>
   )

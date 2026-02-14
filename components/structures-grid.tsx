@@ -34,7 +34,7 @@ const StructureCard: React.FC<{
 
   return (
     <MinimalCard
-      className="h-full flex flex-col p-2 pt-6 shadow-sm hover:shadow-md transition-shadow relative"
+      className="h-full flex flex-col justify-between p-2 pt-6 shadow-sm hover:shadow-md transition-shadow relative"
       style={{ backgroundColor: categoryColor }}
     >
       <div className="px-2 pb-6">

@@ -4,14 +4,11 @@ import type { Metadata } from "next"
 import type React from "react"
 import { wpApi, getPageByPath } from "@/lib/wordpress/api"
 import { PageHeader } from "@/components/layout/page-header"
-import type { HistoireACF, ActiviteACF, TeamMemberACF, WPPost } from "@/lib/wordpress/types"
+import type { HistoireACF, TeamMemberACF, WPPost } from "@/lib/wordpress/types"
 import { REVALIDATION } from "@/lib/constants"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 
 // Code-split: ces composants lourds ne sont chargés que pour leur page spécifique
-const ActivitesFilter = dynamic(() =>
-  import("@/components/activites-filter").then((m) => m.ActivitesFilter)
-)
 const HistoireTimeline = dynamic(() =>
   import("@/components/histoire-timeline").then((m) => m.HistoireTimeline)
 )
@@ -113,23 +110,19 @@ export default async function CatchAllPage({ params }: PageProps) {
 
   const fullPath = slug.join("/")
 
-  const isActivitesPage = fullPath.includes("activites")
   const isHistoirePage = fullPath === "tiers-lieu-rural/lhistoire-du-lieu"
   const isEquipePage = fullPath === "tiers-lieu-rural/lequipe"
   const isDevenirSocietairePage = fullPath === "participer/devenir-societaire"
 
   let page = null
-  let activites: WPPost<ActiviteACF>[] = []
   let teamMembers: WPPost<TeamMemberACF>[] = []
 
   try {
-    const [fetchedPage, fetchedActivites, fetchedTeamMembers] = await Promise.all([
+    const [fetchedPage, fetchedTeamMembers] = await Promise.all([
       getPageByPath(fullPath),
-      isActivitesPage ? wpApi.getActivites() : Promise.resolve([]),
       isEquipePage ? wpApi.getTeamMembers() : Promise.resolve([]),
     ])
     page = fetchedPage
-    activites = fetchedActivites
     teamMembers = fetchedTeamMembers
   } catch (error) {
     notFound()
@@ -157,23 +150,6 @@ export default async function CatchAllPage({ params }: PageProps) {
     )
   } else if (isDevenirSocietairePage) {
     content = <div className="relative z-10"><DevenirSocietairePage page={page} /></div>
-  } else if (isActivitesPage) {
-    content = (
-      <div className="relative z-10 mx-auto px-4 py-2">
-        {activites.length === 0 ? (
-          <div className="rounded-lg border border-muted bg-muted/50 px-8 text-center">
-            <h3 className="mb-2 text-lg font-semibold">Aucune activité trouvée</h3>
-            <p className="text-muted-foreground">
-              Les activités n&apos;ont pas pu être chargées depuis WordPress.
-              <br />
-              Vérifiez que le Custom Post Type &quot;activite&quot; est bien configuré avec &quot;show_in_rest: true&quot;.
-            </p>
-          </div>
-        ) : (
-          <ActivitesFilter activites={activites} />
-        )}
-      </div>
-    )
   } else {
     content = (
       <div className="relative z-10 mx-auto px-4 py-2">
