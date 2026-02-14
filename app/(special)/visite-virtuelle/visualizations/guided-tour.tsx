@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useRef, useCallback } from "react"
+import { useEffect, useState, useRef, useCallback, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { ExternalLink, Camera } from "lucide-react"
 import Image from "next/image"
@@ -87,7 +87,7 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
   const tourStopsRef = useRef<TourStop[]>([])
   const currentStopRef = useRef(0)
 
-  const tourStops = buildTourStops(mapPinPoints)
+  const tourStops = useMemo(() => buildTourStops(mapPinPoints), [mapPinPoints])
 
   useEffect(() => {
     tourStopsRef.current = tourStops
@@ -111,7 +111,7 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
       style: IGN_SATELLITE_STYLE,
       center: [DEFAULT_CENTER.lng, DEFAULT_CENTER.lat],
       zoom: DEFAULT_ZOOM,
-      attributionControl: {} as const,
+      attributionControl: false,
     })
 
     mapRef.current = map

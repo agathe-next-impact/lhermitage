@@ -11,6 +11,7 @@ interface PageHeaderProps {
   image?: string
   className?: string
   color?: string
+  children?: React.ReactNode
 }
 
 const brandColors = [
@@ -30,7 +31,7 @@ function getMainBlobColor(title: string): string {
   return brandColors[Math.abs(hash) % brandColors.length]
 }
 
-export function PageHeader({ title, subtitle, image, className = "", color }: PageHeaderProps) {
+export function PageHeader({ title, subtitle, image, className = "", color, children }: PageHeaderProps) {
   const pathname = usePathname()
   const colorFromPath = useMemo(() => {
     if (color) return color
@@ -99,16 +100,17 @@ export function PageHeader({ title, subtitle, image, className = "", color }: Pa
           />
         </div>
       </div>
-      <div
-        className="relative z-10 mx-auto my-2 px-4 py-2 rounded-xl py-8"
-        style={{ backgroundColor: mainBlobColor }}
-      >
-        {subtitle && (
+      {subtitle && (
+        <div
+          className="relative z-10 mx-auto my-2 px-4 py-8 rounded-xl"
+          style={{ backgroundColor: mainBlobColor }}
+        >
           <p className="text-xl text-center text-white mx-auto">
             {subtitle}
           </p>
-        )}
-      </div>
+        </div>
+      )}
+      {children}
     </div>
   )
 }

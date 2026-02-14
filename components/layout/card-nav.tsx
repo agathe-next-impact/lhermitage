@@ -7,7 +7,7 @@ import { ArrowUpRight, ChevronDown } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import "./CardNav.css"
+import "./card-nav.css"
 
 type CardNavLink = {
   label: string

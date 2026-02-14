@@ -75,7 +75,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export async function generateStaticParams() {
   try {
-    const pages = await wpApi.getPages({ per_page: 100 })
+    const pages = await wpApi.getPages()
 
     const filteredPages = pages.filter((page) => {
       const wpBaseUrl =

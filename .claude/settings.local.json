@@ -16,7 +16,12 @@
       "Bash(timeout 10 npm run dev:*)",
       "Bash(timeout 15 npm run dev:*)",
       "Bash(npx lint-staged:*)",
-      "Bash(npx eslint:*)"
+      "Bash(npx eslint:*)",
+      "Bash(git rm:*)",
+      "Bash(git commit:*)",
+      "Bash(find:*)",
+      "Bash(npx next build:*)",
+      "Bash(npm ls:*)"
     ]
   }
 }

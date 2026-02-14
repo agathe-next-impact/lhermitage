@@ -35,7 +35,7 @@ export async function SejoursListing({
       <PageHeader
         title={page?.title?.rendered || fallbackTitle}
         subtitle={page?.acf?.hero?.["sous-titre"]}
-        image={page?.acf?.hero?.image || "/group-retreat-activities.jpg"}
+        image={typeof page?.acf?.hero?.image === "string" ? page.acf.hero.image : page?.acf?.hero?.image?.url || "/group-retreat-activities.jpg"}
         color={getColorForPath(routePath)}
       />
 
