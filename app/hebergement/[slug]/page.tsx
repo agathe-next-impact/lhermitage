@@ -3,6 +3,8 @@ import { cache } from "react"
 import type { Metadata } from "next"
 import { wpApi } from "@/lib/wordpress/api"
 import { stripHtml } from "@/lib/utils"
+import { PageHeader } from "@/components/layout/page-header"
+import { BentoHeaderContent } from "@/components/layout/bento-header-content"
 import { PhotoGallery, VideoSection, LocationSection, ContactCta } from "@/components/content/detail-page-sections"
 import { REVALIDATION } from "@/lib/constants"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
@@ -56,33 +58,37 @@ export default async function HebergementPage({ params }: HebergementPageProps) 
     notFound()
   }
 
+  const title = hebergement.acf?.nom || hebergement.title.rendered
+  const featuredImage = hebergement.acf?.photos?.[0]?.url
+    || hebergement._embedded?.["wp:featuredmedia"]?.[0]?.source_url
+    || "/rural-accommodation-rooms.jpg"
+
   return (
-    <div className="container mx-auto px-4 py-12">
-      <div className="mb-12">
-        <h1 className="mb-4 font-serif text-4xl font-extrabold uppercase md:text-5xl">
-          {hebergement.acf?.nom || hebergement.title.rendered}
-        </h1>
+    <div>
+      <PageHeader title={title} image={featuredImage} />
+      <BentoHeaderContent>
+        <div className="container mx-auto px-4 py-12">
+          {hebergement.acf?.descriptif && (
+            <div
+              className="prose prose-stone mb-8 max-w-none"
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(hebergement.acf.descriptif) }}
+            />
+          )}
 
-        {hebergement.acf?.descriptif && (
-          <div
-            className="prose prose-stone mb-8 max-w-none"
-            dangerouslySetInnerHTML={{ __html: sanitizeHtml(hebergement.acf.descriptif) }}
+          {hebergement.acf?.photos && hebergement.acf.photos.length > 0 && (
+            <PhotoGallery photos={hebergement.acf.photos} />
+          )}
+
+          {hebergement.acf?.video && <VideoSection video={hebergement.acf.video} />}
+
+          {hebergement.acf?.localisation && <LocationSection localisation={hebergement.acf.localisation} />}
+
+          <ContactCta
+            title="Intéressé par cet hébergement ?"
+            description="Contactez-nous pour vérifier les disponibilités"
           />
-        )}
-      </div>
-
-      {hebergement.acf?.photos && hebergement.acf.photos.length > 0 && (
-        <PhotoGallery photos={hebergement.acf.photos} />
-      )}
-
-      {hebergement.acf?.video && <VideoSection video={hebergement.acf.video} />}
-
-      {hebergement.acf?.localisation && <LocationSection localisation={hebergement.acf.localisation} />}
-
-      <ContactCta
-        title="Intéressé par cet hébergement ?"
-        description="Contactez-nous pour vérifier les disponibilités"
-      />
+        </div>
+      </BentoHeaderContent>
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import { PageHeader } from "@/components/layout/page-header"
+import { BentoHeaderContent } from "@/components/layout/bento-header-content"
 import { wpApi } from "@/lib/wordpress/api"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 import { PartenairesClient } from "@/components/partenaires-client"
@@ -22,15 +23,17 @@ export default async function PartenairesPage() {
         image={page?.acf?.hero?.image?.url || "/rural-retreat-landscape.jpg"}
       />
 
-      <div className="relative z-10 py-12">
-        {page?.content.rendered && (
-          <div className="container mx-auto px-4 mb-12">
-            <div className="prose prose-stone max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }} />
-          </div>
-        )}
+      <BentoHeaderContent title={page?.acf?.hero?.["sous-titre"]}>
+        <div className="py-12">
+          {page?.content.rendered && (
+            <div className="container mx-auto px-4 mb-12">
+              <div className="prose prose-stone max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }} />
+            </div>
+          )}
 
-        <PartenairesClient partenaires={partenaires} categories={categories} />
-      </div>
+          <PartenairesClient partenaires={partenaires} categories={categories} />
+        </div>
+      </BentoHeaderContent>
     </div>
   )
 }

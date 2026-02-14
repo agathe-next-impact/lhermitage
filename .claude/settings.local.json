@@ -21,7 +21,8 @@
       "Bash(git commit:*)",
       "Bash(find:*)",
       "Bash(npx next build:*)",
-      "Bash(npm ls:*)"
+      "Bash(npm ls:*)",
+      "Bash(git diff:*)"
     ]
   }
 }

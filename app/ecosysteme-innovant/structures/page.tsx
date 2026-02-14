@@ -1,4 +1,5 @@
 import { PageHeader } from "@/components/layout/page-header"
+import { BentoHeaderContent } from "@/components/layout/bento-header-content"
 import { wpApi } from "@/lib/wordpress/api"
 import { StructuresGrid } from "@/components/structures-grid"
 import { REVALIDATION } from "@/lib/constants"
@@ -18,11 +19,13 @@ export default async function StructuresPage() {
         subtitle={page?.acf?.hero?.["sous-titre"] || "Découvrez nos structures"}
         image={page?.acf?.hero?.image?.url || "/rural-retreat-landscape.jpg"}
       />
-      <StructuresGrid
-        structures={structures}
-        sectionInternes={page?.acf?.page_structures?.structures_internes}
-        sectionHebergees={page?.acf?.page_structures?.structures_hebergees}
-      />
+      <BentoHeaderContent title={page?.acf?.hero?.["sous-titre"] || "Découvrez nos structures"}>
+        <StructuresGrid
+          structures={structures}
+          sectionInternes={page?.acf?.page_structures?.structures_internes}
+          sectionHebergees={page?.acf?.page_structures?.structures_hebergees}
+        />
+      </BentoHeaderContent>
     </div>
   )
 }

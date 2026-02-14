@@ -1,4 +1,5 @@
 import { PageHeader } from "@/components/layout/page-header"
+import { BentoHeaderContent } from "@/components/layout/bento-header-content"
 import { wpApi } from "@/lib/wordpress/api"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 import { stripHtml } from "@/lib/utils"
@@ -62,35 +63,37 @@ export default async function ActivitesPage() {
         image={page?.acf?.hero?.image?.url || "/diverse-outdoor-activities.png"}
       />
 
-      <div className="relative z-10 container mx-auto px-4 py-12 pt-24">
-        {page?.content.rendered && (
-          <div
-            className="prose prose-stone mb-12 max-w-none"
-            dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }}
-          />
-        )}
+      <BentoHeaderContent title={page?.acf?.hero?.["sous-titre"]}>
+        <div className="container mx-auto pl-2 py-2">
+          {page?.content.rendered && (
+            <div
+              className="prose prose-stone mb-12 max-w-none"
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }}
+            />
+          )}
 
-        {activites.length === 0 ? (
-          <div className="rounded-lg border border-muted bg-muted/50 p-8 text-center">
-            <h3 className="mb-2 text-lg font-semibold">Aucune activité trouvée</h3>
-            <p className="text-muted-foreground">
-              Les activités n&apos;ont pas pu être chargées depuis WordPress.
-              <br />
-              Vérifiez que le Custom Post Type &quot;activite&quot; est bien configuré avec
-              &quot;show_in_rest: true&quot;.
-              {process.env.NODE_ENV === "development" && (
-                <>
-                  <br />
-                  <br />
-                  URL de l&apos;API testée: {process.env.WP_API_URL}/activite
-                </>
-              )}
-            </p>
-          </div>
-        ) : (
-          <ActivitiesClient categories={categories} activities={activitiesData} />
-        )}
-      </div>
+          {activites.length === 0 ? (
+            <div className="rounded-lg border border-muted bg-muted/50 p-8 text-center">
+              <h3 className="mb-2 text-lg font-semibold">Aucune activité trouvée</h3>
+              <p className="text-muted-foreground">
+                Les activités n&apos;ont pas pu être chargées depuis WordPress.
+                <br />
+                Vérifiez que le Custom Post Type &quot;activite&quot; est bien configuré avec
+                &quot;show_in_rest: true&quot;.
+                {process.env.NODE_ENV === "development" && (
+                  <>
+                    <br />
+                    <br />
+                    URL de l&apos;API testée: {process.env.WP_API_URL}/activite
+                  </>
+                )}
+              </p>
+            </div>
+          ) : (
+            <ActivitiesClient categories={categories} activities={activitiesData} />
+          )}
+        </div>
+      </BentoHeaderContent>
     </div>
   )
 }

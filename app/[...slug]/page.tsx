@@ -4,6 +4,7 @@ import type { Metadata } from "next"
 import type React from "react"
 import { wpApi, getPageByPath } from "@/lib/wordpress/api"
 import { PageHeader } from "@/components/layout/page-header"
+import { BentoHeaderContent } from "@/components/layout/bento-header-content"
 import type { HistoireACF, TeamMemberACF, WPPost } from "@/lib/wordpress/types"
 import { REVALIDATION } from "@/lib/constants"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
@@ -170,7 +171,9 @@ export default async function CatchAllPage({ params }: PageProps) {
         subtitle={page.acf?.hero?.["sous-titre"]}
         image={page.acf?.hero?.image?.url || "/rural-retreat-landscape.jpg"}
       />
-      {content}
+      <BentoHeaderContent title={page.acf?.hero?.["sous-titre"]}>
+        {content}
+      </BentoHeaderContent>
     </div>
   )
 }

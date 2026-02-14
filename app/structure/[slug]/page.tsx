@@ -4,6 +4,8 @@ import type { Metadata } from "next"
 import { Button } from "@/components/ui/button"
 import { wpApi } from "@/lib/wordpress/api"
 import { stripHtml } from "@/lib/utils"
+import { PageHeader } from "@/components/layout/page-header"
+import { BentoHeaderContent } from "@/components/layout/bento-header-content"
 import { PhotoGallery, VideoSection, LocationSection, ContactCta } from "@/components/content/detail-page-sections"
 import { REVALIDATION } from "@/lib/constants"
 import { sanitizeHtml, sanitizeUrl } from "@/lib/wordpress/sanitize"
@@ -57,41 +59,45 @@ export default async function StructurePage({ params }: StructurePageProps) {
     notFound()
   }
 
+  const title = structure.acf?.nom || structure.title.rendered
+  const featuredImage = structure.acf?.photos?.[0]?.url
+    || structure._embedded?.["wp:featuredmedia"]?.[0]?.source_url
+    || "/rural-retreat-landscape.jpg"
+
   return (
-    <div className="container mx-auto px-4 py-12">
-      <div className="mb-12">
-        <h1 className="mb-4 font-serif text-4xl font-extrabold uppercase md:text-5xl">
-          {structure.acf?.nom || structure.title.rendered}
-        </h1>
+    <div>
+      <PageHeader title={title} image={featuredImage} />
+      <BentoHeaderContent>
+        <div className="container mx-auto px-4 py-12">
+          {structure.acf?.descriptif && (
+            <div
+              className="prose prose-stone mb-8 max-w-none"
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(structure.acf.descriptif) }}
+            />
+          )}
 
-        {structure.acf?.descriptif && (
-          <div
-            className="prose prose-stone mb-8 max-w-none"
-            dangerouslySetInnerHTML={{ __html: sanitizeHtml(structure.acf.descriptif) }}
+          {structure.acf?.lien && (
+            <Button asChild size="lg" className="mb-8">
+              <a href={sanitizeUrl(structure.acf.lien.url)} target="_blank" rel="noopener noreferrer">
+                {structure.acf.lien.title || "Visiter le site"}
+              </a>
+            </Button>
+          )}
+
+          {structure.acf?.photos && structure.acf.photos.length > 0 && (
+            <PhotoGallery photos={structure.acf.photos} />
+          )}
+
+          {structure.acf?.video && <VideoSection video={structure.acf.video} />}
+
+          {structure.acf?.localisation && <LocationSection localisation={structure.acf.localisation} />}
+
+          <ContactCta
+            title="Intéressé par cette structure ?"
+            description="Contactez-nous pour en savoir plus"
           />
-        )}
-
-        {structure.acf?.lien && (
-          <Button asChild size="lg" className="mb-8">
-            <a href={sanitizeUrl(structure.acf.lien.url)} target="_blank" rel="noopener noreferrer">
-              {structure.acf.lien.title || "Visiter le site"}
-            </a>
-          </Button>
-        )}
-      </div>
-
-      {structure.acf?.photos && structure.acf.photos.length > 0 && (
-        <PhotoGallery photos={structure.acf.photos} />
-      )}
-
-      {structure.acf?.video && <VideoSection video={structure.acf.video} />}
-
-      {structure.acf?.localisation && <LocationSection localisation={structure.acf.localisation} />}
-
-      <ContactCta
-        title="Intéressé par cette structure ?"
-        description="Contactez-nous pour en savoir plus"
-      />
+        </div>
+      </BentoHeaderContent>
     </div>
   )
 }

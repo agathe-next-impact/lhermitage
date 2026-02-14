@@ -6,6 +6,7 @@ import { wpApi } from "@/lib/wordpress/api"
 import { stripHtml } from "@/lib/utils"
 import Link from "next/link"
 import { PageHeader } from "@/components/layout/page-header"
+import { BentoHeaderContent } from "@/components/layout/bento-header-content"
 import { REVALIDATION } from "@/lib/constants"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 
@@ -62,22 +63,24 @@ export default async function ActivitePage({ params }: ActivitePageProps) {
   const featuredImage = activite._embedded?.["wp:featuredmedia"]?.[0]
 
   return (
-    <PageHeader title={title} image={featuredImage?.source_url || "/diverse-outdoor-activities.png"} >
+    <div>
+      <PageHeader title={title} image={featuredImage?.source_url || "/diverse-outdoor-activities.png"} />
+      <BentoHeaderContent>
+        <div className="container mx-auto px-4 py-12">
+          {description && (
+            <div className="prose prose-stone mb-12 max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeHtml(description) }} />
+          )}
 
-      <div className="relative z-10 container mx-auto px-4 py-12">
-        {description && (
-          <div className="prose prose-stone mb-12 max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeHtml(description) }} />
-        )}
-
-        {/* CTA Section */}
-        <section className="rounded-lg bg-muted p-8 text-center">
-          <h2 className="mb-4 font-serif text-2xl font-bold">Intéressé par cette activité ?</h2>
-          <p className="mb-6 text-muted-foreground">Découvrez nos séjours incluant cette activité</p>
-          <Button asChild size="lg">
-            <Link href="/sejours-collectifs">Voir les séjours</Link>
-          </Button>
-        </section>
-      </div>
-    </PageHeader>
+          {/* CTA Section */}
+          <section className="rounded-lg bg-muted p-8 text-center">
+            <h2 className="mb-4 font-serif text-2xl font-bold">Intéressé par cette activité ?</h2>
+            <p className="mb-6 text-muted-foreground">Découvrez nos séjours incluant cette activité</p>
+            <Button asChild size="lg">
+              <Link href="/sejours-collectifs">Voir les séjours</Link>
+            </Button>
+          </section>
+        </div>
+      </BentoHeaderContent>
+    </div>
   )
 }

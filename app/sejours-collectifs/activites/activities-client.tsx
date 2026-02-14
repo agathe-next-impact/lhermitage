@@ -1,8 +1,13 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
 import { CategoryFilter } from "@/components/category-filter"
-import { HeroCard } from "@/components/features/home/hero-card"
+import { MinimalCard } from "@/components/ui/minimal-card"
+import { getCategoryColor } from "@/lib/wordpress/category-colors"
+import { truncateText } from "@/lib/utils"
 
 interface Category {
   id: string
@@ -63,23 +68,54 @@ export function ActivitiesClient({ categories, activities }: ActivitiesClientPro
       {sortedCategories.map((categoryName) => {
         const categoryData = activitiesByCategory[categoryName]
 
+        const color = getCategoryColor(categoryData.slug)
+
         return (
-          <div key={categoryName} className="mb-16">
-            <h2 className="mb-8 font-serif text-3xl font-extrabold uppercase">{categoryName}</h2>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {categoryData.activities.map((activity) => (
-                <HeroCard
-                  key={activity.id}
-                  title={activity.title}
-                  description={activity.description}
-                  image={activity.image}
-                  imageAlt={activity.imageAlt}
-                  link={`/activite/${activity.slug}`}
-                  linkText="En savoir plus"
-                  category={activity.categoryName}
-                  categorySlug={activity.categorySlug}
-                />
-              ))}
+          <div key={categoryName} className="mb-2">
+            <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
+              {categoryData.activities.map((activity) => {
+                const description = activity.description
+                  ? truncateText(activity.description, 120)
+                  : ""
+
+                return (
+                  <MinimalCard
+                    key={activity.id}
+                    className="h-full flex flex-col justify-between p-2 pt-6 shadow-sm hover:shadow-md transition-shadow"
+                    style={{ backgroundColor: color }}
+                  >
+                    <div className="px-2 pb-6">
+                      <h3 className="text-xl font-bold mb-3 text-white">
+                        {activity.title}
+                      </h3>
+                      <p className="text-white/80 text-sm mb-4 line-clamp-4">
+                        {description}
+                      </p>
+
+                      <Button
+                        asChild
+                        size="sm"
+                        className="rounded-full bg-white/20 text-white transition-colors hover:bg-white/30 shadow-sm text-xs h-8 px-4"
+                      >
+                        <Link href={`/activite/${activity.slug}`}>Découvrir</Link>
+                      </Button>
+                    </div>
+                    {activity.image && (
+                      <div>
+                        <Image
+                          src={activity.image}
+                          alt={activity.imageAlt || activity.title}
+                          width={600}
+                          height={400}
+                          quality={100}
+                          sizes="(max-width: 768px) 100vw, 33vw"
+                          className="rounded-xl object-cover w-full h-48"
+                        />
+                      </div>
+                    )}
+                  </MinimalCard>
+                )
+              })}
             </div>
           </div>
         )

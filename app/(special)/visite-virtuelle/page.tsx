@@ -1,5 +1,6 @@
 import { wpApi } from "@/lib/wordpress/api"
 import { PageHeader } from "@/components/layout/page-header"
+import { BentoHeaderContent } from "@/components/layout/bento-header-content"
 import { GuidedTourClient } from "./guided-tour-client"
 import { REVALIDATION } from "@/lib/constants"
 
@@ -15,15 +16,17 @@ export default async function VisiteVirtuellePage() {
   }
 
   return (
-    <PageHeader
-      title="Découvrir le lieu"
-      subtitle="Explorez l'Hermitage à travers un parcours virtuel immersif"
-      image="/rural-retreat-landscape.jpg"
-    >
-
-      <div className="relative z-10 container mx-auto px-4 py-12">
-        <GuidedTourClient mapPinPoints={mapPinPoints} />
-      </div>
-    </PageHeader>
+    <div>
+      <PageHeader
+        title="Découvrir le lieu"
+        subtitle="Explorez l'Hermitage à travers un parcours virtuel immersif"
+        image="/rural-retreat-landscape.jpg"
+      />
+      <BentoHeaderContent title="Explorez l'Hermitage à travers un parcours virtuel immersif">
+        <div className="container mx-auto px-4 py-12">
+          <GuidedTourClient mapPinPoints={mapPinPoints} />
+        </div>
+      </BentoHeaderContent>
+    </div>
   )
 }

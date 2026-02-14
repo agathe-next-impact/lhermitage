@@ -37,7 +37,7 @@ export function CategoryFilter({ categories, onCategoryChange }: CategoryFilterP
   const selectedTab = allTabs.find((tab) => tab.slug === selectedCategory) || allTabs[0]
 
   return (
-    <div className="mb-12 w-full">
+    <div className="mb-2 w-full">
       <div className="w-full">
         <div className="flex flex-wrap gap-1">
           {allTabs.map((category) => (

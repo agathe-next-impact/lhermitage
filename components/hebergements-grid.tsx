@@ -2,43 +2,73 @@
 
 import type React from "react"
 
-import { useRef } from "react"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import Link from "next/link"
 import type { WPPost, HebergementACF } from "@/lib/wordpress/types"
 import { getCategoryColor } from "@/lib/wordpress/category-colors"
-import { sanitizeHtml } from "@/lib/wordpress/sanitize"
-
-import "@/components/ui/MagicBento.css"
+import { truncateText } from "@/lib/utils"
+import { MinimalCard } from "@/components/ui/minimal-card"
+import { BRAND_COLORS } from "@/lib/theme/colors"
 
 interface HebergementsGridProps {
   hebergements: WPPost<HebergementACF>[]
 }
 
+const HebergementCard: React.FC<{
+  hebergement: WPPost<HebergementACF>
+  categoryColor: string
+}> = ({ hebergement, categoryColor }) => {
+  const truncatedDescription = hebergement.acf?.descriptif
+    ? truncateText(hebergement.acf.descriptif, 120)
+    : ""
+
+  const imageUrl =
+    hebergement.acf?.photos?.[0]?.url ||
+    hebergement._embedded?.["wp:featuredmedia"]?.[0]?.source_url
+
+  const imageAlt =
+    hebergement.acf?.photos?.[0]?.alt ||
+    hebergement._embedded?.["wp:featuredmedia"]?.[0]?.alt_text ||
+    hebergement.title.rendered
+
+  return (
+    <MinimalCard
+      className="h-full flex flex-col justify-between p-2 pt-6 shadow-sm hover:shadow-md transition-shadow relative"
+      style={{ backgroundColor: categoryColor }}
+    >
+      <div className="px-2 pb-6">
+        <h3 className="text-xl font-bold mb-3 text-white">
+          {hebergement.acf?.nom || hebergement.title.rendered}
+        </h3>
+        <p className="text-white/80 text-sm mb-4 flex-1 line-clamp-4">{truncatedDescription}</p>
+
+        <Button
+          asChild
+          size="sm"
+          className="rounded-full bg-white/20 text-white transition-colors hover:bg-white/30 shadow-sm text-xs h-8 px-4"
+        >
+          <Link href={`/hebergement/${hebergement.slug}`}>Découvrir</Link>
+        </Button>
+      </div>
+      {imageUrl && (
+        <div>
+          <Image
+            src={imageUrl}
+            alt={imageAlt}
+            width={600}
+            height={400}
+            quality={100}
+            sizes="(max-width: 768px) 100vw, 33vw"
+            className="rounded-xl object-cover w-full h-48"
+          />
+        </div>
+      )}
+    </MinimalCard>
+  )
+}
+
 export function HebergementsGrid({ hebergements }: HebergementsGridProps) {
-  const gridRef = useRef<HTMLDivElement>(null)
-
-  const getBentoClass = (index: number) => {
-    const pattern = index % 6
-    switch (pattern) {
-      case 0:
-        return "md:col-span-2 md:row-span-2" // Large square
-      case 1:
-        return "md:col-span-2 md:row-span-1" // Wide rectangle
-      case 2:
-        return "md:col-span-2 md:row-span-1" // Wide rectangle
-      case 3:
-        return "md:col-span-2 md:row-span-1" // Wide rectangle
-      case 4:
-        return "md:col-span-2 md:row-span-2" // Large square
-      case 5:
-        return "md:col-span-2 md:row-span-1" // Wide rectangle
-      default:
-        return "md:col-span-2 md:row-span-1"
-    }
-  }
-
   if (!hebergements || hebergements.length === 0) {
     return (
       <div className="text-center py-12 border-2 border-dashed border-muted rounded-lg">
@@ -51,88 +81,18 @@ export function HebergementsGrid({ hebergements }: HebergementsGridProps) {
   }
 
   return (
-    <>
-      <div
-        ref={gridRef}
-        className="card-grid bento-section grid grid-cols-1 md:grid-cols-6 auto-rows-[400px] md:auto-rows-[280px] md:grid-flow-dense gap-6"
-      >
-        {/* Real hebergement cards */}
-        {hebergements.map((hebergement, index) => {
-          const categorySlug = hebergement._embedded?.["wp:term"]?.[0]?.[0]?.slug
-          const categoryColor = categorySlug ? getCategoryColor(categorySlug) : "#e75754"
-          const bentoClass = getBentoClass(index)
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+      {hebergements.map((hebergement) => {
+        const categorySlug = hebergement._embedded?.["wp:term"]?.[0]?.[0]?.slug
 
-          return (
-            <div
-              key={hebergement.id}
-              className={`magic-bento-card magic-bento-card--border-glow group relative overflow-hidden rounded-xl shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 ${bentoClass}`}
-              style={
-                {
-                  "--glow-color":
-                    categoryColor
-                      .replace("#", "")
-                      .match(/.{2}/g)
-                      ?.map((x) => Number.parseInt(x, 16))
-                      .join(", ") || "229, 87, 84",
-                } as React.CSSProperties
-              }
-            >
-              {/* Background Image */}
-              {(hebergement.acf?.photos?.[0]?.url ||
-                hebergement._embedded?.["wp:featuredmedia"]?.[0]) && (
-                <div className="absolute inset-0">
-                  <Image
-                    src={
-                      hebergement.acf?.photos?.[0]?.url ||
-                      hebergement._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
-                      "/placeholder.svg" ||
-                      "/placeholder.svg" ||
-                      "/placeholder.svg"
-                    }
-                    alt={
-                      hebergement.acf?.photos?.[0]?.alt ||
-                      hebergement._embedded?.["wp:featuredmedia"]?.[0]?.alt_text ||
-                      hebergement.title.rendered
-                    }
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    quality={70}
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                </div>
-              )}
-
-              {/* Content Container */}
-              <div className="absolute inset-x-0 bottom-0 bg-white/95 backdrop-blur-sm rounded-t-3xl p-6 transform translate-y-[calc(100%-100px)] transition-transform duration-700 ease-out group-hover:translate-y-0 z-20 h-full flex flex-col">
-                <div className="flex-shrink-0">
-                  <h3 className="text-xl font-bold line-clamp-2" style={{ color: categoryColor }}>
-                    {hebergement.acf?.nom || hebergement.title.rendered}
-                  </h3>
-                </div>
-
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 mt-4 flex-grow flex flex-col">
-                  {hebergement.acf?.descriptif && (
-                    <div
-                      className="prose prose-sm line-clamp-6 text-gray-700 mb-4"
-                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(hebergement.acf.descriptif) }}
-                    />
-                  )}
-
-                  <div className="flex-grow" />
-
-                  <Button
-                    className="w-full rounded-xl text-white transition-colors mt-auto flex-shrink-0 hover:opacity-90"
-                    style={{ backgroundColor: categoryColor }}
-                  >
-                    <Link href={`/hebergement/${hebergement.slug}`}>Découvrir</Link>
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )
-        })}
-      </div>
-    </>
+        return (
+          <HebergementCard
+            key={hebergement.id}
+            hebergement={hebergement}
+            categoryColor={BRAND_COLORS.rose}
+          />
+        )
+      })}
+    </div>
   )
 }

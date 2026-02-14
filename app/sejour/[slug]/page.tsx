@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { wpApi } from "@/lib/wordpress/api"
 import { stripHtml } from "@/lib/utils"
+import { PageHeader } from "@/components/layout/page-header"
+import { BentoHeaderContent } from "@/components/layout/bento-header-content"
 import { REVALIDATION } from "@/lib/constants"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 
@@ -57,22 +59,23 @@ export default async function SejourPage({ params }: SejourPageProps) {
     notFound()
   }
 
-  return (
-    <div className="container mx-auto px-4 py-12">
-      {/* Hero Section */}
-      <div className="mb-12">
-        <h1 className="mb-4 font-serif text-4xl font-extrabold uppercase md:text-5xl">
-          {sejour.acf?.nom || sejour.title?.rendered || "Séjour"}
-        </h1>
-        {sejour.content?.rendered && (
-          <div
-            className="prose prose-stone max-w-none"
-            dangerouslySetInnerHTML={{ __html: sanitizeHtml(sejour.content.rendered) }}
-          />
-        )}
-      </div>
+  const title = sejour.acf?.nom || sejour.title?.rendered || "Séjour"
+  const featuredImage = sejour._embedded?.["wp:featuredmedia"]?.[0]?.source_url
+    || "/group-retreat-activities.jpg"
 
-      {/* Hébergements Section */}
+  return (
+    <div>
+      <PageHeader title={title} image={featuredImage} />
+      <BentoHeaderContent>
+        <div className="container mx-auto px-4 py-12">
+          {sejour.content?.rendered && (
+            <div
+              className="prose prose-stone max-w-none mb-12"
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(sejour.content.rendered) }}
+            />
+          )}
+
+          {/* Hébergements Section */}
       {sejour.acf?.hebergements?.hebergements &&
         sejour.acf.hebergements.hebergements.length > 0 && (
           <section className="mb-12">
@@ -168,16 +171,18 @@ export default async function SejourPage({ params }: SejourPageProps) {
         </section>
       )}
 
-      {/* CTA Section */}
-      <section className="rounded-lg bg-muted p-8 text-center">
-        <h2 className="mb-4 font-serif text-2xl font-bold">Intéressé par ce séjour ?</h2>
-        <p className="mb-6 text-muted-foreground">
-          Contactez-nous pour plus d&apos;informations ou pour réserver votre séjour
-        </p>
-        <Button asChild size="lg">
-          <Link href="/infos-pratiques/contacts">Nous contacter</Link>
-        </Button>
-      </section>
+          {/* CTA Section */}
+          <section className="rounded-lg bg-muted p-8 text-center">
+            <h2 className="mb-4 font-serif text-2xl font-bold">Intéressé par ce séjour ?</h2>
+            <p className="mb-6 text-muted-foreground">
+              Contactez-nous pour plus d&apos;informations ou pour réserver votre séjour
+            </p>
+            <Button asChild size="lg">
+              <Link href="/infos-pratiques/contacts">Nous contacter</Link>
+            </Button>
+          </section>
+        </div>
+      </BentoHeaderContent>
     </div>
   )
 }

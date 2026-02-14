@@ -8,7 +8,7 @@ import { getColorForPath } from "@/lib/page-colors"
 import { BRAND_COLORS } from "@/lib/theme/colors"
 
 interface BentoHeaderContentProps {
-  title: string
+  title?: string
   subtitle?: string
   columnImage?: string
   className?: string
@@ -44,7 +44,7 @@ export function BentoHeaderContent({
   const pathname = usePathname()
   const mainBlobColor = useMemo(() => {
     if (color) return color
-    return getColorForPath(pathname) || getMainBlobColor(title)
+    return getColorForPath(pathname) || getMainBlobColor(title || pathname)
   }, [pathname, color, title])
 
   return (
@@ -60,7 +60,7 @@ export function BentoHeaderContent({
         >
           <Image
             src="/logo-arcs-light.png"
-            alt={title}
+            alt={title || "L'Hermitage"}
             width={100}
             height={100}
             quality={100}
@@ -96,12 +96,14 @@ export function BentoHeaderContent({
           />
 
           {/* Titre en bas-gauche du L */}
-          <div className="absolute bottom-0 left-0 w-full md:w-1/4 h-36 p-4 md:p-6 flex flex-col justify-end">
-            <h1 className="font-sans sm:text-lg md:text-xl lg:text-3xl font-extrabold uppercase text-white leading-tight drop-shadow-sm">
-              {title}
-            </h1>
-            {subtitle && <p className="text-xs md:text-sm text-white/80 mt-2">{subtitle}</p>}
-          </div>
+          {title && (
+            <div className="absolute bottom-0 left-0 w-full md:w-1/4 h-36 p-4 md:p-6 flex flex-col justify-end">
+              <h2 className="font-sans sm:text-lg md:text-xl lg:text-3xl font-extrabold uppercase text-white leading-tight drop-shadow-sm">
+                {title}
+              </h2>
+              {subtitle && <p className="text-xs md:text-sm text-white/80 mt-2">{subtitle}</p>}
+            </div>
+          )}
         </motion.div>
 
         {/* Image colonne 1 — occupe la hauteur restante sous le bloc L */}
@@ -109,7 +111,7 @@ export function BentoHeaderContent({
           <div className="hidden md:block col-span-1 relative rounded-[15px] overflow-hidden mt-2">
             <Image
               src={columnImage}
-              alt={title}
+              alt={title || "L'Hermitage"}
               width={400}
               height={400}
               quality={100}
