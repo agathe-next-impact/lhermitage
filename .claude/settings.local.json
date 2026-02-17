@@ -22,7 +22,10 @@
       "Bash(find:*)",
       "Bash(npx next build:*)",
       "Bash(npm ls:*)",
-      "Bash(git diff:*)"
+      "Bash(git diff:*)",
+      "Bash(grep:*)",
+      "Read(//c/Users/agath/.claude/projects/c--dev-lhermitage/memory/**)",
+      "Bash(python -c:*)"
     ]
   }
 }

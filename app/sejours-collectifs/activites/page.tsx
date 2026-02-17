@@ -4,6 +4,9 @@ import { wpApi } from "@/lib/wordpress/api"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 import { stripHtml } from "@/lib/utils"
 import { ActivitiesClient } from "./activities-client"
+import { REVALIDATION } from "@/lib/constants"
+
+export const revalidate = REVALIDATION.listing
 
 function getCategoryColor(slug: string): string {
   const colorMap: Record<string, string> = {

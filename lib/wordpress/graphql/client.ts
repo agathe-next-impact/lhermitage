@@ -5,6 +5,9 @@ import { logger } from "../../logger"
 const GRAPHQL_URL =
   process.env.WP_GRAPHQL_URL || "https://admin.hermitagelelab.com/graphql"
 
+// Longer timeout during build to handle concurrent requests overwhelming WordPress
+const REQUEST_TIMEOUT = 30_000
+
 function createClient(revalidate: number = 900): GraphQLClient {
   return new GraphQLClient(GRAPHQL_URL, {
     headers: {
@@ -13,7 +16,7 @@ function createClient(revalidate: number = 900): GraphQLClient {
     },
     fetch: (input: RequestInfo | URL, init?: RequestInit) => {
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 15000)
+      const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT)
       return fetch(input, {
         ...init,
         signal: controller.signal,
@@ -23,31 +26,38 @@ function createClient(revalidate: number = 900): GraphQLClient {
   })
 }
 
+function isRetryableError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false
+  return (
+    error.name === "AbortError" ||
+    error.message.includes("fetch") ||
+    error.message.includes("ECONNRESET") ||
+    error.message.includes("ETIMEDOUT") ||
+    error.message.includes("socket") ||
+    /\b5\d{2}\b/.test(error.message)
+  )
+}
+
 export async function gqlRequest<T>(
   query: string,
   variables?: Record<string, unknown>,
   options?: { revalidate?: number; retries?: number }
 ): Promise<T> {
-  const { revalidate = 900, retries = 2 } = options || {}
+  const { revalidate = 900, retries = 3 } = options || {}
   const client = createClient(revalidate)
 
   try {
     const data = await client.request<T>(query, variables)
     return decodeObjectEntities(data)
   } catch (error) {
-    if (retries > 0) {
-      const isServerError =
-        error instanceof Error &&
-        (error.message.includes("5") || error.name === "AbortError" || error.message.includes("fetch"))
-
-      if (isServerError) {
-        const delay = Math.pow(2, 3 - retries) * 1000
-        await new Promise((r) => setTimeout(r, delay))
-        return gqlRequest<T>(query, variables, {
-          revalidate,
-          retries: retries - 1,
-        })
-      }
+    if (retries > 0 && isRetryableError(error)) {
+      const delay = Math.pow(2, 4 - retries) * 1000
+      logger.warn(`GraphQL request failed, retrying in ${delay}ms (${retries} left):`, error instanceof Error ? error.message : error)
+      await new Promise((r) => setTimeout(r, delay))
+      return gqlRequest<T>(query, variables, {
+        revalidate,
+        retries: retries - 1,
+      })
     }
 
     logger.error("GraphQL request failed:", error instanceof Error ? error.message : error)
@@ -56,7 +66,8 @@ export async function gqlRequest<T>(
 }
 
 /**
- * Safe wrapper for list queries — returns empty array on error
+ * Safe wrapper for list queries — returns empty object on error.
+ * Always logs full error details (even in production) to diagnose build failures.
  */
 export async function gqlRequestList<T>(
   query: string,
@@ -66,7 +77,12 @@ export async function gqlRequestList<T>(
   try {
     return await gqlRequest<T>(query, variables, options)
   } catch (error) {
-    logger.error("GraphQL list request failed:", error instanceof Error ? error.message : error)
+    // Always log full error in production — silent failures here cause empty pages
+    console.error(
+      "[GraphQL] List request failed — returning empty result.",
+      "Query:", query.slice(0, 80).replace(/\s+/g, " "),
+      "Error:", error instanceof Error ? error.message : error
+    )
     return {} as T
   }
 }
