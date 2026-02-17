@@ -80,12 +80,25 @@ export async function generateStaticParams() {
         process.env.WP_API_URL?.replace("/wp-json/wp/v2", "") || "https://admin.hermitagelelab.com"
       const pagePath = page.link.replace(wpBaseUrl, "").replace(/^\/+|\/+$/g, "")
 
-      // Exclude empty paths and dedicated pages
-      if (pagePath === "") return false
-      if (pagePath === "hebergements") return false
-      if (pagePath === "sejours-collectifs/packs-de-sejours") return false
-      if (pagePath === "sejours-collectifs/nos-sejours") return false
-      if (pagePath === "ecosysteme-innovant/partenaires") return false
+      // Exclude paths that have dedicated page.tsx routes —
+      // otherwise the catch-all SSG overwrites them with generic WordPress content
+      const dedicatedRoutes = [
+        "hebergements",
+        "sejours-collectifs",
+        "sejours-collectifs/activites",
+        "sejours-collectifs/nos-sejours",
+        "sejours-collectifs/packs-de-sejours",
+        "sejours-individuels",
+        "ecosysteme-innovant/structures",
+        "ecosysteme-innovant/partenaires",
+        "ecosysteme-innovant/evenements",
+        "services",
+        "infos-pratiques/contacts",
+        "infos-pratiques/jours-et-horaires-douverture",
+        "infos-pratiques/localisation",
+      ]
+
+      if (!pagePath || dedicatedRoutes.includes(pagePath)) return false
 
       return true
     })
