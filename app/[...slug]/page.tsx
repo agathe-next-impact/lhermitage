@@ -14,12 +14,6 @@ const HistoireTimeline = dynamic(() =>
   import("@/components/histoire-timeline").then((m) => m.HistoireTimeline)
 )
 const TeamMasonry = dynamic(() => import("@/components/team-masonry").then((m) => m.TeamMasonry))
-const DevenirSocietairePage = dynamic(() =>
-  import("@/components/features/devenir-societaire/devenir-societaire-page").then(
-    (m) => m.DevenirSocietairePage
-  )
-)
-
 export const revalidate = REVALIDATION.listing
 
 interface PageProps {
@@ -96,6 +90,7 @@ export async function generateStaticParams() {
         "infos-pratiques/contacts",
         "infos-pratiques/jours-et-horaires-douverture",
         "infos-pratiques/localisation",
+        "participer/devenir-societaire",
       ]
 
       if (!pagePath || dedicatedRoutes.includes(pagePath)) return false
@@ -126,8 +121,6 @@ export default async function CatchAllPage({ params }: PageProps) {
 
   const isHistoirePage = fullPath === "tiers-lieu-rural/lhistoire-du-lieu"
   const isEquipePage = fullPath === "tiers-lieu-rural/lequipe"
-  const isDevenirSocietairePage = fullPath === "participer/devenir-societaire"
-
   let page = null
   let teamMembers: WPPost<TeamMemberACF>[] = []
 
@@ -149,7 +142,11 @@ export default async function CatchAllPage({ params }: PageProps) {
   let content: React.ReactNode = null
 
   if (isHistoirePage && page.acf) {
-    content = <div className="relative z-10"><HistoireTimeline acf={page.acf as HistoireACF} /></div>
+    content = (
+      <div className="relative z-10">
+        <HistoireTimeline acf={page.acf as HistoireACF} />
+      </div>
+    )
   } else if (isEquipePage) {
     content = (
       <div className="relative z-10 mx-auto px-4 py-2">
@@ -162,8 +159,6 @@ export default async function CatchAllPage({ params }: PageProps) {
         <TeamMasonry members={teamMembers} />
       </div>
     )
-  } else if (isDevenirSocietairePage) {
-    content = <div className="relative z-10"><DevenirSocietairePage page={page} /></div>
   } else {
     content = (
       <div className="relative z-10 mx-auto px-4 py-2">
@@ -184,9 +179,7 @@ export default async function CatchAllPage({ params }: PageProps) {
         subtitle={page.acf?.hero?.["sous-titre"]}
         image={page.acf?.hero?.image?.url || "/rural-retreat-landscape.jpg"}
       />
-      <BentoHeaderContent title={page.acf?.hero?.["sous-titre"]}>
-        {content}
-      </BentoHeaderContent>
+      <BentoHeaderContent title={page.acf?.hero?.["sous-titre"]}>{content}</BentoHeaderContent>
     </div>
   )
 }

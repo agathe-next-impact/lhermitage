@@ -47,7 +47,7 @@ export async function SiteHeader() {
     globalOptions = {
       lien_du_cta_de_barre_superieure: {
         title: "Réserver",
-        url: "/contact",
+        url: "/simulateur",
         target: "",
       },
       miniature_du_megamenu: {
@@ -79,10 +79,22 @@ export async function SiteHeader() {
         bgColor: "#2A4A51",
         textColor: "#ffffff",
         links: [
-          { label: "Séjours Collectifs", href: "/sejours-collectifs", ariaLabel: "Voir les séjours collectifs" },
-          { label: "Séjours Individuels", href: "/sejours-individuels", ariaLabel: "Voir les séjours individuels" },
+          {
+            label: "Séjours Collectifs",
+            href: "/sejours-collectifs",
+            ariaLabel: "Voir les séjours collectifs",
+          },
+          {
+            label: "Séjours Individuels",
+            href: "/sejours-individuels",
+            ariaLabel: "Voir les séjours individuels",
+          },
           { label: "Hébergements", href: "/hebergements", ariaLabel: "Voir les hébergements" },
-          { label: "Activités", href: "/sejours-collectifs/activites", ariaLabel: "Voir les activités" },
+          {
+            label: "Activités",
+            href: "/sejours-collectifs/activites",
+            ariaLabel: "Voir les activités",
+          },
         ],
       },
       {
@@ -95,8 +107,16 @@ export async function SiteHeader() {
             href: "/ecosysteme-innovant/structures-hebergees",
             ariaLabel: "Voir les structures hébergées",
           },
-          { label: "Partenaires", href: "/ecosysteme-innovant/partenaires", ariaLabel: "Voir les partenaires" },
-          { label: "Événements", href: "/ecosysteme-innovant/evenements", ariaLabel: "Voir les événements" },
+          {
+            label: "Partenaires",
+            href: "/ecosysteme-innovant/partenaires",
+            ariaLabel: "Voir les partenaires",
+          },
+          {
+            label: "Événements",
+            href: "/ecosysteme-innovant/evenements",
+            ariaLabel: "Voir les événements",
+          },
         ],
       },
       {
@@ -115,7 +135,11 @@ export async function SiteHeader() {
         bgColor: "#C14C66",
         textColor: "#ffffff",
         links: [
-          { label: "Localisation", href: "/infos-pratiques/localisation", ariaLabel: "Voir la localisation" },
+          {
+            label: "Localisation",
+            href: "/infos-pratiques/localisation",
+            ariaLabel: "Voir la localisation",
+          },
           { label: "Contacts", href: "/infos-pratiques/contacts", ariaLabel: "Nous contacter" },
           {
             label: "Jours et Horaires",
@@ -138,7 +162,9 @@ export async function SiteHeader() {
       "/rural-retreat-hermitage-building-nature.jpg",
     imageAlt: globalOptions.miniature_du_megamenu?.image?.alt || "Vue de l'Hermitage",
     ctaLabel: globalOptions.miniature_du_megamenu?.titre_cta_1 || "Découvrir le lieu",
-    ctaHref: transformWordPressUrl(globalOptions.miniature_du_megamenu?.lien_cta_1?.url || "/visite-virtuelle"),
+    ctaHref: transformWordPressUrl(
+      globalOptions.miniature_du_megamenu?.lien_cta_1?.url || "/visite-virtuelle"
+    ),
     ctaTarget: globalOptions.miniature_du_megamenu?.lien_cta_1?.target,
     cta2Label: globalOptions.miniature_du_megamenu?.titre_cta_2,
     cta2Href: globalOptions.miniature_du_megamenu?.lien_cta_2?.url
@@ -162,7 +188,7 @@ export async function SiteHeader() {
         buttonBgColor="#E75754"
         buttonTextColor="#ffffff"
         ctaLabel={ctaButton?.title || "Réserver"}
-        ctaHref={transformWordPressUrl(ctaButton?.url || "/reserver")}
+        ctaHref={transformWordPressUrl(ctaButton?.url || "/simulateur")}
         ctaTarget={ctaButton?.target}
         ease="power3.out"
       />

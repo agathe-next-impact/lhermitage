@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { useMemo, type ReactNode } from "react"
+import { useMemo, useRef, type ReactNode } from "react"
 import { usePathname } from "next/navigation"
 import { getColorForPath } from "@/lib/page-colors"
 import { BRAND_COLORS } from "@/lib/theme/colors"
@@ -42,6 +42,7 @@ export function BentoHeaderContent({
   children,
 }: BentoHeaderContentProps) {
   const pathname = usePathname()
+  const lBlockRef = useRef<HTMLDivElement>(null)
   const mainBlobColor = useMemo(() => {
     if (color) return color
     return getColorForPath(pathname) || getMainBlobColor(title || pathname)
@@ -52,11 +53,18 @@ export function BentoHeaderContent({
       <div className="grid grid-cols-1 md:grid-cols-4">
         {/* Bloc L continu — un seul élément croppé par overlay */}
         <motion.div
-          className="col-span-1 md:col-span-4 relative rounded-[15px] overflow-hidden"
-          style={{ height: "calc(clamp(160px, 35vh, 80px) + 9rem)" }}
+          ref={lBlockRef}
+          className="col-span-1 md:col-span-4 relative rounded-xl overflow-hidden border-b-2 border-background"
+          style={{
+            height: "calc(clamp(160px, 35vh, 80px) + 9rem)",
+            backgroundColor: mainBlobColor,
+          }}
           initial={{ clipPath: "inset(0 0 100% 0)" }}
           animate={{ clipPath: "inset(0 0 0% 0)" }}
           transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.1 }}
+          onAnimationComplete={() => {
+            lBlockRef.current?.style.removeProperty("clip-path")
+          }}
         >
           <Image
             src="/logo-arcs-light.png"
@@ -66,12 +74,9 @@ export function BentoHeaderContent({
             quality={100}
             className="absolute bottom-20 left-6 w-24 h-full object-contain z-10"
           />
-          {/* Fond coloré continu */}
-          <div className="absolute inset-0" style={{ backgroundColor: mainBlobColor }} />
-
           {/* Overlay — masque le bas-droit pour former le L (desktop) */}
           <div
-            className="hidden md:block absolute right-0 bottom-0 bg-background rounded-tl-[15px]"
+            className="hidden md:block absolute right-0 bottom-0 bg-background rounded-tl-[15px] pointer-events-none"
             style={{ width: "75%", height: "9rem" }}
           />
 
@@ -122,7 +127,7 @@ export function BentoHeaderContent({
 
         {/* Contenu de page — colonnes 2-4 (ou décalé si pas d'image) */}
         <div
-          className={`col-span-1 ${columnImage ? "md:col-span-3" : "md:col-start-2 md:col-span-3"} md:-mt-36 relative`}
+          className={`col-span-1 bg-white m-2 p-4 rounded-xl ${columnImage ? "md:col-span-3" : "md:col-start-2 md:col-span-3"} md:-mt-36 relative z-10`}
         >
           {children}
         </div>

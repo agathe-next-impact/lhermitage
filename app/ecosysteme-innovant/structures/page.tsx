@@ -19,13 +19,11 @@ export default async function StructuresPage() {
         subtitle={page?.acf?.hero?.["sous-titre"] || "Découvrez nos structures"}
         image={page?.acf?.hero?.image?.url || "/rural-retreat-landscape.jpg"}
       />
-      <BentoHeaderContent title={page?.acf?.hero?.["sous-titre"] || "Découvrez nos structures"}>
-        <StructuresGrid
-          structures={structures}
-          sectionInternes={page?.acf?.page_structures?.structures_internes}
-          sectionHebergees={page?.acf?.page_structures?.structures_hebergees}
-        />
-      </BentoHeaderContent>
+      <StructuresGrid
+        structures={structures}
+        sectionInternes={page?.acf?.page_structures?.structures_internes}
+        sectionHebergees={page?.acf?.page_structures?.structures_hebergees}
+      />
     </div>
   )
 }

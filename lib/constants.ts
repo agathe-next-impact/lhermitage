@@ -8,4 +8,6 @@ export const REVALIDATION = {
   detail: 3600,
   /** Contenu fréquemment mis à jour (structures, événements) - 15min */
   frequent: 900,
+  /** Simulateur - données catalogue (activités, hébergements, etc.) - 1h */
+  simulateur: 3600,
 } as const

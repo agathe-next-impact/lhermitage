@@ -24,11 +24,14 @@ export const PAGE_COLORS: Record<string, string> = {
   "/infos-pratiques": BRAND_COLORS.orange,
 
   "/participer": BRAND_COLORS.coral,
+
+  "/simulateur": BRAND_COLORS.dark,
 }
 
 export function getColorForPath(pathname: string): string | undefined {
   // Remove trailing slash for consistency
-  const normalizedPath = pathname.endsWith("/") && pathname.length > 1 ? pathname.slice(0, -1) : pathname
+  const normalizedPath =
+    pathname.endsWith("/") && pathname.length > 1 ? pathname.slice(0, -1) : pathname
 
   // Direct match
   if (PAGE_COLORS[normalizedPath]) {

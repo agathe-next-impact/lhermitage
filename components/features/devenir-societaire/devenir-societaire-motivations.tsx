@@ -66,7 +66,7 @@ export function DevenirSocietaireMotivations({ motivations }: DevenirSocietaireM
           }`}
         >
           <div
-            className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center"
+            className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center"
             style={{ backgroundColor: cardColors[index % cardColors.length] }}
           >
             <span className="text-white">

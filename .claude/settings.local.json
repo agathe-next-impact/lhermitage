@@ -27,7 +27,8 @@
       "Read(//c/Users/agath/.claude/projects/c--dev-lhermitage/memory/**)",
       "Bash(python -c:*)",
       "Bash(# Search for specific activity card content in the deployed HTML curl -s \"\"https://v0-headless-word-press-app.vercel.app/sejours-collectifs/activites\"\")",
-      "Bash(# Check if partenaires \\(excluded from catch-all\\) works, and evenements \\(NOT excluded\\) doesn''t curl -s \"\"https://v0-headless-word-press-app.vercel.app/ecosysteme-innovant/partenaires\"\")"
+      "Bash(# Check if partenaires \\(excluded from catch-all\\) works, and evenements \\(NOT excluded\\) doesn''t curl -s \"\"https://v0-headless-word-press-app.vercel.app/ecosysteme-innovant/partenaires\"\")",
+      "Bash(curl -s -X POST \"https://admin.hermitagelelab.com/graphql\" -H \"Content-Type: application/json\" -d \"{\"\"query\"\":\"\"{ simulateurSettings { simulateurSettings { pageServices { nom descriptif services { nonExistent123 } fieldGroupName } menuTitle pageTitle } } }\"\"}\")"
     ]
   }
 }
