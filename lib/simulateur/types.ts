@@ -62,6 +62,7 @@ export interface ActiviteSimACF {
   prix_forfaitaire?: number
   mode_tarification?: ModeTarification
   creneau_suggere?: CreneauType | "journee"
+  creneaux_disponibles?: string[]
   description_immersive?: string
   galerie?: WPImage[]
   video_teaser_url?: string
@@ -107,6 +108,7 @@ export interface ServiceSimACF {
   prix_forfaitaire?: number
   mode_tarification?: ModeTarification
   inclus_par_defaut?: boolean
+  creneaux_disponibles?: string[]
   description_courte?: string
   description_immersive?: string
   galerie?: WPImage[]
@@ -189,6 +191,8 @@ export interface SimulateurSettings {
   periodes_haute_saison?: Array<{ date_debut: string; date_fin: string }>
   email_commercial?: string
   telephone_commercial?: string
+  equipements_disponibles?: Array<{ slug: string; label: string }>
+  ambiances_disponibles?: Array<{ slug: string; label: string }>
 }
 
 // ─── État du simulateur (store) ──────────────────────────────
@@ -231,6 +235,11 @@ export interface ServiceSelection {
   option_index?: number
 }
 
+export interface EspaceSelection {
+  espace_slug: string
+  privatise: boolean
+}
+
 export interface BudgetBreakdown {
   base: number
   activites: number
@@ -253,6 +262,8 @@ export interface SimulateurState {
   accommodations: AccommodationSelection[]
   // Services
   selectedServices: ServiceSelection[]
+  // Espaces de travail
+  selectedEspaces: EspaceSelection[]
   // Navigation
   currentStep: SimulateurStep
 }

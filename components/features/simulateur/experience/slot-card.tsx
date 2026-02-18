@@ -66,13 +66,18 @@ export function SlotCard({ dayIndex, slotIndex }: SlotCardProps) {
     ? data.activites.find((a) => a.slug === slot.activite_slug)
     : null
   const espace = slot.espace_slug ? data.espaces.find((e) => e.slug === slot.espace_slug) : null
+  const service = slot.service_slug
+    ? data.services.find((s) => s.slug === slot.service_slug)
+    : null
 
-  const hasAssignment = !!activity || !!espace
+  const hasAssignment = !!activity || !!espace || !!service
   const assignedLabel =
     activity?.title ??
     activity?.acf.nom ??
     espace?.title ??
     espace?.acf.nom ??
+    service?.title ??
+    service?.acf.nom ??
     slot.label_personnalise ??
     null
 

@@ -23,6 +23,7 @@ export const demoActivites: SimActivite[] = [
       prix_par_personne: 25,
       mode_tarification: "par_personne",
       creneau_suggere: "matin",
+      creneaux_disponibles: ["matin", "apres_midi"],
       description_immersive:
         "Dès le signal de départ, les équipes s'élancent à travers les sentiers boisés du domaine. Carte en main, boussole au poing, chaque groupe doit trouver les balises cachées entre les chênes centenaires.",
       niveau_physique: "modere",
@@ -43,6 +44,7 @@ export const demoActivites: SimActivite[] = [
       prix_par_personne: 55,
       mode_tarification: "par_personne",
       creneau_suggere: "matin",
+      creneaux_disponibles: ["matin", "apres_midi"],
       description_immersive:
         "Sous la houlette du Chef, vous apprendrez à sublimer les produits du terroir picard. Chaque équipe prépare une partie du menu, avant de partager ensemble le fruit de votre travail.",
       niveau_physique: "faible",
@@ -62,6 +64,7 @@ export const demoActivites: SimActivite[] = [
       prix_par_personne: 18,
       mode_tarification: "par_personne",
       creneau_suggere: "matin",
+      creneaux_disponibles: ["petit_dejeuner", "matin"],
       description_immersive:
         "Le soleil matinal filtre à travers les feuillages tandis que vous déroulez votre tapis sur l'herbe fraîche. Guidés par une voix apaisante, vous enchaînez les postures au rythme du chant des oiseaux.",
       niveau_physique: "faible",
@@ -81,6 +84,7 @@ export const demoActivites: SimActivite[] = [
       prix_forfaitaire: 800,
       mode_tarification: "forfaitaire",
       creneau_suggere: "apres_midi",
+      creneaux_disponibles: ["matin", "apres_midi"],
       description_immersive:
         "Les portes se referment. Votre équipe dispose de 90 minutes pour percer les mystères de L'Hermitage. Chaque pièce du domaine recèle un indice, chaque recoin une surprise.",
       niveau_physique: "faible",
@@ -100,6 +104,7 @@ export const demoActivites: SimActivite[] = [
       prix_par_personne: 30,
       mode_tarification: "par_personne",
       creneau_suggere: "apres_midi",
+      creneaux_disponibles: ["matin", "apres_midi"],
       description_immersive:
         "Tir à l'arc, relais en sac, quiz culture générale, construction de radeau... Les épreuves s'enchaînent dans une ambiance de franche camaraderie. La compétition est là, mais c'est l'esprit d'équipe qui l'emporte.",
       niveau_physique: "modere",
@@ -119,6 +124,7 @@ export const demoActivites: SimActivite[] = [
       prix_forfaitaire: 600,
       mode_tarification: "forfaitaire",
       creneau_suggere: "apres_midi",
+      creneaux_disponibles: ["matin", "apres_midi"],
       description_immersive:
         "Autour des tables, les cartes s'assemblent progressivement pour révéler les liens de cause à effet du changement climatique. Un moment de prise de conscience collective, suivi d'un brainstorm sur les actions concrètes.",
       niveau_physique: "faible",
@@ -138,6 +144,7 @@ export const demoActivites: SimActivite[] = [
       prix_par_personne: 35,
       mode_tarification: "par_personne",
       creneau_suggere: "soiree",
+      creneaux_disponibles: ["apres_midi", "diner", "soir"],
       description_immersive:
         "Dans la cave voûtée aux pierres centenaires, le sommelier débouche les premières bouteilles. Les arômes se libèrent tandis qu'il vous guide à travers les terroirs picards et leurs secrets.",
       niveau_physique: "faible",
@@ -157,6 +164,7 @@ export const demoActivites: SimActivite[] = [
       prix_par_personne: 28,
       mode_tarification: "par_personne",
       creneau_suggere: "apres_midi",
+      creneaux_disponibles: ["matin", "apres_midi"],
       description_immersive:
         "Pinceaux, argile, éléments naturels... Chaque participant apporte sa touche à l'œuvre collective. Pas besoin d'être artiste : l'important, c'est de créer ensemble.",
       niveau_physique: "faible",
@@ -373,6 +381,7 @@ export const demoServices: SimService[] = [
       prix_par_personne: 35,
       mode_tarification: "par_personne",
       inclus_par_defaut: false,
+      creneaux_disponibles: ["dejeuner", "diner"],
       description_courte: "Buffet avec produits du terroir",
       options: [
         { nom: "Buffet standard", supplement_par_personne: 0 },
@@ -392,6 +401,7 @@ export const demoServices: SimService[] = [
       prix_par_personne: 12,
       mode_tarification: "par_personne",
       inclus_par_defaut: true,
+      creneaux_disponibles: ["petit_dejeuner"],
       description_courte: "Continental avec viennoiseries",
     },
     categories: [{ slug: "restauration", name: "Restauration" }],
@@ -405,6 +415,7 @@ export const demoServices: SimService[] = [
       prix_forfaitaire: 250,
       mode_tarification: "forfaitaire",
       inclus_par_defaut: false,
+      creneaux_disponibles: ["matin", "apres_midi", "soir"],
       description_courte: "A/R gare — L'Hermitage",
     },
     categories: [{ slug: "transport-logistique", name: "Transport & Logistique" }],
@@ -418,6 +429,7 @@ export const demoServices: SimService[] = [
       prix_forfaitaire: 800,
       mode_tarification: "forfaitaire",
       inclus_par_defaut: false,
+      creneaux_disponibles: ["soir"],
       description_courte: "Animation musicale professionnelle",
     },
     categories: [{ slug: "animation-soiree", name: "Animation de soirée" }],
@@ -431,6 +443,7 @@ export const demoServices: SimService[] = [
       prix_forfaitaire: 150,
       mode_tarification: "forfaitaire",
       inclus_par_defaut: false,
+      creneaux_disponibles: ["soir"],
       description_courte: "Soirée conviviale autour du feu",
     },
     categories: [{ slug: "animation-soiree", name: "Animation de soirée" }],
@@ -444,6 +457,7 @@ export const demoServices: SimService[] = [
       prix_par_personne: 22,
       mode_tarification: "par_personne",
       inclus_par_defaut: false,
+      creneaux_disponibles: ["matin"],
       description_courte: "Brunch gourmand le dernier jour",
     },
     categories: [{ slug: "restauration", name: "Restauration" }],
@@ -457,6 +471,7 @@ export const demoServices: SimService[] = [
       prix_par_personne: 8,
       mode_tarification: "par_personne",
       inclus_par_defaut: false,
+      creneaux_disponibles: ["petit_dejeuner", "matin"],
       description_courte: "30 min de yoga au réveil",
     },
     categories: [{ slug: "bien-etre", name: "Bien-être" }],
@@ -470,6 +485,7 @@ export const demoServices: SimService[] = [
       prix_forfaitaire: 650,
       mode_tarification: "forfaitaire",
       inclus_par_defaut: false,
+      creneaux_disponibles: ["matin", "apres_midi", "soir"],
       description_courte: "Reportage photo du séjour",
     },
     categories: [{ slug: "sur-mesure", name: "Sur mesure" }],
@@ -665,6 +681,21 @@ export const demoSettings: SimulateurSettings = {
   ],
   email_commercial: "sejours@lhermitage.fr",
   telephone_commercial: "+33 3 44 XX XX XX",
+  equipements_disponibles: [
+    { slug: "videoprojecteur", label: "Vidéoprojecteur" },
+    { slug: "paperboard", label: "Paperboard" },
+    { slug: "wifi_fibre", label: "Wi-Fi fibre" },
+    { slug: "sonorisation", label: "Sonorisation" },
+    { slug: "ecran_geant", label: "Écran géant" },
+    { slug: "mobilier_modulable", label: "Mobilier modulable" },
+    { slug: "cuisine_equipee", label: "Cuisine équipée" },
+  ],
+  ambiances_disponibles: [
+    { slug: "professionnel", label: "Professionnel" },
+    { slug: "decontracte", label: "Décontracté" },
+    { slug: "intimiste", label: "Intimiste" },
+    { slug: "festif", label: "Festif" },
+  ],
 }
 
 // ─── Export complet ──────────────────────────────────────────

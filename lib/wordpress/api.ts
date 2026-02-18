@@ -27,6 +27,7 @@ import {
   transformSejourAcf,
   transformMenuItems,
   transformTerm,
+  transformGlobalOptions,
 } from "./graphql/transformers"
 import { GET_PAGE_BY_SLUG, GET_PAGE_BY_ID, GET_ALL_PAGES } from "./graphql/queries/pages"
 import {
@@ -42,7 +43,7 @@ import {
   GET_TEAM_MEMBERS,
 } from "./graphql/queries/posts"
 import { GET_SEJOURS, GET_SEJOUR_BY_SLUG } from "./graphql/queries/sejours"
-import { GET_MENU } from "./graphql/queries/menu"
+import { GET_MENU, GET_GLOBAL_OPTIONS } from "./graphql/queries/menu"
 import { GET_TYPES_DE_PARTENAIRE } from "./graphql/queries/taxonomy"
 import { rewriteWordPressAssetUrl } from "./url-transform"
 import { logger } from "../logger"
@@ -428,14 +429,10 @@ export class WordPressAPI {
   // --- Global options ---
 
   async getGlobalOptions(): Promise<GlobalOptionsACF> {
-    // NOTE: OptionsGlobales ACF Options Page exists in GraphQL but the "menu" field group
-    // is not yet properly attached. Using fallback values until WordPress ACF configuration
-    // exposes the menu field group on the optionsGlobales query.
-    const defaultCtaUrl = process.env.DEFAULT_CTA_URL || "/contact"
-    return {
+    const fallback: GlobalOptionsACF = {
       lien_du_cta_de_barre_superieure: {
         title: "Réserver",
-        url: defaultCtaUrl,
+        url: process.env.DEFAULT_CTA_URL || "/simulateur",
         target: "",
       },
       miniature_du_megamenu: {
@@ -453,6 +450,32 @@ export class WordPressAPI {
           height: 1080,
         },
       },
+    }
+
+    try {
+      const data = await gqlRequest<{
+        optionsGlobales: {
+          menu?: {
+            lienDuCtaDeBarreSuperieure?: { url?: string; title?: string; target?: string }
+            miniatureDuMegamenu?: {
+              titreCta1?: string
+              lienCta1?: { url?: string; title?: string; target?: string }
+              titreCta2?: string
+              lienCta2?: { url?: string; title?: string; target?: string }
+              image?: { node?: { databaseId: number; sourceUrl: string; altText?: string; mediaDetails?: { width?: number; height?: number; sizes?: Array<{ name: string; sourceUrl: string; width?: string; height?: string }> } } }
+            }
+          }
+        }
+      }>(GET_GLOBAL_OPTIONS, undefined, { retries: 0 })
+
+      const result = transformGlobalOptions(data)
+      if (result) return result
+
+      logger.warn("GraphQL optionsGlobales returned no menu data, using fallback")
+      return fallback
+    } catch (error) {
+      logger.warn("GraphQL optionsGlobales query failed, using fallback:", error instanceof Error ? error.message : error)
+      return fallback
     }
   }
 

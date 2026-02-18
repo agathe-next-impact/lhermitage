@@ -4,7 +4,7 @@ export const STEPS: { key: SimulateurStep; label: string; path: string }[] = [
   { key: "profil", label: "Profil", path: "/simulateur/profil" },
   { key: "experience", label: "Expérience", path: "/simulateur/experience" },
   { key: "hebergements", label: "Hébergements", path: "/simulateur/hebergements" },
-  { key: "services", label: "Services", path: "/simulateur/services" },
+  { key: "services", label: "Espaces de travail", path: "/simulateur/services" },
   { key: "recapitulatif", label: "Récapitulatif", path: "/simulateur/recapitulatif" },
 ]
 
@@ -26,6 +26,25 @@ export const DEFAULT_DAY_SLOTS = [
   { heure_debut: "14:30", type_creneau: "activite" as const, label: "Après-midi" },
   { heure_debut: "19:30", type_creneau: "soiree" as const, label: "Soirée" },
 ]
+
+/** Ordre et labels des créneaux horaires */
+export const CRENEAU_ORDER = [
+  "petit_dejeuner",
+  "matin",
+  "dejeuner",
+  "apres_midi",
+  "diner",
+  "soir",
+] as const
+
+export const CRENEAU_LABELS: Record<string, string> = {
+  petit_dejeuner: "Petit déjeuner",
+  matin: "Matin",
+  dejeuner: "Déjeuner",
+  apres_midi: "Après-midi",
+  diner: "Dîner",
+  soir: "Soir",
+}
 
 /** Prix de base par défaut (utilisé si WP ne fournit pas de settings) */
 export const DEFAULT_SETTINGS = {

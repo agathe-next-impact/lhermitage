@@ -37,6 +37,7 @@ export const GET_ACTIVITES_SIMULATEUR = gql`
           prixForfaitaire
           modeTarification
           creneauSuggere
+          creneauxDisponibles
           descriptionImmersive
           galerie {
             nodes {
@@ -188,6 +189,7 @@ export const GET_SERVICES_SIMULATEUR = gql`
           prixForfaitaire
           modeTarification
           inclusParDefaut
+          creneauxDisponibles
           descriptionCourte
           descriptionImmersive
           galerie {
@@ -301,6 +303,14 @@ export const GET_SIMULATEUR_SETTINGS = gql`
         }
         emailCommercial
         telephoneCommercial
+        equipementsDisponibles {
+          slug
+          label
+        }
+        ambiancesDisponibles {
+          slug
+          label
+        }
       }
     }
   }

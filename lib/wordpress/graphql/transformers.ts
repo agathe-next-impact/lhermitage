@@ -13,6 +13,7 @@ import type {
   PartenaireACF,
   TeamMemberACF,
   EspaceDeTravailACF,
+  GlobalOptionsACF,
   WPLink,
   WPGoogleMap,
 } from "../types"
@@ -533,5 +534,42 @@ export function transformTerm(gqlTerm: {
     description: gqlTerm.description || "",
     link: gqlTerm.link || "",
     taxonomy: gqlTerm.taxonomyName || "",
+  }
+}
+
+// --- Global Options transformer ---
+
+interface GqlGlobalOptionsResponse {
+  optionsGlobales: {
+    menu?: {
+      lienDuCtaDeBarreSuperieure?: { url?: string; title?: string; target?: string }
+      miniatureDuMegamenu?: {
+        titreCta1?: string
+        lienCta1?: { url?: string; title?: string; target?: string }
+        titreCta2?: string
+        lienCta2?: { url?: string; title?: string; target?: string }
+        image?: { node?: GqlMediaItem }
+      }
+    }
+  }
+}
+
+export function transformGlobalOptions(data: GqlGlobalOptionsResponse): GlobalOptionsACF | null {
+  const menu = data.optionsGlobales?.menu
+  if (!menu) return null
+
+  const megamenu = menu.miniatureDuMegamenu
+
+  return {
+    lien_du_cta_de_barre_superieure: transformLink(menu.lienDuCtaDeBarreSuperieure),
+    miniature_du_megamenu: megamenu
+      ? {
+          titre_cta_1: megamenu.titreCta1,
+          lien_cta_1: transformLink(megamenu.lienCta1),
+          titre_cta_2: megamenu.titreCta2,
+          lien_cta_2: transformLink(megamenu.lienCta2),
+          image: transformAcfMediaEdge(megamenu.image),
+        }
+      : undefined,
   }
 }

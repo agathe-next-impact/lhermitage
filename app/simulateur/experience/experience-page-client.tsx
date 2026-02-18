@@ -12,7 +12,7 @@ export function ExperiencePageClient() {
   const hasAtLeastOneActivity = useMemo(() => {
     for (const day of days) {
       for (const slot of day.slots) {
-        if (slot.activite_slug || slot.espace_slug) {
+        if (slot.activite_slug || slot.espace_slug || slot.service_slug) {
           return true
         }
       }

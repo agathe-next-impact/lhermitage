@@ -14,13 +14,14 @@ export function PdfDownloadButton() {
   const days = useSimulateurStore((s) => s.days)
   const accommodations = useSimulateurStore((s) => s.accommodations)
   const selectedServices = useSimulateurStore((s) => s.selectedServices)
+  const selectedEspaces = useSimulateurStore((s) => s.selectedEspaces)
   const currentStep = useSimulateurStore((s) => s.currentStep)
   const data = useSimulateurData()
 
   const handleDownload = async () => {
     setLoading(true)
     try {
-      const state = { profile, days, accommodations, selectedServices, currentStep }
+      const state = { profile, days, accommodations, selectedServices, selectedEspaces, currentStep }
       const budget = calculateBudget(state, data, data.settings)
       const blob = await pdf(<QuoteDocument state={state} data={data} budget={budget} />).toBlob()
       const url = URL.createObjectURL(blob)

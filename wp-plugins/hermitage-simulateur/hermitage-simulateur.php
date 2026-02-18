@@ -308,6 +308,22 @@ function hermitage_register_acf_fields() {
 				),
 			),
 			array(
+				'key'               => 'field_act_creneaux_disponibles',
+				'label'             => 'Creneaux disponibles',
+				'name'              => 'creneaux_disponibles',
+				'type'              => 'checkbox',
+				'show_in_graphql'   => 1,
+				'instructions'      => 'Cochez les creneaux horaires ou cette activite peut etre proposee.',
+				'choices'           => array(
+					'petit_dejeuner' => 'Petit dejeuner',
+					'matin'          => 'Matin',
+					'dejeuner'       => 'Dejeuner',
+					'apres_midi'     => 'Apres-midi',
+					'diner'          => 'Diner',
+					'soir'           => 'Soir',
+				),
+			),
+			array(
 				'key'               => 'field_act_description_immersive',
 				'label'             => 'Description immersive',
 				'name'              => 'description_immersive',
@@ -675,6 +691,22 @@ function hermitage_register_acf_fields() {
 				'show_in_graphql'   => 1,
 			),
 			array(
+				'key'               => 'field_srv_creneaux_disponibles',
+				'label'             => 'Creneaux disponibles',
+				'name'              => 'creneaux_disponibles',
+				'type'              => 'checkbox',
+				'show_in_graphql'   => 1,
+				'instructions'      => 'Cochez les creneaux horaires ou ce service peut etre propose.',
+				'choices'           => array(
+					'petit_dejeuner' => 'Petit dejeuner',
+					'matin'          => 'Matin',
+					'dejeuner'       => 'Dejeuner',
+					'apres_midi'     => 'Apres-midi',
+					'diner'          => 'Diner',
+					'soir'           => 'Soir',
+				),
+			),
+			array(
 				'key'               => 'field_srv_description_courte',
 				'label'             => 'Description courte',
 				'name'              => 'description_courte',
@@ -973,6 +1005,66 @@ function hermitage_register_acf_fields() {
 				'type'              => 'text',
 				'show_in_graphql'   => 1,
 			),
+			array(
+				'key'               => 'field_ss_equipements_disponibles',
+				'label'             => 'Equipements disponibles',
+				'name'              => 'equipements_disponibles',
+				'type'              => 'repeater',
+				'show_in_graphql'   => 1,
+				'layout'            => 'table',
+				'instructions'      => 'Definir les equipements selectionnables pour les espaces de travail.',
+				'button_label'      => 'Ajouter un equipement',
+				'sub_fields'        => array(
+					array(
+						'key'             => 'field_ss_eq_slug',
+						'label'           => 'Slug',
+						'name'            => 'slug',
+						'type'            => 'text',
+						'show_in_graphql' => 1,
+						'required'        => 1,
+						'instructions'    => 'Identifiant unique (ex: wifi_fibre)',
+					),
+					array(
+						'key'             => 'field_ss_eq_label',
+						'label'           => 'Label',
+						'name'            => 'label',
+						'type'            => 'text',
+						'show_in_graphql' => 1,
+						'required'        => 1,
+						'instructions'    => 'Nom affiche (ex: Wi-Fi fibre)',
+					),
+				),
+			),
+			array(
+				'key'               => 'field_ss_ambiances_disponibles',
+				'label'             => 'Ambiances disponibles',
+				'name'              => 'ambiances_disponibles',
+				'type'              => 'repeater',
+				'show_in_graphql'   => 1,
+				'layout'            => 'table',
+				'instructions'      => 'Definir les ambiances selectionnables pour les espaces de travail.',
+				'button_label'      => 'Ajouter une ambiance',
+				'sub_fields'        => array(
+					array(
+						'key'             => 'field_ss_amb_slug',
+						'label'           => 'Slug',
+						'name'            => 'slug',
+						'type'            => 'text',
+						'show_in_graphql' => 1,
+						'required'        => 1,
+						'instructions'    => 'Identifiant unique (ex: professionnel)',
+					),
+					array(
+						'key'             => 'field_ss_amb_label',
+						'label'           => 'Label',
+						'name'            => 'label',
+						'type'            => 'text',
+						'show_in_graphql' => 1,
+						'required'        => 1,
+						'instructions'    => 'Nom affiche (ex: Professionnel)',
+					),
+				),
+			),
 		),
 		'location'              => array(
 			array(
@@ -986,6 +1078,48 @@ function hermitage_register_acf_fields() {
 		'show_in_graphql'       => 1,
 		'graphql_field_name'    => 'simulateurSettings',
 	) );
+}
+
+/**
+ * -------------------------------------------------------------------------
+ * 3bis. Dynamic ACF field choices from settings repeaters
+ * -------------------------------------------------------------------------
+ */
+
+add_filter( 'acf/load_field/key=field_esp_equipements', 'hermitage_load_equipements_choices' );
+
+function hermitage_load_equipements_choices( $field ) {
+	$rows = get_field( 'equipements_disponibles', 'option' );
+	if ( ! empty( $rows ) && is_array( $rows ) ) {
+		$choices = array();
+		foreach ( $rows as $row ) {
+			if ( ! empty( $row['slug'] ) && ! empty( $row['label'] ) ) {
+				$choices[ $row['slug'] ] = $row['label'];
+			}
+		}
+		if ( ! empty( $choices ) ) {
+			$field['choices'] = $choices;
+		}
+	}
+	return $field;
+}
+
+add_filter( 'acf/load_field/key=field_esp_ambiance', 'hermitage_load_ambiances_choices' );
+
+function hermitage_load_ambiances_choices( $field ) {
+	$rows = get_field( 'ambiances_disponibles', 'option' );
+	if ( ! empty( $rows ) && is_array( $rows ) ) {
+		$choices = array();
+		foreach ( $rows as $row ) {
+			if ( ! empty( $row['slug'] ) && ! empty( $row['label'] ) ) {
+				$choices[ $row['slug'] ] = $row['label'];
+			}
+		}
+		if ( ! empty( $choices ) ) {
+			$field['choices'] = $choices;
+		}
+	}
+	return $field;
 }
 
 /**

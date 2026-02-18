@@ -21,16 +21,17 @@ export function BudgetTable() {
   const days = useSimulateurStore((s) => s.days)
   const accommodations = useSimulateurStore((s) => s.accommodations)
   const selectedServices = useSimulateurStore((s) => s.selectedServices)
+  const selectedEspaces = useSimulateurStore((s) => s.selectedEspaces)
   const data = useSimulateurData()
 
   const budget = useMemo(
     () =>
       calculateBudget(
-        { profile, days, accommodations, selectedServices, currentStep: "recapitulatif" },
+        { profile, days, accommodations, selectedServices, selectedEspaces, currentStep: "recapitulatif" },
         data,
         data.settings
       ),
-    [profile, days, accommodations, selectedServices, data]
+    [profile, days, accommodations, selectedServices, selectedEspaces, data]
   )
 
   const groupSize = profile.groupSize || 1

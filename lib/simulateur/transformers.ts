@@ -67,6 +67,7 @@ export function transformActiviteSim(gqlPost: any): SimActivite {
       prix_forfaitaire: sim?.prixForfaitaire ?? undefined,
       mode_tarification: unwrapSelect(sim?.modeTarification),
       creneau_suggere: unwrapSelect(sim?.creneauSuggere),
+      creneaux_disponibles: sim?.creneauxDisponibles ?? undefined,
       description_immersive: sim?.descriptionImmersive ?? undefined,
       galerie: transformAcfMediaConnection(sim?.galerie),
       video_teaser_url: sim?.videoTeaserUrl ?? undefined,
@@ -162,6 +163,7 @@ export function transformServiceSim(gqlPost: any): SimService {
       prix_forfaitaire: sim?.prixForfaitaire ?? undefined,
       mode_tarification: unwrapSelect(sim?.modeTarification),
       inclus_par_defaut: sim?.inclusParDefaut ?? undefined,
+      creneaux_disponibles: sim?.creneauxDisponibles ?? undefined,
       description_courte: sim?.descriptionCourte ?? undefined,
       description_immersive: sim?.descriptionImmersive ?? undefined,
       galerie: transformAcfMediaConnection(sim?.galerie),
@@ -259,5 +261,15 @@ export function transformSimulateurSettings(raw: any): SimulateurSettings {
       })) ?? undefined,
     email_commercial: raw.emailCommercial ?? undefined,
     telephone_commercial: raw.telephoneCommercial ?? undefined,
+    equipements_disponibles:
+      raw.equipementsDisponibles?.map((e: any) => ({
+        slug: e.slug || "",
+        label: e.label || "",
+      })) ?? undefined,
+    ambiances_disponibles:
+      raw.ambiancesDisponibles?.map((a: any) => ({
+        slug: a.slug || "",
+        label: a.label || "",
+      })) ?? undefined,
   }
 }

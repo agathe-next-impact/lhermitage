@@ -109,6 +109,7 @@
         "prix_forfaitaire": "",
         "mode_tarification": "par_personne",
         "inclus_par_defaut": false,
+        "creneaux_disponibles": ["dejeuner", "diner"],
         "description_courte": "Buffet avec produits du terroir",
         "description_immersive": "Un buffet généreux composé de produits locaux et de saison, préparé par notre équipe de cuisiniers. De l'entrée au dessert, chaque plat raconte le terroir picard.",
         "options": [
@@ -127,6 +128,7 @@
         "prix_forfaitaire": "",
         "mode_tarification": "par_personne",
         "inclus_par_defaut": true,
+        "creneaux_disponibles": ["petit_dejeuner"],
         "description_courte": "Continental avec viennoiseries",
         "description_immersive": "Viennoiseries fraîches, confitures maison, fruits de saison et boissons chaudes. Le petit-déjeuner est servi dans la salle lumineuse donnant sur le parc."
       }
@@ -140,6 +142,7 @@
         "prix_forfaitaire": 250,
         "mode_tarification": "forfaitaire",
         "inclus_par_defaut": false,
+        "creneaux_disponibles": ["matin", "apres_midi", "soir"],
         "description_courte": "A/R gare — L'Hermitage",
         "description_immersive": "Notre navette vous attend à la gare pour un transfert confortable jusqu'au domaine. Service aller-retour inclus pour simplifier votre logistique."
       }
@@ -153,6 +156,7 @@
         "prix_forfaitaire": 800,
         "mode_tarification": "forfaitaire",
         "inclus_par_defaut": false,
+        "creneaux_disponibles": ["soir"],
         "description_courte": "Animation musicale professionnelle",
         "description_immersive": "Un DJ professionnel avec sono et éclairages pour transformer votre soirée en événement mémorable. Playlist adaptée à vos envies."
       }
@@ -166,6 +170,7 @@
         "prix_forfaitaire": 150,
         "mode_tarification": "forfaitaire",
         "inclus_par_defaut": false,
+        "creneaux_disponibles": ["soir"],
         "description_courte": "Soirée conviviale autour du feu",
         "description_immersive": "Sous les étoiles, les flammes crépitent. Marshmallows grillés, guitare et histoires partagées. Le feu de camp est le moment préféré de beaucoup de groupes."
       }
@@ -179,6 +184,7 @@
         "prix_forfaitaire": "",
         "mode_tarification": "par_personne",
         "inclus_par_defaut": false,
+        "creneaux_disponibles": ["matin"],
         "description_courte": "Brunch gourmand le dernier jour",
         "description_immersive": "Un brunch généreux pour clôturer le séjour en beauté. Œufs brouillés, pancakes, charcuterie, fromages et fruits frais."
       }
@@ -192,6 +198,7 @@
         "prix_forfaitaire": "",
         "mode_tarification": "par_personne",
         "inclus_par_defaut": false,
+        "creneaux_disponibles": ["petit_dejeuner", "matin"],
         "description_courte": "30 min de yoga au réveil",
         "description_immersive": "Une séance de yoga douce de 30 minutes pour bien démarrer la journée. Étirements, respiration et méditation dans le calme du matin."
       }
@@ -205,6 +212,7 @@
         "prix_forfaitaire": 650,
         "mode_tarification": "forfaitaire",
         "inclus_par_defaut": false,
+        "creneaux_disponibles": ["matin", "apres_midi", "soir"],
         "description_courte": "Reportage photo du séjour",
         "description_immersive": "Un photographe professionnel capture les moments forts de votre séjour. Galerie numérique livrée sous 5 jours avec retouches."
       }
@@ -367,6 +375,21 @@
       { "date_debut": "2026-12-15", "date_fin": "2027-01-05" }
     ],
     "email_commercial": "sejours@lhermitage.fr",
-    "telephone_commercial": "+33 3 44 XX XX XX"
+    "telephone_commercial": "+33 3 44 XX XX XX",
+    "equipements_disponibles": [
+      { "slug": "videoprojecteur", "label": "Vidéoprojecteur" },
+      { "slug": "paperboard", "label": "Paperboard" },
+      { "slug": "wifi_fibre", "label": "Wi-Fi fibre" },
+      { "slug": "sonorisation", "label": "Sonorisation" },
+      { "slug": "ecran_geant", "label": "Écran géant" },
+      { "slug": "mobilier_modulable", "label": "Mobilier modulable" },
+      { "slug": "cuisine_equipee", "label": "Cuisine équipée" }
+    ],
+    "ambiances_disponibles": [
+      { "slug": "professionnel", "label": "Professionnel" },
+      { "slug": "decontracte", "label": "Décontracté" },
+      { "slug": "intimiste", "label": "Intimiste" },
+      { "slug": "festif", "label": "Festif" }
+    ]
   }
 }

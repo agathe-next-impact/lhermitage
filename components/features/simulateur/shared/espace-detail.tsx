@@ -9,20 +9,19 @@ interface EspaceDetailProps {
   slug: string
 }
 
-const AMBIANCE_LABELS: Record<string, string> = {
-  professionnel: "Professionnel",
-  decontracte: "Decontracte",
-  intimiste: "Intimiste",
-  festif: "Festif",
-}
-
-function formatEquipement(slug: string): string {
+function formatSlugFallback(slug: string): string {
   return slug.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
 }
 
 export function EspaceDetail({ slug }: EspaceDetailProps) {
-  const { espaces } = useSimulateurData()
+  const { espaces, settings } = useSimulateurData()
   const espace = espaces.find((e) => e.slug === slug)
+
+  const getEquipementLabel = (eq: string) =>
+    settings.equipements_disponibles?.find((e) => e.slug === eq)?.label ?? formatSlugFallback(eq)
+
+  const getAmbianceLabel = (amb: string) =>
+    settings.ambiances_disponibles?.find((a) => a.slug === amb)?.label ?? formatSlugFallback(amb)
 
   if (!espace) {
     return (
@@ -62,7 +61,7 @@ export function EspaceDetail({ slug }: EspaceDetailProps) {
           {acf.ambiance && (
             <div className="mt-2">
               <Badge variant="secondary" className="rounded-full">
-                {AMBIANCE_LABELS[acf.ambiance] || acf.ambiance}
+                {getAmbianceLabel(acf.ambiance)}
               </Badge>
             </div>
           )}
@@ -96,7 +95,7 @@ export function EspaceDetail({ slug }: EspaceDetailProps) {
             <div className="flex flex-wrap gap-2">
               {acf.equipements.map((eq) => (
                 <Badge key={eq} variant="outline" className="rounded-full">
-                  {formatEquipement(eq)}
+                  {getEquipementLabel(eq)}
                 </Badge>
               ))}
             </div>
