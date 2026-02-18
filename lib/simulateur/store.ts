@@ -16,22 +16,27 @@ import {
   DEFAULT_GROUP_SIZE,
   DEFAULT_DURATION,
   DEFAULT_BUDGET_MAX,
-  DEFAULT_DAY_SLOTS,
+  CRENEAU_SLOT_DEFAULTS,
+  CRENEAU_LABELS,
+  CRENEAU_ORDER,
 } from "./constants"
 
 function generateSlotId(): string {
   return Math.random().toString(36).slice(2, 9)
 }
 
-function createDefaultDay(dayNumber: number): DayProgram {
+function createDayFromCreneaux(dayNumber: number, creneaux: string[]): DayProgram {
   return {
     dayNumber,
-    slots: DEFAULT_DAY_SLOTS.map((s) => ({
-      id: generateSlotId(),
-      heure_debut: s.heure_debut,
-      type_creneau: s.type_creneau,
-      label_personnalise: s.label,
-    })),
+    slots: creneaux.map((creneau) => {
+      const defaults = CRENEAU_SLOT_DEFAULTS[creneau]
+      return {
+        id: generateSlotId(),
+        heure_debut: defaults?.heure_debut ?? "09:00",
+        type_creneau: defaults?.type_creneau ?? "activite",
+        label_personnalise: CRENEAU_LABELS[creneau] ?? creneau,
+      }
+    }),
   }
 }
 
@@ -61,10 +66,8 @@ interface SimulateurActions {
   // Profil
   setProfile: (partial: Partial<SimulateurProfile>) => void
   // Planning
-  initDays: (count: number) => void
+  initDays: (count: number, creneaux?: string[]) => void
   updateSlot: (dayIndex: number, slotIndex: number, data: Partial<TimeSlot>) => void
-  addSlot: (dayIndex: number, slot: Omit<TimeSlot, "id">) => void
-  removeSlot: (dayIndex: number, slotIndex: number) => void
   clearSlot: (dayIndex: number, slotIndex: number) => void
   // Hébergements
   setAccommodation: (hebergement_slug: string, quantity: number) => void
@@ -91,13 +94,18 @@ export const useSimulateurStore = create<SimulateurStore>()(
     setProfile: (partial) => set((s) => ({ profile: { ...s.profile, ...partial } })),
 
     // ─── Planning ────────────────────────────────────────────
-    initDays: (count) =>
+    initDays: (count, creneaux) =>
       set((s) => {
+        const effectiveCreneaux = creneaux ?? [...CRENEAU_ORDER]
         const days: DayProgram[] = []
         for (let i = 1; i <= count; i++) {
-          // Conserver les jours existants si possible
+          // Conserver les jours existants si même nombre de créneaux
           const existing = s.days.find((d) => d.dayNumber === i)
-          days.push(existing ?? createDefaultDay(i))
+          if (existing && existing.slots.length === effectiveCreneaux.length) {
+            days.push(existing)
+          } else {
+            days.push(createDayFromCreneaux(i, effectiveCreneaux))
+          }
         }
         return { days }
       }),
@@ -107,25 +115,6 @@ export const useSimulateurStore = create<SimulateurStore>()(
         const days = [...s.days]
         const day = { ...days[dayIndex], slots: [...days[dayIndex].slots] }
         day.slots[slotIndex] = { ...day.slots[slotIndex], ...data }
-        days[dayIndex] = day
-        return { days }
-      }),
-
-    addSlot: (dayIndex, slot) =>
-      set((s) => {
-        const days = [...s.days]
-        const day = { ...days[dayIndex], slots: [...days[dayIndex].slots] }
-        day.slots.push({ ...slot, id: generateSlotId() })
-        day.slots.sort((a, b) => a.heure_debut.localeCompare(b.heure_debut))
-        days[dayIndex] = day
-        return { days }
-      }),
-
-    removeSlot: (dayIndex, slotIndex) =>
-      set((s) => {
-        const days = [...s.days]
-        const day = { ...days[dayIndex], slots: [...days[dayIndex].slots] }
-        day.slots.splice(slotIndex, 1)
         days[dayIndex] = day
         return { days }
       }),

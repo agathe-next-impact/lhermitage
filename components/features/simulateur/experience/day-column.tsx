@@ -1,9 +1,7 @@
 "use client"
 
-import { useCallback } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { AnimatePresence, motion } from "framer-motion"
 import { useSimulateurStore } from "@/lib/simulateur/store"
-import { Button } from "@/components/ui/button"
 import { SlotCard } from "./slot-card"
 
 interface DayColumnProps {
@@ -12,25 +10,8 @@ interface DayColumnProps {
 
 export function DayColumn({ dayIndex }: DayColumnProps) {
   const days = useSimulateurStore((s) => s.days)
-  const addSlot = useSimulateurStore((s) => s.addSlot)
 
   const day = days[dayIndex]
-
-  const handleAddSlot = useCallback(() => {
-    // Determine a reasonable default time for the new slot
-    const slots = day?.slots ?? []
-    let nextTime = "10:00"
-    if (slots.length > 0) {
-      const lastSlot = slots[slots.length - 1]
-      const [h, m] = lastSlot.heure_debut.split(":").map(Number)
-      const nextH = Math.min(h + 2, 23)
-      nextTime = `${String(nextH).padStart(2, "0")}:${String(m).padStart(2, "0")}`
-    }
-    addSlot(dayIndex, {
-      heure_debut: nextTime,
-      type_creneau: "activite",
-    })
-  }, [dayIndex, day?.slots, addSlot])
 
   if (!day) return null
 
@@ -67,18 +48,6 @@ export function DayColumn({ dayIndex }: DayColumnProps) {
           ))}
         </div>
       </AnimatePresence>
-
-      {/* Add slot button */}
-      <div className="flex items-start gap-3 md:gap-4 mt-4">
-        <div className="hidden md:block w-[46px] flex-shrink-0" />
-        <Button
-          variant="outline"
-          onClick={handleAddSlot}
-          className="w-full rounded-full border-2 border-dashed border-[#2A4A51]/30 text-[#2A4A51]/60 font-heading uppercase text-xs tracking-wider hover:border-[#2A4A51]/50 hover:text-[#2A4A51] transition-all duration-200"
-        >
-          + Ajouter un créneau
-        </Button>
-      </div>
     </div>
   )
 }

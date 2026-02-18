@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback } from "react"
+import { useCallback, useMemo } from "react"
 import { useSimulateurStore } from "@/lib/simulateur/store"
 import { useSimulateurData } from "@/lib/simulateur/context"
 import { CategoryCard } from "./category-card"
@@ -12,6 +12,7 @@ import {
   GROUP_SIZE_STEP,
   MIN_DURATION,
   MAX_DURATION,
+  CRENEAU_ORDER,
 } from "@/lib/simulateur/constants"
 
 export function ProfilForm() {
@@ -21,6 +22,18 @@ export function ProfilForm() {
   const data = useSimulateurData()
 
   const categories = Object.keys(SEJOUR_CATEGORIES) as SejourCategory[]
+
+  // Compute available créneaux from all activities + services
+  const availableCreneaux = useMemo(() => {
+    const set = new Set<string>()
+    for (const act of data.activites) {
+      act.acf.creneaux_disponibles?.forEach((c) => set.add(c))
+    }
+    for (const srv of data.services) {
+      srv.acf.creneaux_disponibles?.forEach((c) => set.add(c))
+    }
+    return CRENEAU_ORDER.filter((c) => set.has(c))
+  }, [data.activites, data.services])
 
   const handleCategorySelect = useCallback(
     (category: SejourCategory) => {
@@ -39,10 +52,10 @@ export function ProfilForm() {
 
   const handleBeforeNext = useCallback(() => {
     if (!profile.category) return false
-    // Initialiser les jours selon la durée
-    initDays(profile.duration)
+    // Initialiser les jours avec les créneaux disponibles
+    initDays(profile.duration, availableCreneaux)
     return true
-  }, [profile.category, profile.duration, initDays])
+  }, [profile.category, profile.duration, initDays, availableCreneaux])
 
   const canProceed = !!profile.category && profile.groupSize >= MIN_GROUP_SIZE
 

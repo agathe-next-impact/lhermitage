@@ -27,7 +27,6 @@ const TYPE_CONFIG: Record<TypeCreneau, { label: string; color: string; icon: str
 export function SlotCard({ dayIndex, slotIndex }: SlotCardProps) {
   const days = useSimulateurStore((s) => s.days)
   const clearSlot = useSimulateurStore((s) => s.clearSlot)
-  const removeSlot = useSimulateurStore((s) => s.removeSlot)
   const data = useSimulateurData()
 
   const [selectorOpen, setSelectorOpen] = useState<"activite" | "espace" | null>(null)
@@ -36,9 +35,7 @@ export function SlotCard({ dayIndex, slotIndex }: SlotCardProps) {
 
   const handleOpenSelector = useCallback(() => {
     const type = days[dayIndex]?.slots[slotIndex]?.type_creneau
-    if (type === "activite" || type === "soiree") {
-      setSelectorOpen("activite")
-    } else if (type === "travail") {
+    if (type === "travail") {
       setSelectorOpen("espace")
     } else {
       setSelectorOpen("activite")
@@ -52,10 +49,6 @@ export function SlotCard({ dayIndex, slotIndex }: SlotCardProps) {
   const handleClear = useCallback(() => {
     clearSlot(dayIndex, slotIndex)
   }, [clearSlot, dayIndex, slotIndex])
-
-  const handleRemove = useCallback(() => {
-    removeSlot(dayIndex, slotIndex)
-  }, [removeSlot, dayIndex, slotIndex])
 
   if (!slot) return null
 
@@ -78,10 +71,10 @@ export function SlotCard({ dayIndex, slotIndex }: SlotCardProps) {
     espace?.acf.nom ??
     service?.title ??
     service?.acf.nom ??
-    slot.label_personnalise ??
     null
 
-  const isDefaultSlot = slotIndex < 4 // Default slots from constants
+  // Créneau label (set by initDays from CRENEAU_LABELS)
+  const creneauLabel = slot.label_personnalise
 
   return (
     <>
@@ -101,16 +94,23 @@ export function SlotCard({ dayIndex, slotIndex }: SlotCardProps) {
             </span>
 
             <div className="flex-1 min-w-0">
-              {/* Type badge */}
-              <Badge
-                variant="outline"
-                className={cn(
-                  "text-[10px] mb-1.5 rounded-full px-3 py-1 font-semibold",
-                  typeConfig.color
+              {/* Créneau label + type badge */}
+              <div className="flex items-center gap-2 mb-1.5">
+                {creneauLabel && (
+                  <span className="text-xs font-heading font-bold uppercase tracking-wider text-brand-dark">
+                    {creneauLabel}
+                  </span>
                 )}
-              >
-                {typeConfig.icon} {typeConfig.label}
-              </Badge>
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    "text-[10px] rounded-full px-2 py-0.5 font-semibold",
+                    typeConfig.color
+                  )}
+                >
+                  {typeConfig.icon} {typeConfig.label}
+                </Badge>
+              </div>
 
               {/* Content */}
               {assignedLabel ? (
@@ -133,9 +133,9 @@ export function SlotCard({ dayIndex, slotIndex }: SlotCardProps) {
             </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-            {hasAssignment && (
+          {/* Clear action */}
+          {hasAssignment && (
+            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
               <Button
                 variant="ghost"
                 size="icon-sm"
@@ -158,33 +158,8 @@ export function SlotCard({ dayIndex, slotIndex }: SlotCardProps) {
                   />
                 </svg>
               </Button>
-            )}
-            {!isDefaultSlot && (
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                onClick={handleRemove}
-                className="text-muted-foreground hover:text-destructive"
-                title="Supprimer le créneau"
-              >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 14 14"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M2.5 4H11.5M5.5 6V10M8.5 6V10M3.5 4L4 11.5C4 12.05 4.45 12.5 5 12.5H9C9.55 12.5 10 12.05 10 11.5L10.5 4M5 4V2.5C5 2.22 5.22 2 5.5 2H8.5C8.78 2 9 2.22 9 2.5V4"
-                    stroke="currentColor"
-                    strokeWidth="1.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </Button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
 

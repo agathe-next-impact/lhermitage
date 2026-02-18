@@ -1,4 +1,4 @@
-import type { SimulateurStep } from "./types"
+import type { SimulateurStep, TypeCreneau } from "./types"
 
 export const STEPS: { key: SimulateurStep; label: string; path: string }[] = [
   { key: "profil", label: "Profil", path: "/simulateur/profil" },
@@ -44,6 +44,16 @@ export const CRENEAU_LABELS: Record<string, string> = {
   apres_midi: "Après-midi",
   diner: "Dîner",
   soir: "Soir",
+}
+
+/** Configuration de chaque créneau horaire : heure de début et type par défaut */
+export const CRENEAU_SLOT_DEFAULTS: Record<string, { heure_debut: string; type_creneau: TypeCreneau }> = {
+  petit_dejeuner: { heure_debut: "07:30", type_creneau: "repas" },
+  matin: { heure_debut: "09:00", type_creneau: "activite" },
+  dejeuner: { heure_debut: "12:30", type_creneau: "repas" },
+  apres_midi: { heure_debut: "14:30", type_creneau: "activite" },
+  diner: { heure_debut: "19:30", type_creneau: "repas" },
+  soir: { heure_debut: "21:00", type_creneau: "soiree" },
 }
 
 /** Prix de base par défaut (utilisé si WP ne fournit pas de settings) */
