@@ -10,7 +10,6 @@ import type {
   TimeSlot,
   AccommodationSelection,
   ServiceSelection,
-  EspaceSelection,
 } from "./types"
 import {
   DEFAULT_GROUP_SIZE,
@@ -58,7 +57,6 @@ const initialState: SimulateurState = {
   days: [],
   accommodations: [],
   selectedServices: [],
-  selectedEspaces: [],
   currentStep: "profil",
 }
 
@@ -68,6 +66,12 @@ interface SimulateurActions {
   // Planning
   initDays: (count: number, creneaux?: string[]) => void
   updateSlot: (dayIndex: number, slotIndex: number, data: Partial<TimeSlot>) => void
+  toggleSlotItem: (
+    dayIndex: number,
+    slotIndex: number,
+    kind: "activite" | "espace" | "service",
+    slug: string
+  ) => void
   clearSlot: (dayIndex: number, slotIndex: number) => void
   // Hébergements
   setAccommodation: (hebergement_slug: string, quantity: number) => void
@@ -75,9 +79,6 @@ interface SimulateurActions {
   // Services
   toggleService: (service_slug: string) => void
   setServiceOption: (service_slug: string, option_index: number) => void
-  // Espaces de travail
-  toggleEspace: (espace_slug: string) => void
-  setEspacePrivatise: (espace_slug: string, privatise: boolean) => void
   // Navigation
   setStep: (step: SimulateurStep) => void
   // Reset
@@ -119,14 +120,37 @@ export const useSimulateurStore = create<SimulateurStore>()(
         return { days }
       }),
 
+    toggleSlotItem: (dayIndex, slotIndex, kind, slug) =>
+      set((s) => {
+        const days = [...s.days]
+        const day = { ...days[dayIndex], slots: [...days[dayIndex].slots] }
+        const slot = { ...day.slots[slotIndex] }
+        const key =
+          kind === "activite"
+            ? "activite_slugs"
+            : kind === "espace"
+              ? "espace_slugs"
+              : "service_slugs"
+        const current = slot[key] ?? []
+        if (current.includes(slug)) {
+          slot[key] = current.filter((s) => s !== slug)
+          if (slot[key]!.length === 0) delete slot[key]
+        } else {
+          slot[key] = [...current, slug]
+        }
+        day.slots[slotIndex] = slot
+        days[dayIndex] = day
+        return { days }
+      }),
+
     clearSlot: (dayIndex, slotIndex) =>
       set((s) => {
         const days = [...s.days]
         const day = { ...days[dayIndex], slots: [...days[dayIndex].slots] }
         const slot = { ...day.slots[slotIndex] }
-        delete slot.activite_slug
-        delete slot.espace_slug
-        delete slot.service_slug
+        delete slot.activite_slugs
+        delete slot.espace_slugs
+        delete slot.service_slugs
         day.slots[slotIndex] = slot
         days[dayIndex] = day
         return { days }
@@ -167,27 +191,6 @@ export const useSimulateurStore = create<SimulateurStore>()(
       set((s) => ({
         selectedServices: s.selectedServices.map((sv) =>
           sv.service_slug === service_slug ? { ...sv, option_index } : sv
-        ),
-      })),
-
-    // ─── Espaces de travail ────────────────────────────────────
-    toggleEspace: (espace_slug) =>
-      set((s) => {
-        const exists = s.selectedEspaces.find((e) => e.espace_slug === espace_slug)
-        if (exists) {
-          return {
-            selectedEspaces: s.selectedEspaces.filter((e) => e.espace_slug !== espace_slug),
-          }
-        }
-        return {
-          selectedEspaces: [...s.selectedEspaces, { espace_slug, privatise: false }],
-        }
-      }),
-
-    setEspacePrivatise: (espace_slug, privatise) =>
-      set((s) => ({
-        selectedEspaces: s.selectedEspaces.map((e) =>
-          e.espace_slug === espace_slug ? { ...e, privatise } : e
         ),
       })),
 

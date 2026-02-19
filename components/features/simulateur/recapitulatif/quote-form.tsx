@@ -29,9 +29,9 @@ export function QuoteForm() {
     }
 
     if (!profile.contactEmail.trim()) {
-      newErrors.contactEmail = "L\u2019email est requis"
+      newErrors.contactEmail = "L’email est requis"
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profile.contactEmail)) {
-      newErrors.contactEmail = "Format d\u2019email invalide"
+      newErrors.contactEmail = "Format d’email invalide"
     }
 
     setErrors(newErrors)
@@ -90,10 +90,10 @@ export function QuoteForm() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h3 className="text-lg font-bold text-brand-dark">Demande envoy\u00e9e</h3>
+        <h3 className="text-lg font-bold text-brand-dark">Demande envoyée</h3>
         <p className="text-muted-foreground max-w-md mx-auto">
-          Merci {profile.contactName} ! Notre \u00e9quipe reviendra vers vous dans les 48 heures
-          avec un devis personnalis\u00e9 \u00e0 l\u2019adresse {profile.contactEmail}.
+          Merci {profile.contactName} ! Notre équipe reviendra vers vous dans les 48 heures avec un
+          devis personnalisé à l’adresse {profile.contactEmail}.
         </p>
         <Button variant="outline" className="mt-4" onClick={() => setSubmitted(false)}>
           Modifier ma demande
@@ -113,8 +113,7 @@ export function QuoteForm() {
         Demander un devis
       </h2>
       <p className="text-muted-foreground">
-        Compl\u00e9tez vos coordonn\u00e9es et notre \u00e9quipe vous contactera avec un devis
-        d\u00e9taill\u00e9.
+        Complétez vos coordonnées et notre équipe vous contactera avec un devis détaillé.
       </p>
 
       <form
@@ -201,10 +200,10 @@ export function QuoteForm() {
             />
           </div>
 
-          {/* T\u00e9l\u00e9phone */}
+          {/* Téléphone */}
           <div className="space-y-1">
             <label htmlFor="quote-phone" className="text-sm font-medium text-foreground">
-              T\u00e9l\u00e9phone
+              Téléphone
             </label>
             <input
               id="quote-phone"
@@ -220,13 +219,13 @@ export function QuoteForm() {
         {/* Message */}
         <div className="space-y-1">
           <label htmlFor="quote-message" className="text-sm font-medium text-foreground">
-            Message ou demandes particuli\u00e8res
+            Message ou demandes particulières
           </label>
           <textarea
             id="quote-message"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Pr\u00e9cisez vos besoins, contraintes ou questions..."
+            placeholder="Précisez vos besoins, contraintes ou questions..."
             rows={4}
             className="w-full px-4 py-2.5 rounded-lg border-2 border-border bg-background text-sm focus:outline-none focus:border-[#2A4A51] transition-colors resize-none"
           />

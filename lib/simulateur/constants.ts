@@ -4,7 +4,6 @@ export const STEPS: { key: SimulateurStep; label: string; path: string }[] = [
   { key: "profil", label: "Profil", path: "/simulateur/profil" },
   { key: "experience", label: "Expérience", path: "/simulateur/experience" },
   { key: "hebergements", label: "Hébergements", path: "/simulateur/hebergements" },
-  { key: "services", label: "Espaces de travail", path: "/simulateur/services" },
   { key: "recapitulatif", label: "Récapitulatif", path: "/simulateur/recapitulatif" },
 ]
 
@@ -47,7 +46,10 @@ export const CRENEAU_LABELS: Record<string, string> = {
 }
 
 /** Configuration de chaque créneau horaire : heure de début et type par défaut */
-export const CRENEAU_SLOT_DEFAULTS: Record<string, { heure_debut: string; type_creneau: TypeCreneau }> = {
+export const CRENEAU_SLOT_DEFAULTS: Record<
+  string,
+  { heure_debut: string; type_creneau: TypeCreneau }
+> = {
   petit_dejeuner: { heure_debut: "07:30", type_creneau: "repas" },
   matin: { heure_debut: "09:00", type_creneau: "activite" },
   dejeuner: { heure_debut: "12:30", type_creneau: "repas" },

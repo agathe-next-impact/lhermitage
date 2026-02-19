@@ -26,9 +26,9 @@ const inputSchema = z.object({
           id: z.string(),
           heure_debut: z.string(),
           type_creneau: z.enum(["activite", "repas", "travail", "libre", "soiree"]),
-          activite_slug: z.string().optional(),
-          espace_slug: z.string().optional(),
-          service_slug: z.string().optional(),
+          activite_slugs: z.array(z.string()).optional(),
+          espace_slugs: z.array(z.string()).optional(),
+          service_slugs: z.array(z.string()).optional(),
           label_personnalise: z.string().optional(),
         })
       ),
@@ -53,7 +53,7 @@ export async function calculatePriceAction(
   stateRaw: unknown
 ): Promise<{ success: true; budget: BudgetBreakdown } | { success: false; error: string }> {
   const parsed = inputSchema.safeParse(stateRaw)
-  if (!parsed.success) return { success: false, error: "Donn\u00e9es invalides" }
+  if (!parsed.success) return { success: false, error: "Données invalides" }
 
   const data = await simulateurApi.getAllData()
   const budget = calculateBudget(parsed.data as SimulateurState, data)

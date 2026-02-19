@@ -214,9 +214,9 @@ export interface TimeSlot {
   id: string
   heure_debut: string
   type_creneau: TypeCreneau
-  activite_slug?: string
-  espace_slug?: string
-  service_slug?: string
+  activite_slugs?: string[]
+  espace_slugs?: string[]
+  service_slugs?: string[]
   label_personnalise?: string
 }
 
@@ -235,11 +235,6 @@ export interface ServiceSelection {
   option_index?: number
 }
 
-export interface EspaceSelection {
-  espace_slug: string
-  privatise: boolean
-}
-
 export interface BudgetBreakdown {
   base: number
   activites: number
@@ -251,7 +246,7 @@ export interface BudgetBreakdown {
   par_personne_par_jour: number
 }
 
-export type SimulateurStep = "profil" | "experience" | "hebergements" | "services" | "recapitulatif"
+export type SimulateurStep = "profil" | "experience" | "hebergements" | "recapitulatif"
 
 export interface SimulateurState {
   // Profil
@@ -262,8 +257,6 @@ export interface SimulateurState {
   accommodations: AccommodationSelection[]
   // Services
   selectedServices: ServiceSelection[]
-  // Espaces de travail
-  selectedEspaces: EspaceSelection[]
   // Navigation
   currentStep: SimulateurStep
 }

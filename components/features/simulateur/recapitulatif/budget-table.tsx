@@ -21,17 +21,16 @@ export function BudgetTable() {
   const days = useSimulateurStore((s) => s.days)
   const accommodations = useSimulateurStore((s) => s.accommodations)
   const selectedServices = useSimulateurStore((s) => s.selectedServices)
-  const selectedEspaces = useSimulateurStore((s) => s.selectedEspaces)
   const data = useSimulateurData()
 
   const budget = useMemo(
     () =>
       calculateBudget(
-        { profile, days, accommodations, selectedServices, selectedEspaces, currentStep: "recapitulatif" },
+        { profile, days, accommodations, selectedServices, currentStep: "recapitulatif" },
         data,
         data.settings
       ),
-    [profile, days, accommodations, selectedServices, selectedEspaces, data]
+    [profile, days, accommodations, selectedServices, data]
   )
 
   const groupSize = profile.groupSize || 1
@@ -44,23 +43,24 @@ export function BudgetTable() {
     const lines: Array<{ label: string; detail: string; amount: number }> = []
     for (const day of days) {
       for (const slot of day.slots) {
-        if (!slot.activite_slug) continue
-        const act = data.activites.find((a) => a.slug === slot.activite_slug)
-        if (!act?.acf) continue
+        for (const slug of slot.activite_slugs ?? []) {
+          const act = data.activites.find((a) => a.slug === slug)
+          if (!act?.acf) continue
 
-        if (act.acf.mode_tarification === "forfaitaire" && act.acf.prix_forfaitaire) {
-          lines.push({
-            label: act.acf.nom,
-            detail: `forfait ${formatEuros(act.acf.prix_forfaitaire)}`,
-            amount: act.acf.prix_forfaitaire,
-          })
-        } else if (act.acf.prix_par_personne) {
-          const total = act.acf.prix_par_personne * groupSize
-          lines.push({
-            label: act.acf.nom,
-            detail: `${formatEuros(act.acf.prix_par_personne)} x ${groupSize} pers.`,
-            amount: total,
-          })
+          if (act.acf.mode_tarification === "forfaitaire" && act.acf.prix_forfaitaire) {
+            lines.push({
+              label: act.acf.nom,
+              detail: `forfait ${formatEuros(act.acf.prix_forfaitaire)}`,
+              amount: act.acf.prix_forfaitaire,
+            })
+          } else if (act.acf.prix_par_personne) {
+            const total = act.acf.prix_par_personne * groupSize
+            lines.push({
+              label: act.acf.nom,
+              detail: `${formatEuros(act.acf.prix_par_personne)} x ${groupSize} pers.`,
+              amount: total,
+            })
+          }
         }
       }
     }
@@ -73,16 +73,18 @@ export function BudgetTable() {
     const lines: Array<{ label: string; detail: string; amount: number }> = []
     for (const day of days) {
       for (const slot of day.slots) {
-        if (!slot.espace_slug || used.has(slot.espace_slug)) continue
-        used.add(slot.espace_slug)
-        const esp = data.espaces.find((e) => e.slug === slot.espace_slug)
-        if (esp?.acf?.privatisable && esp.acf.prix_privatisation_journee) {
-          const total = esp.acf.prix_privatisation_journee * duration
-          lines.push({
-            label: esp.acf.nom,
-            detail: `${formatEuros(esp.acf.prix_privatisation_journee)}/j x ${duration} j`,
-            amount: total,
-          })
+        for (const slug of slot.espace_slugs ?? []) {
+          if (used.has(slug)) continue
+          used.add(slug)
+          const esp = data.espaces.find((e) => e.slug === slug)
+          if (esp?.acf?.privatisable && esp.acf.prix_privatisation_journee) {
+            const total = esp.acf.prix_privatisation_journee * duration
+            lines.push({
+              label: esp.acf.nom,
+              detail: `${formatEuros(esp.acf.prix_privatisation_journee)}/j x ${duration} j`,
+              amount: total,
+            })
+          }
         }
       }
     }
@@ -145,14 +147,14 @@ export function BudgetTable() {
       <div className="rounded-2xl border shadow-sm overflow-hidden">
         {/* Base */}
         <BudgetSection
-          title="Base s\u00e9jour"
+          title="Base séjour"
           subtitle={`${formatEuros(priceBase)} x ${groupSize} pers. x ${duration} j`}
           amount={budget.base}
         />
 
-        {/* Activit\u00e9s */}
+        {/* Activités */}
         {activityLines.length > 0 && (
-          <BudgetSection title="Activit\u00e9s" amount={budget.activites}>
+          <BudgetSection title="Activités" amount={budget.activites}>
             {activityLines.map((line, i) => (
               <BudgetDetailLine
                 key={i}
@@ -166,7 +168,7 @@ export function BudgetTable() {
 
         {/* Espaces */}
         {espaceLines.length > 0 && (
-          <BudgetSection title="Espaces privatis\u00e9s" amount={budget.espaces}>
+          <BudgetSection title="Espaces privatisés" amount={budget.espaces}>
             {espaceLines.map((line, i) => (
               <BudgetDetailLine
                 key={i}
@@ -178,9 +180,9 @@ export function BudgetTable() {
           </BudgetSection>
         )}
 
-        {/* H\u00e9bergements */}
+        {/* Hébergements */}
         {hebergementLines.length > 0 && (
-          <BudgetSection title="H\u00e9bergements" amount={budget.hebergements}>
+          <BudgetSection title="Hébergements" amount={budget.hebergements}>
             {hebergementLines.map((line, i) => (
               <BudgetDetailLine
                 key={i}
@@ -209,7 +211,7 @@ export function BudgetTable() {
         {/* Total */}
         <div className="bg-[#2A4A51] text-white px-6 py-4 flex items-center justify-between">
           <span className="text-lg font-heading uppercase font-bold tracking-wider">
-            Total estim\u00e9
+            Total estimé
           </span>
           <span className="text-2xl font-extrabold text-[#E75754]">
             {formatEuros(budget.total)}
@@ -237,8 +239,8 @@ export function BudgetTable() {
       </div>
 
       <p className="text-xs text-muted-foreground/60 text-center leading-tight">
-        Estimation indicative, hors taxes. Le devis final sera ajust\u00e9 par notre \u00e9quipe en
-        fonction de vos besoins sp\u00e9cifiques.
+        Estimation indicative, hors taxes. Le devis final sera ajusté par notre équipe en fonction
+        de vos besoins spécifiques.
       </p>
     </motion.div>
   )

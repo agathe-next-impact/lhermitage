@@ -133,9 +133,9 @@ export function ActivitySelector({ dayIndex, slotIndex, onClose }: ActivitySelec
   const handleSelectActivity = useCallback(
     (slug: string) => {
       updateSlot(dayIndex, slotIndex, {
-        activite_slug: slug,
-        service_slug: undefined,
-        espace_slug: undefined,
+        activite_slugs: [slug],
+        service_slugs: undefined,
+        espace_slugs: undefined,
       })
       onClose()
     },
@@ -145,9 +145,9 @@ export function ActivitySelector({ dayIndex, slotIndex, onClose }: ActivitySelec
   const handleSelectService = useCallback(
     (slug: string) => {
       updateSlot(dayIndex, slotIndex, {
-        service_slug: slug,
-        activite_slug: undefined,
-        espace_slug: undefined,
+        service_slugs: [slug],
+        activite_slugs: undefined,
+        espace_slugs: undefined,
       })
       onClose()
     },
@@ -157,9 +157,7 @@ export function ActivitySelector({ dayIndex, slotIndex, onClose }: ActivitySelec
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-heading font-bold text-brand-dark">
-          Choisir une expérience
-        </h3>
+        <h3 className="text-lg font-heading font-bold text-brand-dark">Choisir une expérience</h3>
         <Button variant="ghost" size="icon-sm" onClick={onClose} title="Fermer">
           <svg
             width="16"

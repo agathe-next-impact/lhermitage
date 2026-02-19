@@ -261,15 +261,15 @@ const styles = StyleSheet.create({
 // ─── Helpers ─────────────────────────────────────────────────
 
 function formatEuros(amount: number): string {
-  return amount.toLocaleString("fr-FR") + " \u20AC"
+  return amount.toLocaleString("fr-FR") + " €"
 }
 
 const TYPE_CRENEAU_LABELS: Record<string, string> = {
-  activite: "Activit\u00e9",
+  activite: "Activité",
   repas: "Repas",
   travail: "Travail",
   libre: "Libre",
-  soiree: "Soir\u00e9e",
+  soiree: "Soirée",
 }
 
 // ─── Document ────────────────────────────────────────────────
@@ -293,9 +293,9 @@ export function QuoteDocument({ state, data, budget }: QuoteDocumentProps) {
         {/* ─── Header ─── */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>L&apos;Hermitage</Text>
-          <Text style={styles.headerSubtitle}>Devis s\u00e9jour corporate</Text>
+          <Text style={styles.headerSubtitle}>Devis séjour corporate</Text>
           <Text style={styles.headerDate}>
-            G\u00e9n\u00e9r\u00e9 le{" "}
+            Généré le{" "}
             {new Date().toLocaleDateString("fr-FR", {
               day: "numeric",
               month: "long",
@@ -306,11 +306,11 @@ export function QuoteDocument({ state, data, budget }: QuoteDocumentProps) {
 
         {/* ─── Profil ─── */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Profil du s\u00e9jour</Text>
+          <Text style={styles.sectionTitle}>Profil du séjour</Text>
           <View style={styles.profileGrid}>
             {categoryInfo && (
               <View style={styles.profileItem}>
-                <Text style={styles.profileLabel}>Type de s\u00e9jour</Text>
+                <Text style={styles.profileLabel}>Type de séjour</Text>
                 <Text style={styles.profileValue}>{categoryInfo.label}</Text>
               </View>
             )}
@@ -319,7 +319,7 @@ export function QuoteDocument({ state, data, budget }: QuoteDocumentProps) {
               <Text style={styles.profileValue}>{profile.groupSize} personnes</Text>
             </View>
             <View style={styles.profileItem}>
-              <Text style={styles.profileLabel}>Dur\u00e9e</Text>
+              <Text style={styles.profileLabel}>Durée</Text>
               <Text style={styles.profileValue}>
                 {profile.duration} jour{profile.duration > 1 ? "s" : ""}
                 {nights > 0 ? ` / ${nights} nuit${nights > 1 ? "s" : ""}` : ""}
@@ -327,7 +327,7 @@ export function QuoteDocument({ state, data, budget }: QuoteDocumentProps) {
             </View>
             {profile.startDate && (
               <View style={styles.profileItem}>
-                <Text style={styles.profileLabel}>Date souhait\u00e9e</Text>
+                <Text style={styles.profileLabel}>Date souhaitée</Text>
                 <Text style={styles.profileValue}>{profile.startDate}</Text>
               </View>
             )}
@@ -351,7 +351,7 @@ export function QuoteDocument({ state, data, budget }: QuoteDocumentProps) {
             )}
             {profile.contactPhone && (
               <View style={styles.profileItem}>
-                <Text style={styles.profileLabel}>T\u00e9l\u00e9phone</Text>
+                <Text style={styles.profileLabel}>Téléphone</Text>
                 <Text style={styles.profileValue}>{profile.contactPhone}</Text>
               </View>
             )}
@@ -366,16 +366,19 @@ export function QuoteDocument({ state, data, budget }: QuoteDocumentProps) {
               <View key={day.dayNumber} style={styles.dayBlock}>
                 <Text style={styles.dayTitle}>Jour {day.dayNumber}</Text>
                 {day.slots.map((slot) => {
-                  const activite = slot.activite_slug
-                    ? data.activites.find((a) => a.slug === slot.activite_slug)
-                    : null
-                  const espace = slot.espace_slug
-                    ? data.espaces.find((e) => e.slug === slot.espace_slug)
-                    : null
-
                   const details: string[] = []
-                  if (activite) details.push(activite.acf.nom)
-                  if (espace) details.push(espace.acf.nom)
+                  for (const slug of slot.activite_slugs ?? []) {
+                    const act = data.activites.find((a) => a.slug === slug)
+                    if (act) details.push(act.acf.nom)
+                  }
+                  for (const slug of slot.espace_slugs ?? []) {
+                    const esp = data.espaces.find((e) => e.slug === slug)
+                    if (esp) details.push(esp.acf.nom)
+                  }
+                  for (const slug of slot.service_slugs ?? []) {
+                    const srv = data.services.find((sv) => sv.slug === slug)
+                    if (srv) details.push(srv.acf.nom)
+                  }
                   if (slot.label_personnalise) details.push(slot.label_personnalise)
 
                   return (
@@ -385,7 +388,7 @@ export function QuoteDocument({ state, data, budget }: QuoteDocumentProps) {
                         {TYPE_CRENEAU_LABELS[slot.type_creneau] || slot.type_creneau}
                       </Text>
                       <Text style={styles.slotDetail}>
-                        {details.length > 0 ? details.join(" \u2014 ") : "\u2014"}
+                        {details.length > 0 ? details.join(" — ") : "—"}
                       </Text>
                     </View>
                   )
@@ -395,15 +398,13 @@ export function QuoteDocument({ state, data, budget }: QuoteDocumentProps) {
           </View>
         )}
 
-        {/* ─── H\u00e9bergements ─── */}
+        {/* ─── Hébergements ─── */}
         {accommodations.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>H\u00e9bergements</Text>
+            <Text style={styles.sectionTitle}>Hébergements</Text>
             <View style={styles.tableHeader}>
               <Text style={[styles.tableHeaderText, { flex: 1 }]}>Type</Text>
-              <Text style={[styles.tableHeaderText, { width: 60, textAlign: "center" }]}>
-                Qt\u00e9
-              </Text>
+              <Text style={[styles.tableHeaderText, { width: 60, textAlign: "center" }]}>Qté</Text>
               <Text style={[styles.tableHeaderText, { width: 80, textAlign: "right" }]}>
                 Sous-total
               </Text>
@@ -464,26 +465,26 @@ export function QuoteDocument({ state, data, budget }: QuoteDocumentProps) {
           <View style={styles.budgetTable}>
             <View style={styles.budgetRow}>
               <Text style={styles.budgetRowLabel}>
-                Base s\u00e9jour ({formatEuros(data.settings.prix_base_journee_personne)}
+                Base séjour ({formatEuros(data.settings.prix_base_journee_personne)}
                 /pers./jour)
               </Text>
               <Text style={styles.budgetRowValue}>{formatEuros(budget.base)}</Text>
             </View>
             {budget.activites > 0 && (
               <View style={styles.budgetRow}>
-                <Text style={styles.budgetRowLabel}>Activit\u00e9s</Text>
+                <Text style={styles.budgetRowLabel}>Activités</Text>
                 <Text style={styles.budgetRowValue}>{formatEuros(budget.activites)}</Text>
               </View>
             )}
             {budget.espaces > 0 && (
               <View style={styles.budgetRow}>
-                <Text style={styles.budgetRowLabel}>Espaces privatis\u00e9s</Text>
+                <Text style={styles.budgetRowLabel}>Espaces privatisés</Text>
                 <Text style={styles.budgetRowValue}>{formatEuros(budget.espaces)}</Text>
               </View>
             )}
             {budget.hebergements > 0 && (
               <View style={styles.budgetRow}>
-                <Text style={styles.budgetRowLabel}>H\u00e9bergements</Text>
+                <Text style={styles.budgetRowLabel}>Hébergements</Text>
                 <Text style={styles.budgetRowValue}>{formatEuros(budget.hebergements)}</Text>
               </View>
             )}
@@ -495,7 +496,7 @@ export function QuoteDocument({ state, data, budget }: QuoteDocumentProps) {
             )}
 
             <View style={styles.budgetTotalRow}>
-              <Text style={styles.budgetTotalLabel}>Total estim\u00e9</Text>
+              <Text style={styles.budgetTotalLabel}>Total estimé</Text>
               <Text style={styles.budgetTotalValue}>{formatEuros(budget.total)}</Text>
             </View>
 
@@ -516,8 +517,7 @@ export function QuoteDocument({ state, data, budget }: QuoteDocumentProps) {
             Ce devis est indicatif et ne constitue pas un engagement contractuel.
           </Text>
           <Text style={styles.footerText}>
-            Le montant final sera ajust\u00e9 par notre \u00e9quipe en fonction de vos besoins
-            sp\u00e9cifiques.
+            Le montant final sera ajusté par notre équipe en fonction de vos besoins spécifiques.
           </Text>
           <Text style={[styles.footerText, { marginTop: 4, color: colors.coral }]}>
             Contact : sejours@lhermitage.fr

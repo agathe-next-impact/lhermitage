@@ -56,9 +56,9 @@ export function EspaceSelector({ dayIndex, slotIndex, onClose }: EspaceSelectorP
   const handleSelect = useCallback(
     (slug: string) => {
       updateSlot(dayIndex, slotIndex, {
-        espace_slug: slug,
+        espace_slugs: [slug],
         type_creneau: "travail",
-        activite_slug: undefined,
+        activite_slugs: undefined,
       })
       onClose()
     },

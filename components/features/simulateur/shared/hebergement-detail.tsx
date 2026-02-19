@@ -80,7 +80,7 @@ export function HebergementDetail({ slug }: HebergementDetailProps) {
             <InfoCard label="Capacite" value={`${acf.capacite_personnes} pers.`} />
           )}
           {acf.prix_nuit_unite && (
-            <InfoCard label="Tarif" value={`${acf.prix_nuit_unite} \u20ac / nuit`} />
+            <InfoCard label="Tarif" value={`${acf.prix_nuit_unite} € / nuit`} />
           )}
         </div>
 

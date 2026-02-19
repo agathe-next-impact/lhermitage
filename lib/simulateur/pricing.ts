@@ -22,13 +22,14 @@ export function calculateBudget(
   let activites = 0
   for (const day of days) {
     for (const slot of day.slots) {
-      if (!slot.activite_slug) continue
-      const act = data.activites.find((a) => a.slug === slot.activite_slug)
-      if (!act?.acf) continue
-      if (act.acf.mode_tarification === "forfaitaire" && act.acf.prix_forfaitaire) {
-        activites += act.acf.prix_forfaitaire
-      } else if (act.acf.prix_par_personne) {
-        activites += act.acf.prix_par_personne * groupSize
+      for (const slug of slot.activite_slugs ?? []) {
+        const act = data.activites.find((a) => a.slug === slug)
+        if (!act?.acf) continue
+        if (act.acf.mode_tarification === "forfaitaire" && act.acf.prix_forfaitaire) {
+          activites += act.acf.prix_forfaitaire
+        } else if (act.acf.prix_par_personne) {
+          activites += act.acf.prix_par_personne * groupSize
+        }
       }
     }
   }
@@ -38,8 +39,9 @@ export function calculateBudget(
   const usedEspaces = new Set<string>()
   for (const day of days) {
     for (const slot of day.slots) {
-      if (!slot.espace_slug) continue
-      usedEspaces.add(slot.espace_slug)
+      for (const slug of slot.espace_slugs ?? []) {
+        usedEspaces.add(slug)
+      }
     }
   }
   for (const espaceSlug of usedEspaces) {

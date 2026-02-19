@@ -32,17 +32,16 @@ export function BudgetSidebar() {
   const days = useSimulateurStore((s) => s.days)
   const accommodations = useSimulateurStore((s) => s.accommodations)
   const selectedServices = useSimulateurStore((s) => s.selectedServices)
-  const selectedEspaces = useSimulateurStore((s) => s.selectedEspaces)
   const data = useSimulateurData()
 
   const budget = useMemo(
     () =>
       calculateBudget(
-        { profile, days, accommodations, selectedServices, selectedEspaces, currentStep: "experience" },
+        { profile, days, accommodations, selectedServices, currentStep: "experience" },
         data,
         data.settings
       ),
-    [profile, days, accommodations, selectedServices, selectedEspaces, data]
+    [profile, days, accommodations, selectedServices, data]
   )
 
   return (

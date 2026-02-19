@@ -10,17 +10,12 @@ export { CategoryCard } from "./profil/category-card"
 export { TimelineEditor } from "./experience/timeline-editor"
 export { DayColumn } from "./experience/day-column"
 export { SlotCard } from "./experience/slot-card"
-export { ActivitySelector } from "./experience/activity-selector"
-export { EspaceSelector } from "./experience/espace-selector"
+export { UnifiedSelector } from "./experience/unified-selector"
 
 // Hébergements
 export { HebergementPicker } from "./hebergements/hebergement-picker"
 export { HebergementCard } from "./hebergements/hebergement-card"
 export { CapacityBar } from "./hebergements/capacity-bar"
-
-// Services
-export { ServiceList } from "./services/service-list"
-export { ServiceToggleCard } from "./services/service-toggle-card"
 
 // Récapitulatif
 export { NarrativeSummary } from "./recapitulatif/narrative-summary"

@@ -5,7 +5,7 @@ import { useSimulateurStore } from "@/lib/simulateur/store"
 import { useSimulateurData } from "@/lib/simulateur/context"
 import { CategoryCard } from "./category-card"
 import { StepNavigation } from "../step-navigation"
-import { SEJOUR_CATEGORIES, type SejourCategory } from "@/lib/simulateur/types"
+import type { SimSejourTemplate } from "@/lib/simulateur/types"
 import {
   MIN_GROUP_SIZE,
   MAX_GROUP_SIZE,
@@ -21,8 +21,6 @@ export function ProfilForm() {
   const initDays = useSimulateurStore((s) => s.initDays)
   const data = useSimulateurData()
 
-  const categories = Object.keys(SEJOUR_CATEGORIES) as SejourCategory[]
-
   // Compute available créneaux from all activities + services
   const availableCreneaux = useMemo(() => {
     const set = new Set<string>()
@@ -35,29 +33,27 @@ export function ProfilForm() {
     return CRENEAU_ORDER.filter((c) => set.has(c))
   }, [data.activites, data.services])
 
-  const handleCategorySelect = useCallback(
-    (category: SejourCategory) => {
-      setProfile({ category })
-      // Trouver le template correspondant
-      const template = data.templates.find((t) => t.category === category)
-      if (template) {
-        setProfile({ templateSlug: template.slug })
-        if (template.acf.duree_jours) {
-          setProfile({ duration: template.acf.duree_jours })
-        }
+  const handleTemplateSelect = useCallback(
+    (template: SimSejourTemplate) => {
+      setProfile({
+        category: template.category ?? null,
+        templateSlug: template.slug,
+      })
+      if (template.acf.duree_jours) {
+        setProfile({ duration: template.acf.duree_jours })
       }
     },
-    [setProfile, data.templates]
+    [setProfile]
   )
 
   const handleBeforeNext = useCallback(() => {
-    if (!profile.category) return false
+    if (!profile.templateSlug) return false
     // Initialiser les jours avec les créneaux disponibles
     initDays(profile.duration, availableCreneaux)
     return true
-  }, [profile.category, profile.duration, initDays, availableCreneaux])
+  }, [profile.templateSlug, profile.duration, initDays, availableCreneaux])
 
-  const canProceed = !!profile.category && profile.groupSize >= MIN_GROUP_SIZE
+  const canProceed = !!profile.templateSlug && profile.groupSize >= MIN_GROUP_SIZE
 
   return (
     <div className="max-w-4xl mx-auto space-y-10">
@@ -70,12 +66,12 @@ export function ProfilForm() {
           Choisissez la thématique qui correspond à vos objectifs.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {categories.map((cat) => (
+          {data.templates.map((tpl) => (
             <CategoryCard
-              key={cat}
-              category={cat}
-              isSelected={profile.category === cat}
-              onSelect={handleCategorySelect}
+              key={tpl.slug}
+              template={tpl}
+              isSelected={profile.templateSlug === tpl.slug}
+              onSelect={handleTemplateSelect}
             />
           ))}
         </div>

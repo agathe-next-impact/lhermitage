@@ -88,12 +88,22 @@ const config: Config = {
               "rotate(calc(var(--angle) * 1deg + 360deg)) translateY(calc(var(--radius) * 1px)) rotate(calc((var(--angle) * -1deg) - 360deg))",
           },
         },
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
       },
       animation: {
         "zoom-in-90": "zoom-in-90 150ms cubic-bezier(0.16, 1, 0.3, 1)",
         "zoom-in-95": "zoom-in-95 150ms cubic-bezier(0.16, 1, 0.3, 1)",
         "zoom-out-95": "zoom-out-95 150ms cubic-bezier(0.16, 1, 0.3, 1)",
         orbit: "orbit var(--duration,20s) linear infinite",
+        "accordion-down": "accordion-down 200ms ease-out",
+        "accordion-up": "accordion-up 200ms ease-out",
       },
     },
   },

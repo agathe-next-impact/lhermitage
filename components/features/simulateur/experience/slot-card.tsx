@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useMemo, useEffect } from "react"
+import { createPortal } from "react-dom"
 import { AnimatePresence, motion } from "framer-motion"
 import { useSimulateurStore } from "@/lib/simulateur/store"
 import { useSimulateurData } from "@/lib/simulateur/context"
@@ -8,8 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import type { TypeCreneau } from "@/lib/simulateur/types"
-import { ActivitySelector } from "./activity-selector"
-import { EspaceSelector } from "./espace-selector"
+import { UnifiedSelector } from "./unified-selector"
 
 interface SlotCardProps {
   dayIndex: number
@@ -24,56 +24,80 @@ const TYPE_CONFIG: Record<TypeCreneau, { label: string; color: string; icon: str
   soiree: { label: "Soirée", color: "bg-[#DC6F45] text-white border-transparent", icon: "🌙" },
 }
 
+const KIND_COLORS: Record<string, { bg: string; text: string; remove: string }> = {
+  activite: { bg: "bg-[#E75754]/10", text: "text-[#E75754]", remove: "hover:bg-[#E75754]/20" },
+  espace: { bg: "bg-[#56939F]/10", text: "text-[#56939F]", remove: "hover:bg-[#56939F]/20" },
+  service: { bg: "bg-[#2A4A51]/10", text: "text-[#2A4A51]", remove: "hover:bg-[#2A4A51]/20" },
+}
+
 export function SlotCard({ dayIndex, slotIndex }: SlotCardProps) {
   const days = useSimulateurStore((s) => s.days)
+  const toggleSlotItem = useSimulateurStore((s) => s.toggleSlotItem)
   const clearSlot = useSimulateurStore((s) => s.clearSlot)
   const data = useSimulateurData()
 
-  const [selectorOpen, setSelectorOpen] = useState<"activite" | "espace" | null>(null)
+  const [selectorOpen, setSelectorOpen] = useState(false)
 
   const slot = days[dayIndex]?.slots[slotIndex]
 
   const handleOpenSelector = useCallback(() => {
-    const type = days[dayIndex]?.slots[slotIndex]?.type_creneau
-    if (type === "travail") {
-      setSelectorOpen("espace")
-    } else {
-      setSelectorOpen("activite")
-    }
-  }, [days, dayIndex, slotIndex])
+    setSelectorOpen(true)
+  }, [])
 
   const handleCloseSelector = useCallback(() => {
-    setSelectorOpen(null)
+    setSelectorOpen(false)
   }, [])
 
   const handleClear = useCallback(() => {
     clearSlot(dayIndex, slotIndex)
   }, [clearSlot, dayIndex, slotIndex])
 
+  const handleRemoveItem = useCallback(
+    (kind: "activite" | "espace" | "service", slug: string) => {
+      toggleSlotItem(dayIndex, slotIndex, kind, slug)
+    },
+    [toggleSlotItem, dayIndex, slotIndex]
+  )
+
+  // Resolve all selected items
+  const selectedItems = useMemo(() => {
+    if (!slot) return []
+    const items: Array<{ kind: "activite" | "espace" | "service"; slug: string; label: string }> =
+      []
+    for (const slug of slot.activite_slugs ?? []) {
+      const act = data.activites.find((a) => a.slug === slug)
+      if (act) items.push({ kind: "activite", slug, label: act.title || act.acf.nom })
+    }
+    for (const slug of slot.espace_slugs ?? []) {
+      const esp = data.espaces.find((e) => e.slug === slug)
+      if (esp) items.push({ kind: "espace", slug, label: esp.title || esp.acf.nom })
+    }
+    for (const slug of slot.service_slugs ?? []) {
+      const srv = data.services.find((s) => s.slug === slug)
+      if (srv) items.push({ kind: "service", slug, label: srv.title || srv.acf.nom })
+    }
+    return items
+  }, [slot, data.activites, data.espaces, data.services])
+
+  // Lock body scroll when selector is open
+  useEffect(() => {
+    if (!selectorOpen) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") handleCloseSelector()
+    }
+    document.addEventListener("keydown", handleKey)
+    return () => {
+      document.body.style.overflow = prev
+      document.removeEventListener("keydown", handleKey)
+    }
+  }, [selectorOpen, handleCloseSelector])
+
   if (!slot) return null
 
   const typeConfig = TYPE_CONFIG[slot.type_creneau]
-
-  // Resolve assigned names from data context
-  const activity = slot.activite_slug
-    ? data.activites.find((a) => a.slug === slot.activite_slug)
-    : null
-  const espace = slot.espace_slug ? data.espaces.find((e) => e.slug === slot.espace_slug) : null
-  const service = slot.service_slug
-    ? data.services.find((s) => s.slug === slot.service_slug)
-    : null
-
-  const hasAssignment = !!activity || !!espace || !!service
-  const assignedLabel =
-    activity?.title ??
-    activity?.acf.nom ??
-    espace?.title ??
-    espace?.acf.nom ??
-    service?.title ??
-    service?.acf.nom ??
-    null
-
-  // Créneau label (set by initDays from CRENEAU_LABELS)
+  const hasAssignment = selectedItems.length > 0
   const creneauLabel = slot.label_personnalise
 
   return (
@@ -112,15 +136,59 @@ export function SlotCard({ dayIndex, slotIndex }: SlotCardProps) {
                 </Badge>
               </div>
 
-              {/* Content */}
-              {assignedLabel ? (
-                <button
-                  type="button"
-                  onClick={handleOpenSelector}
-                  className="block text-sm font-heading font-bold text-left hover:text-brand-coral transition-colors truncate w-full"
-                >
-                  {assignedLabel}
-                </button>
+              {/* Selected items as chips */}
+              {hasAssignment ? (
+                <div className="flex flex-wrap gap-1.5 mt-1">
+                  {selectedItems.map((item) => {
+                    const colors = KIND_COLORS[item.kind]
+                    return (
+                      <span
+                        key={`${item.kind}-${item.slug}`}
+                        className={cn(
+                          "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium",
+                          colors.bg,
+                          colors.text
+                        )}
+                      >
+                        {item.label}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleRemoveItem(item.kind, item.slug)
+                          }}
+                          className={cn(
+                            "ml-0.5 rounded-full w-4 h-4 flex items-center justify-center transition-colors",
+                            colors.remove
+                          )}
+                          title="Retirer"
+                        >
+                          <svg
+                            width="8"
+                            height="8"
+                            viewBox="0 0 8 8"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M6 2L2 6M2 2L6 6"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                        </button>
+                      </span>
+                    )
+                  })}
+                  <button
+                    type="button"
+                    onClick={handleOpenSelector}
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border border-dashed border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+                  >
+                    + Ajouter
+                  </button>
+                </div>
               ) : (
                 <button
                   type="button"
@@ -141,7 +209,7 @@ export function SlotCard({ dayIndex, slotIndex }: SlotCardProps) {
                 size="icon-sm"
                 onClick={handleClear}
                 className="text-muted-foreground hover:text-foreground"
-                title="Retirer la sélection"
+                title="Tout retirer"
               >
                 <svg
                   width="14"
@@ -163,54 +231,47 @@ export function SlotCard({ dayIndex, slotIndex }: SlotCardProps) {
         </div>
       </div>
 
-      {/* Selector modal overlay */}
-      <AnimatePresence>
-        {selectorOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          >
-            {/* Backdrop */}
-            <div
-              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-              onClick={handleCloseSelector}
-              onKeyDown={(e) => {
-                if (e.key === "Escape") handleCloseSelector()
-              }}
-              role="button"
-              tabIndex={-1}
-              aria-label="Fermer"
-            />
-            {/* Content */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              transition={{ duration: 0.2 }}
-              className="relative z-10 w-full max-w-2xl max-h-[80vh] bg-background rounded-xl border shadow-xl overflow-hidden"
-            >
-              <div className="p-4 md:p-6 overflow-y-auto max-h-[80vh]">
-                {selectorOpen === "activite" ? (
-                  <ActivitySelector
+      {/* Selector modal — portaled to body to avoid Framer layout jank */}
+      {typeof document !== "undefined" &&
+        createPortal(
+          <AnimatePresence>
+            {selectorOpen && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
+                className="fixed inset-0 z-50 flex items-center justify-center p-4"
+              >
+                {/* Backdrop */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+                  onClick={handleCloseSelector}
+                  aria-label="Fermer"
+                />
+                {/* Content */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                  transition={{ type: "spring", duration: 0.3, bounce: 0.1 }}
+                  className="relative z-10 w-full max-w-2xl bg-background rounded-xl border shadow-xl flex flex-col overflow-hidden"
+                  style={{ height: "min(80vh, 700px)" }}
+                >
+                  <UnifiedSelector
                     dayIndex={dayIndex}
                     slotIndex={slotIndex}
                     onClose={handleCloseSelector}
                   />
-                ) : (
-                  <EspaceSelector
-                    dayIndex={dayIndex}
-                    slotIndex={slotIndex}
-                    onClose={handleCloseSelector}
-                  />
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body
         )}
-      </AnimatePresence>
     </>
   )
 }

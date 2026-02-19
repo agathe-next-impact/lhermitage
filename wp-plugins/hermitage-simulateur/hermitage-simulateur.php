@@ -31,7 +31,7 @@ function hermitage_register_reservations_menu() {
 		'hermitage-reservations',
 		'',
 		'dashicons-calendar-alt',
-		25
+		5
 	);
 }
 

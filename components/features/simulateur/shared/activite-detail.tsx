@@ -25,10 +25,10 @@ function formatPrice(activite: {
   acf: { mode_tarification?: string; prix_par_personne?: number; prix_forfaitaire?: number }
 }): string {
   if (activite.acf.mode_tarification === "forfaitaire" && activite.acf.prix_forfaitaire) {
-    return `${activite.acf.prix_forfaitaire} \u20ac forfait`
+    return `${activite.acf.prix_forfaitaire} € forfait`
   }
   if (activite.acf.prix_par_personne) {
-    return `${activite.acf.prix_par_personne} \u20ac / pers.`
+    return `${activite.acf.prix_par_personne} € / pers.`
   }
   return "Sur devis"
 }

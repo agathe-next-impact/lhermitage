@@ -23,9 +23,9 @@ const inputSchema = z.object({
           id: z.string(),
           heure_debut: z.string(),
           type_creneau: z.enum(["activite", "repas", "travail", "libre", "soiree"]),
-          activite_slug: z.string().optional(),
-          espace_slug: z.string().optional(),
-          service_slug: z.string().optional(),
+          activite_slugs: z.array(z.string()).optional(),
+          espace_slugs: z.array(z.string()).optional(),
+          service_slugs: z.array(z.string()).optional(),
           label_personnalise: z.string().optional(),
         })
       ),
@@ -51,13 +51,13 @@ export async function generatePdfAction(
 ): Promise<{ success: boolean; message: string }> {
   const parsed = inputSchema.safeParse(stateRaw)
   if (!parsed.success) {
-    return { success: false, message: "Donn\u00e9es invalides. V\u00e9rifiez votre configuration." }
+    return { success: false, message: "Données invalides. Vérifiez votre configuration." }
   }
 
   // PDF generation will be handled client-side with @react-pdf/renderer
   // This action validates the data server-side before the client generates the PDF
   return {
     success: true,
-    message: "Donn\u00e9es valid\u00e9es. G\u00e9n\u00e9ration PDF c\u00f4t\u00e9 client.",
+    message: "Données validées. Génération PDF côté client.",
   }
 }

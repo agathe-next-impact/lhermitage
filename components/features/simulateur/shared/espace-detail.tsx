@@ -75,14 +75,9 @@ export function EspaceDetail({ slug }: EspaceDetailProps) {
           {acf.capacite_max && (
             <InfoCard label="Capacite" value={`${acf.capacite_max} pers. max`} />
           )}
-          {acf.superficie_m2 && (
-            <InfoCard label="Superficie" value={`${acf.superficie_m2} m\u00B2`} />
-          )}
+          {acf.superficie_m2 && <InfoCard label="Superficie" value={`${acf.superficie_m2} m²`} />}
           {acf.privatisable && acf.prix_privatisation_journee && (
-            <InfoCard
-              label="Privatisation"
-              value={`${acf.prix_privatisation_journee} \u20ac / jour`}
-            />
+            <InfoCard label="Privatisation" value={`${acf.prix_privatisation_journee} € / jour`} />
           )}
         </div>
 
