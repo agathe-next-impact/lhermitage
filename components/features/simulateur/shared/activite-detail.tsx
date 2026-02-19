@@ -156,32 +156,63 @@ export function ActiviteDetail({ slug }: ActiviteDetailProps) {
         {/* Video teaser */}
         {acf.video_teaser_url && (
           <div>
-            <a
-              href={acf.video_teaser_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm font-medium text-brand-coral hover:text-brand-coral/80 transition-colors"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polygon points="5 3 19 12 5 21 5 3" />
-              </svg>
-              Voir la video teaser
-            </a>
+            <h3 className="font-heading uppercase text-xs tracking-wider text-muted-foreground font-bold mb-3">
+              Video
+            </h3>
+            <VideoEmbed url={acf.video_teaser_url} />
           </div>
         )}
       </div>
     </div>
   )
+}
+
+function VideoEmbed({ url }: { url: string }) {
+  const embedUrl = toEmbedUrl(url)
+  if (embedUrl) {
+    return (
+      <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-black/5">
+        <iframe
+          src={embedUrl}
+          title="Vidéo teaser"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="absolute inset-0 w-full h-full"
+        />
+      </div>
+    )
+  }
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-2 text-sm font-medium text-brand-coral hover:text-brand-coral/80 transition-colors"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <polygon points="5 3 19 12 5 21 5 3" />
+      </svg>
+      Voir la vidéo teaser
+    </a>
+  )
+}
+
+function toEmbedUrl(url: string): string | null {
+  const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/)
+  if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}`
+  const vimeoMatch = url.match(/(?:vimeo\.com\/|player\.vimeo\.com\/video\/)(\d+)/)
+  if (vimeoMatch) return `https://player.vimeo.com/video/${vimeoMatch[1]}`
+  return null
 }
 
 function InfoCard({ label, value }: { label: string; value: string }) {

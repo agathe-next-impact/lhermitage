@@ -19,6 +19,7 @@ export function ProfilForm() {
   const profile = useSimulateurStore((s) => s.profile)
   const setProfile = useSimulateurStore((s) => s.setProfile)
   const initDays = useSimulateurStore((s) => s.initDays)
+  const initDaysFromTemplate = useSimulateurStore((s) => s.initDaysFromTemplate)
   const data = useSimulateurData()
 
   // Compute available créneaux from all activities + services
@@ -48,10 +49,27 @@ export function ProfilForm() {
 
   const handleBeforeNext = useCallback(() => {
     if (!profile.templateSlug) return false
-    // Initialiser les jours avec les créneaux disponibles
-    initDays(profile.duration, availableCreneaux)
+
+    // Chercher le template sélectionné pour son programme par défaut
+    const selectedTemplate = data.templates.find((t) => t.slug === profile.templateSlug)
+    const programmeDefaut = selectedTemplate?.acf.programme_defaut
+
+    if (programmeDefaut && programmeDefaut.length > 0) {
+      // Pré-remplir les journées depuis le programme du template
+      initDaysFromTemplate(programmeDefaut, profile.duration, availableCreneaux)
+    } else {
+      // Fallback : créneaux vides
+      initDays(profile.duration, availableCreneaux)
+    }
     return true
-  }, [profile.templateSlug, profile.duration, initDays, availableCreneaux])
+  }, [
+    profile.templateSlug,
+    profile.duration,
+    initDays,
+    initDaysFromTemplate,
+    availableCreneaux,
+    data.templates,
+  ])
 
   const canProceed = !!profile.templateSlug && profile.groupSize >= MIN_GROUP_SIZE
 

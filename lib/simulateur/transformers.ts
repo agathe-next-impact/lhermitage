@@ -207,8 +207,7 @@ function transformProgrammeJour(gqlJour: any): ProgrammeJour {
 
 function transformProgrammeCreneau(gqlCreneau: any): ProgrammeCreneau {
   const creneau: ProgrammeCreneau = {
-    heure_debut: gqlCreneau.heureDebut || "09:00",
-    type_creneau: unwrapSelect(gqlCreneau.typeCreneau) || "libre",
+    creneau: unwrapSelect(gqlCreneau.creneau) || "matin",
   }
 
   // Relationship fields come as AcfContentNodeConnection { nodes: [...] }

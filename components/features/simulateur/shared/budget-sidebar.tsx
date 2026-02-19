@@ -93,6 +93,21 @@ export function BudgetSidebar() {
         })}
       </ul>
 
+      {/* Coefficient saisonnier */}
+      {budget.coefficient > 1 && (
+        <>
+          <div className="border-t" />
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-xs uppercase tracking-wider font-medium text-amber-700">
+              {budget.coefficient_label || "Majoration"}
+            </span>
+            <span className="tabular-nums font-bold text-amber-700">
+              x{budget.coefficient.toFixed(2)}
+            </span>
+          </div>
+        </>
+      )}
+
       <div className="border-t" />
 
       <div className="flex items-center justify-between text-sm font-bold">

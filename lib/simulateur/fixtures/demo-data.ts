@@ -508,23 +508,19 @@ export const demoTemplates: SimSejourTemplate[] = [
           jour_numero: 1,
           creneaux: [
             {
-              heure_debut: "10:00",
-              type_creneau: "activite",
+              creneau: "matin",
               activite_suggeree: { slug: "course-orientation", title: "Course d'orientation" },
             },
             {
-              heure_debut: "12:30",
-              type_creneau: "repas",
+              creneau: "dejeuner",
               label_personnalise: "Déjeuner buffet champêtre",
             },
             {
-              heure_debut: "14:30",
-              type_creneau: "activite",
+              creneau: "apres_midi",
               activite_suggeree: { slug: "escape-game", title: "Escape Game grandeur nature" },
             },
             {
-              heure_debut: "19:30",
-              type_creneau: "soiree",
+              creneau: "diner",
               label_personnalise: "Dîner & soirée conviviale",
             },
           ],
@@ -533,11 +529,10 @@ export const demoTemplates: SimSejourTemplate[] = [
           jour_numero: 2,
           creneaux: [
             {
-              heure_debut: "09:00",
-              type_creneau: "activite",
+              creneau: "matin",
               activite_suggeree: { slug: "atelier-creatif", title: "Atelier créatif collectif" },
             },
-            { heure_debut: "12:00", type_creneau: "repas", label_personnalise: "Brunch de départ" },
+            { creneau: "dejeuner", label_personnalise: "Brunch de départ" },
           ],
         },
       ],
@@ -556,20 +551,17 @@ export const demoTemplates: SimSejourTemplate[] = [
           jour_numero: 1,
           creneaux: [
             {
-              heure_debut: "09:30",
-              type_creneau: "travail",
+              creneau: "matin",
               espace_suggere: { slug: "grande-salle", title: "Grande salle de réunion" },
               label_personnalise: "Session plénière",
             },
-            { heure_debut: "12:30", type_creneau: "repas", label_personnalise: "Déjeuner" },
+            { creneau: "dejeuner" },
             {
-              heure_debut: "14:30",
-              type_creneau: "activite",
+              creneau: "apres_midi",
               activite_suggeree: { slug: "atelier-fresque-climat", title: "Fresque du climat" },
             },
             {
-              heure_debut: "19:30",
-              type_creneau: "soiree",
+              creneau: "diner",
               label_personnalise: "Dîner & networking",
             },
           ],
@@ -578,20 +570,17 @@ export const demoTemplates: SimSejourTemplate[] = [
           jour_numero: 2,
           creneaux: [
             {
-              heure_debut: "09:00",
-              type_creneau: "travail",
+              creneau: "matin",
               espace_suggere: { slug: "grande-salle", title: "Grande salle de réunion" },
               label_personnalise: "Ateliers en sous-groupes",
             },
-            { heure_debut: "12:30", type_creneau: "repas", label_personnalise: "Déjeuner" },
+            { creneau: "dejeuner" },
             {
-              heure_debut: "14:30",
-              type_creneau: "activite",
+              creneau: "apres_midi",
               activite_suggeree: { slug: "olympiades", title: "Olympiades d'équipe" },
             },
             {
-              heure_debut: "19:30",
-              type_creneau: "soiree",
+              creneau: "soir",
               activite_suggeree: {
                 slug: "degustation-oenologique",
                 title: "Dégustation œnologique",
@@ -603,19 +592,17 @@ export const demoTemplates: SimSejourTemplate[] = [
           jour_numero: 3,
           creneaux: [
             {
-              heure_debut: "09:00",
-              type_creneau: "activite",
+              creneau: "petit_dejeuner",
               activite_suggeree: { slug: "yoga-plein-air", title: "Yoga en plein air" },
+              label_personnalise: "Yoga matinal",
             },
             {
-              heure_debut: "10:00",
-              type_creneau: "travail",
+              creneau: "matin",
               espace_suggere: { slug: "grande-salle", title: "Grande salle de réunion" },
               label_personnalise: "Restitution & plan d'action",
             },
             {
-              heure_debut: "12:30",
-              type_creneau: "repas",
+              creneau: "dejeuner",
               label_personnalise: "Brunch de clôture",
             },
           ],
@@ -636,23 +623,19 @@ export const demoTemplates: SimSejourTemplate[] = [
           jour_numero: 1,
           creneaux: [
             {
-              heure_debut: "09:30",
-              type_creneau: "activite",
+              creneau: "matin",
               activite_suggeree: { slug: "olympiades", title: "Olympiades d'équipe" },
             },
             {
-              heure_debut: "12:30",
-              type_creneau: "repas",
+              creneau: "dejeuner",
               label_personnalise: "Déjeuner gastronomique",
             },
             {
-              heure_debut: "14:30",
-              type_creneau: "activite",
+              creneau: "apres_midi",
               activite_suggeree: { slug: "atelier-cuisine", title: "Atelier cuisine" },
             },
             {
-              heure_debut: "18:00",
-              type_creneau: "soiree",
+              creneau: "soir",
               activite_suggeree: {
                 slug: "degustation-oenologique",
                 title: "Dégustation œnologique",

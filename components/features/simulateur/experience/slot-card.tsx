@@ -32,6 +32,7 @@ const KIND_COLORS: Record<string, { bg: string; text: string; remove: string }> 
 
 export function SlotCard({ dayIndex, slotIndex }: SlotCardProps) {
   const days = useSimulateurStore((s) => s.days)
+  const groupSize = useSimulateurStore((s) => s.profile.groupSize)
   const toggleSlotItem = useSimulateurStore((s) => s.toggleSlotItem)
   const clearSlot = useSimulateurStore((s) => s.clearSlot)
   const data = useSimulateurData()
@@ -59,25 +60,41 @@ export function SlotCard({ dayIndex, slotIndex }: SlotCardProps) {
     [toggleSlotItem, dayIndex, slotIndex]
   )
 
-  // Resolve all selected items
+  // Resolve all selected items (with capacity alerts)
   const selectedItems = useMemo(() => {
     if (!slot) return []
-    const items: Array<{ kind: "activite" | "espace" | "service"; slug: string; label: string }> =
-      []
+    const items: Array<{
+      kind: "activite" | "espace" | "service"
+      slug: string
+      label: string
+      capacityExceeded?: boolean
+    }> = []
     for (const slug of slot.activite_slugs ?? []) {
       const act = data.activites.find((a) => a.slug === slug)
-      if (act) items.push({ kind: "activite", slug, label: act.title || act.acf.nom })
+      if (act)
+        items.push({
+          kind: "activite",
+          slug,
+          label: act.title || act.acf.nom,
+          capacityExceeded: act.acf.capacite_max != null && act.acf.capacite_max < groupSize,
+        })
     }
     for (const slug of slot.espace_slugs ?? []) {
       const esp = data.espaces.find((e) => e.slug === slug)
-      if (esp) items.push({ kind: "espace", slug, label: esp.title || esp.acf.nom })
+      if (esp)
+        items.push({
+          kind: "espace",
+          slug,
+          label: esp.title || esp.acf.nom,
+          capacityExceeded: esp.acf.capacite_max != null && esp.acf.capacite_max < groupSize,
+        })
     }
     for (const slug of slot.service_slugs ?? []) {
       const srv = data.services.find((s) => s.slug === slug)
       if (srv) items.push({ kind: "service", slug, label: srv.title || srv.acf.nom })
     }
     return items
-  }, [slot, data.activites, data.espaces, data.services])
+  }, [slot, data.activites, data.espaces, data.services, groupSize])
 
   // Lock body scroll when selector is open
   useEffect(() => {
@@ -146,10 +163,17 @@ export function SlotCard({ dayIndex, slotIndex }: SlotCardProps) {
                         key={`${item.kind}-${item.slug}`}
                         className={cn(
                           "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium",
-                          colors.bg,
-                          colors.text
+                          item.capacityExceeded
+                            ? "bg-amber-100 text-amber-800"
+                            : cn(colors.bg, colors.text)
                         )}
+                        title={
+                          item.capacityExceeded
+                            ? "Capacité insuffisante pour votre groupe"
+                            : undefined
+                        }
                       >
+                        {item.capacityExceeded && <span className="text-[10px]">⚠</span>}
                         {item.label}
                         <button
                           type="button"

@@ -107,28 +107,44 @@ export function BudgetTable() {
       .filter(Boolean) as Array<{ label: string; detail: string; amount: number }>
   }, [accommodations, data.hebergements, nights])
 
-  // Build detail lines for services
+  // Build detail lines for services (with option supplements)
   const serviceLines = useMemo(() => {
     return selectedServices
       .map((sel) => {
         const svc = data.services.find((sv) => sv.slug === sel.service_slug)
         if (!svc?.acf) return null
 
+        let baseAmount = 0
+        let baseDetail = ""
+
         if (svc.acf.mode_tarification === "forfaitaire" && svc.acf.prix_forfaitaire) {
-          return {
-            label: svc.acf.nom,
-            detail: `forfait ${formatEuros(svc.acf.prix_forfaitaire)}`,
-            amount: svc.acf.prix_forfaitaire,
-          }
+          baseAmount = svc.acf.prix_forfaitaire
+          baseDetail = `forfait ${formatEuros(svc.acf.prix_forfaitaire)}`
         } else if (svc.acf.prix_par_personne) {
-          const total = svc.acf.prix_par_personne * groupSize
-          return {
-            label: svc.acf.nom,
-            detail: `${formatEuros(svc.acf.prix_par_personne)} x ${groupSize} pers.`,
-            amount: total,
+          baseAmount = svc.acf.prix_par_personne * groupSize
+          baseDetail = `${formatEuros(svc.acf.prix_par_personne)} x ${groupSize} pers.`
+        }
+
+        // Option supplement
+        let optionSupplement = 0
+        if (sel.option_index !== undefined && svc.acf.options?.[sel.option_index]) {
+          const opt = svc.acf.options[sel.option_index]
+          if (opt.supplement_par_personne > 0) {
+            optionSupplement = opt.supplement_par_personne * groupSize
+            baseDetail += ` + ${opt.nom} (+${formatEuros(opt.supplement_par_personne)} x ${groupSize})`
+          } else if (opt.nom) {
+            baseDetail += ` · ${opt.nom}`
           }
         }
-        return null
+
+        const totalAmount = baseAmount + optionSupplement
+        if (totalAmount === 0) return null
+
+        return {
+          label: svc.acf.nom,
+          detail: baseDetail,
+          amount: totalAmount,
+        }
       })
       .filter(Boolean) as Array<{ label: string; detail: string; amount: number }>
   }, [selectedServices, data.services, groupSize])
@@ -206,6 +222,25 @@ export function BudgetTable() {
               />
             ))}
           </BudgetSection>
+        )}
+
+        {/* Coefficient saisonnier */}
+        {budget.coefficient > 1 && (
+          <div className="border-b last:border-0">
+            <div className="px-6 py-3 flex items-center justify-between bg-amber-50/50">
+              <div>
+                <span className="font-heading uppercase text-xs tracking-wider font-bold text-amber-700">
+                  {budget.coefficient_label || "Majoration saisonnière"}
+                </span>
+                <span className="ml-2 text-xs text-amber-600">
+                  (sous-total {formatEuros(budget.sous_total)} x{budget.coefficient.toFixed(2)})
+                </span>
+              </div>
+              <span className="font-mono tabular-nums font-bold text-amber-700">
+                +{formatEuros(budget.total - budget.sous_total)}
+              </span>
+            </div>
+          </div>
         )}
 
         {/* Total */}

@@ -244,8 +244,7 @@ export const GET_SEJOUR_TEMPLATES = gql`
           programmeDefaut {
             jourNumero
             creneaux {
-              heureDebut
-              typeCreneau
+              creneau
               activiteSuggeree {
                 nodes {
                   ... on Activit__ {

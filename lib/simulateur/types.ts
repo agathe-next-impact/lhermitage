@@ -128,8 +128,7 @@ export interface ProgrammeJour {
 }
 
 export interface ProgrammeCreneau {
-  heure_debut: string
-  type_creneau: TypeCreneau
+  creneau: string // clé de CRENEAU_ORDER, ex: "matin", "dejeuner", "apres_midi"
   activite_suggeree?: { slug: string; title: string }
   espace_suggere?: { slug: string; title: string }
   service_suggere?: { slug: string; title: string }
@@ -241,6 +240,9 @@ export interface BudgetBreakdown {
   espaces: number
   hebergements: number
   services: number
+  coefficient: number // multiplicateur saisonnier/weekend appliqué (1 = aucun)
+  coefficient_label?: string // ex: "Haute saison", "Weekend"
+  sous_total: number // avant coefficient
   total: number
   par_personne: number
   par_personne_par_jour: number

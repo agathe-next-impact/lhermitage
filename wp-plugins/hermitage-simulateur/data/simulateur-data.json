@@ -231,17 +231,17 @@
           {
             "jour_numero": 1,
             "creneaux": [
-              { "heure_debut": "10:00", "type_creneau": "activite", "activite_suggeree": "course-orientation", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" },
-              { "heure_debut": "12:30", "type_creneau": "libre",    "activite_suggeree": "", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Déjeuner buffet champêtre" },
-              { "heure_debut": "14:30", "type_creneau": "activite", "activite_suggeree": "escape-game", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" },
-              { "heure_debut": "19:30", "type_creneau": "libre",    "activite_suggeree": "", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Dîner & soirée conviviale" }
+              { "creneau": "matin",     "activite_suggeree": "course-orientation", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" },
+              { "creneau": "dejeuner",  "activite_suggeree": "", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Déjeuner buffet champêtre" },
+              { "creneau": "apres_midi","activite_suggeree": "escape-game", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" },
+              { "creneau": "diner",     "activite_suggeree": "", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Dîner & soirée conviviale" }
             ]
           },
           {
             "jour_numero": 2,
             "creneaux": [
-              { "heure_debut": "09:00", "type_creneau": "activite", "activite_suggeree": "atelier-creatif", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" },
-              { "heure_debut": "12:00", "type_creneau": "libre",    "activite_suggeree": "", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Brunch de départ" }
+              { "creneau": "matin",    "activite_suggeree": "atelier-creatif", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" },
+              { "creneau": "dejeuner", "activite_suggeree": "", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Brunch de départ" }
             ]
           }
         ]
@@ -258,27 +258,27 @@
           {
             "jour_numero": 1,
             "creneaux": [
-              { "heure_debut": "09:30", "type_creneau": "activite", "activite_suggeree": "", "espace_suggere": "grande-salle", "service_suggere": "", "label_personnalise": "Session plénière" },
-              { "heure_debut": "12:30", "type_creneau": "libre",    "activite_suggeree": "", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Déjeuner" },
-              { "heure_debut": "14:30", "type_creneau": "activite", "activite_suggeree": "atelier-fresque-climat", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" },
-              { "heure_debut": "19:30", "type_creneau": "libre",    "activite_suggeree": "", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Dîner & networking" }
+              { "creneau": "matin",     "activite_suggeree": "", "espace_suggere": "grande-salle", "service_suggere": "", "label_personnalise": "Session plénière" },
+              { "creneau": "dejeuner",  "activite_suggeree": "", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" },
+              { "creneau": "apres_midi","activite_suggeree": "atelier-fresque-climat", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" },
+              { "creneau": "diner",     "activite_suggeree": "", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Dîner & networking" }
             ]
           },
           {
             "jour_numero": 2,
             "creneaux": [
-              { "heure_debut": "09:00", "type_creneau": "activite", "activite_suggeree": "", "espace_suggere": "grande-salle", "service_suggere": "", "label_personnalise": "Ateliers en sous-groupes" },
-              { "heure_debut": "12:30", "type_creneau": "libre",    "activite_suggeree": "", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Déjeuner" },
-              { "heure_debut": "14:30", "type_creneau": "activite", "activite_suggeree": "olympiades", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" },
-              { "heure_debut": "19:30", "type_creneau": "activite", "activite_suggeree": "degustation-oenologique", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" }
+              { "creneau": "matin",     "activite_suggeree": "", "espace_suggere": "grande-salle", "service_suggere": "", "label_personnalise": "Ateliers en sous-groupes" },
+              { "creneau": "dejeuner",  "activite_suggeree": "", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" },
+              { "creneau": "apres_midi","activite_suggeree": "olympiades", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" },
+              { "creneau": "soir",      "activite_suggeree": "degustation-oenologique", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" }
             ]
           },
           {
             "jour_numero": 3,
             "creneaux": [
-              { "heure_debut": "09:00", "type_creneau": "activite", "activite_suggeree": "yoga-plein-air", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" },
-              { "heure_debut": "10:00", "type_creneau": "activite", "activite_suggeree": "", "espace_suggere": "grande-salle", "service_suggere": "", "label_personnalise": "Restitution & plan d'action" },
-              { "heure_debut": "12:30", "type_creneau": "libre",    "activite_suggeree": "", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Brunch de clôture" }
+              { "creneau": "petit_dejeuner","activite_suggeree": "yoga-plein-air", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Yoga matinal" },
+              { "creneau": "matin",         "activite_suggeree": "", "espace_suggere": "grande-salle", "service_suggere": "", "label_personnalise": "Restitution & plan d'action" },
+              { "creneau": "dejeuner",      "activite_suggeree": "", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Brunch de clôture" }
             ]
           }
         ]
@@ -295,10 +295,10 @@
           {
             "jour_numero": 1,
             "creneaux": [
-              { "heure_debut": "09:30", "type_creneau": "activite", "activite_suggeree": "olympiades", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" },
-              { "heure_debut": "12:30", "type_creneau": "libre",    "activite_suggeree": "", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Déjeuner gastronomique" },
-              { "heure_debut": "14:30", "type_creneau": "activite", "activite_suggeree": "atelier-cuisine", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" },
-              { "heure_debut": "18:00", "type_creneau": "activite", "activite_suggeree": "degustation-oenologique", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" }
+              { "creneau": "matin",     "activite_suggeree": "olympiades", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" },
+              { "creneau": "dejeuner",  "activite_suggeree": "", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Déjeuner gastronomique" },
+              { "creneau": "apres_midi","activite_suggeree": "atelier-cuisine", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" },
+              { "creneau": "soir",      "activite_suggeree": "degustation-oenologique", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" }
             ]
           }
         ]
@@ -315,19 +315,17 @@
           {
             "jour_numero": 1,
             "creneaux": [
-              { "heure_debut": "09:00", "type_creneau": "activite", "activite_suggeree": "yoga-plein-air", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" },
-              { "heure_debut": "10:30", "type_creneau": "activite", "activite_suggeree": "course-orientation", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Balade nature guidée" },
-              { "heure_debut": "12:30", "type_creneau": "libre",    "activite_suggeree": "", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Déjeuner en terrasse" },
-              { "heure_debut": "14:30", "type_creneau": "activite", "activite_suggeree": "atelier-creatif", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" },
-              { "heure_debut": "19:30", "type_creneau": "libre",    "activite_suggeree": "", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Dîner & feu de camp" }
+              { "creneau": "matin",     "activite_suggeree": "yoga-plein-air", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" },
+              { "creneau": "dejeuner",  "activite_suggeree": "", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Déjeuner en terrasse" },
+              { "creneau": "apres_midi","activite_suggeree": "atelier-creatif", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" },
+              { "creneau": "diner",     "activite_suggeree": "", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Dîner & feu de camp" }
             ]
           },
           {
             "jour_numero": 2,
             "creneaux": [
-              { "heure_debut": "09:00", "type_creneau": "activite", "activite_suggeree": "yoga-plein-air", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" },
-              { "heure_debut": "10:30", "type_creneau": "activite", "activite_suggeree": "degustation-oenologique", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Atelier bien-être & dégustation" },
-              { "heure_debut": "12:30", "type_creneau": "libre",    "activite_suggeree": "", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Brunch de départ" }
+              { "creneau": "matin",    "activite_suggeree": "yoga-plein-air", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" },
+              { "creneau": "dejeuner", "activite_suggeree": "", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Brunch de départ" }
             ]
           }
         ]
@@ -344,18 +342,17 @@
           {
             "jour_numero": 1,
             "creneaux": [
-              { "heure_debut": "09:30", "type_creneau": "activite", "activite_suggeree": "", "espace_suggere": "grande-salle", "service_suggere": "", "label_personnalise": "Présentation entreprise & ice-breakers" },
-              { "heure_debut": "12:30", "type_creneau": "libre",    "activite_suggeree": "", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Déjeuner convivial" },
-              { "heure_debut": "14:30", "type_creneau": "activite", "activite_suggeree": "escape-game", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" },
-              { "heure_debut": "19:30", "type_creneau": "libre",    "activite_suggeree": "", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Dîner & soirée découverte" }
+              { "creneau": "matin",     "activite_suggeree": "", "espace_suggere": "grande-salle", "service_suggere": "", "label_personnalise": "Présentation entreprise & ice-breakers" },
+              { "creneau": "dejeuner",  "activite_suggeree": "", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Déjeuner convivial" },
+              { "creneau": "apres_midi","activite_suggeree": "escape-game", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" },
+              { "creneau": "diner",     "activite_suggeree": "", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Dîner & soirée découverte" }
             ]
           },
           {
             "jour_numero": 2,
             "creneaux": [
-              { "heure_debut": "09:00", "type_creneau": "activite", "activite_suggeree": "", "espace_suggere": "salle-creative", "service_suggere": "", "label_personnalise": "Atelier valeurs & vision" },
-              { "heure_debut": "10:30", "type_creneau": "activite", "activite_suggeree": "atelier-fresque-climat", "espace_suggere": "", "service_suggere": "", "label_personnalise": "" },
-              { "heure_debut": "12:30", "type_creneau": "libre",    "activite_suggeree": "", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Brunch de clôture" }
+              { "creneau": "matin",    "activite_suggeree": "atelier-fresque-climat", "espace_suggere": "salle-creative", "service_suggere": "", "label_personnalise": "Atelier valeurs & vision" },
+              { "creneau": "dejeuner", "activite_suggeree": "", "espace_suggere": "", "service_suggere": "", "label_personnalise": "Brunch de clôture" }
             ]
           }
         ]
