@@ -13,7 +13,7 @@ interface HistoireTimelineProps {
 export function HistoireTimeline({ acf }: HistoireTimelineProps) {
   if (!acf.timeline || acf.timeline.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 py-2">
         <div className="rounded-lg border border-muted bg-muted/50 p-8 text-center">
           <h3 className="mb-2 text-lg font-semibold">Aucun élément d&apos;historique trouvé</h3>
           <p className="text-muted-foreground">
@@ -27,7 +27,7 @@ export function HistoireTimeline({ acf }: HistoireTimelineProps) {
   const timelineData = acf.timeline.map((item) => ({
     title: item.annee || "",
     content: (
-      <div className="overflow-hidden rounded-2xl bg-white shadow-xl transition-all duration-300 hover:shadow-2xl">
+      <div className="-mt-28 overflow-hidden rounded-2xl bg-white shadow-xl transition-all duration-300 hover:shadow-2xl">
         {item.image && (
           <div className="relative h-[200px] w-full md:h-[300px]">
             <Image

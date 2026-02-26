@@ -5,7 +5,9 @@
   max-width: calc(100% - 0.5rem);
   /* Reduced top margin from 3rem to 1rem to allow video to be visible from top */
   margin: 0.5rem auto;
-  transition: max-width 0.5s ease, margin-top 0.5s ease;
+  transition:
+    max-width 0.5s ease,
+    margin-top 0.5s ease;
 }
 
 /* Expand to full width on hover and maintain it */
@@ -28,17 +30,23 @@
 .card-nav {
   position: relative;
   width: 100%;
-  height: 60px;
+  height: 40px;
   /* Apply rounded-full (pill shape) when closed, normal rounding when open */
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -2px rgb(0 0 0 / 0.1);
   /* Reduced transparency from 0.7 to 0.9 for less transparency */
   background: rgba(255, 255, 255, 0.9) !important;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  transition: border-radius 0.4s ease, background 0.4s ease, backdrop-filter 0.4s ease, border 0.4s ease;
+  transition:
+    border-radius 0.4s ease,
+    background 0.4s ease,
+    backdrop-filter 0.4s ease,
+    border 0.4s ease;
 }
 
 /* Remove glass effect and change border-radius when menu is open */
@@ -51,11 +59,12 @@
 }
 
 .card-nav-top {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 60px;
-  padding: 0 1rem;
+  height: 40px;
+  padding: 0 0.5rem;
   position: relative;
   z-index: 10;
 }
@@ -89,27 +98,30 @@
   transform: rotate(-45deg) translate(5px, -5px);
 }
 
+.hamburger-label {
+  padding-top: 0.1rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #e75754; /* Coral color for label */
+  transition: opacity 0.3s ease;
+}
+
 /* Removed .warno-container styles as the white logo is being removed */
 
 /* Added centered logo styling */
 .center-logo-container {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
   z-index: 5;
 }
 
 .center-logo {
-  height: 45px;
+  height: 35px;
   width: auto;
   object-fit: contain;
 }
 
 /* Added card-nav-center-logo styles for clickable center logo */
 .card-nav-center-logo {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  position: relative;
   display: flex;
   align-items: center;
   transition: opacity 0.3s ease;
@@ -123,7 +135,7 @@
 .center-logo-image {
   height: auto;
   width: auto;
-  max-height: 40px;
+  max-height: 30px;
 }
 
 .card-nav-cta-button {
@@ -354,7 +366,12 @@
   flex-direction: column;
   justify-content: flex-end;
   padding: 1.5rem;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.3) 50%, transparent 100%);
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.7) 0%,
+    rgba(0, 0, 0, 0.3) 50%,
+    transparent 100%
+  );
 }
 
 .nav-card-image-content .nav-card-label {

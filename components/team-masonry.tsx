@@ -22,8 +22,8 @@ export function TeamMasonry({ members }: TeamMasonryProps) {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto py-12 px-4">
-      <div className="flex flex-col gap-8">
+    <div className="w-full pt-2 pl-2">
+      <div className="flex flex-col gap-16">
         {members.map((member, index) => {
           const photo = member.acf?.photo
           const description = member.acf?.descriptif
@@ -40,11 +40,13 @@ export function TeamMasonry({ members }: TeamMasonryProps) {
               viewport={{ once: true }}
               className="flex flex-col gap-6"
             >
-              <div className={`grid grid-cols-1 md:grid-cols-12 gap-6 ${isEven ? "" : "md:grid-flow-dense"}`}>
+              <div
+                className={`grid grid-cols-1 md:grid-cols-12 gap-6 ${isEven ? "" : "md:grid-flow-dense"}`}
+              >
                 {/* Photo card */}
                 <div className={`${isEven ? "md:col-span-4" : "md:col-span-4 md:col-start-9"}`}>
                   <motion.div
-                    className="relative rounded-2xl overflow-hidden shadow-lg group bg-card"
+                    className="h-full relative rounded-2xl overflow-hidden shadow-lg group bg-card"
                     whileHover={{ scale: 1.02 }}
                     transition={{ duration: 0.3 }}
                   >
@@ -54,7 +56,7 @@ export function TeamMasonry({ members }: TeamMasonryProps) {
                         alt={photo.alt || title}
                         width={photo.width || 600}
                         height={photo.height || 800}
-                        className="w-full h-auto"
+                        className="w-full h-full object-cover"
                         sizes="(max-width: 768px) 100vw, 33vw"
                       />
                     ) : (
@@ -65,11 +67,10 @@ export function TeamMasonry({ members }: TeamMasonryProps) {
                   </motion.div>
                 </div>
 
-                <div className={`flex flex-col gap-4 ${isEven ? "md:col-span-8" : "md:col-span-8 md:col-start-1"}`}>
-                  <motion.div
-                    className="bg-card rounded-full shadow-lg px-6 py-3 border border-border w-fit flex items-center gap-3"
-                    whileHover={{ boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)" }}
-                  >
+                <div
+                  className={`flex flex-col gap-4 ${isEven ? "md:col-span-8" : "md:col-span-8 md:col-start-1"}`}
+                >
+                  <motion.div className="py-3 w-fit flex items-center gap-3">
                     <Image
                       src="/logo-arcs-coral.png"
                       alt="Logo arc coral"
@@ -77,24 +78,23 @@ export function TeamMasonry({ members }: TeamMasonryProps) {
                       height={30}
                       className="flex-shrink-0"
                     />
-                    <h3 className="text-xl md:text-2xl font-bold" style={{ color: "#E75754" }}>
-                      {title}
-                    </h3>
+                    <h3 className="text-xl md:text-2xl font-bold text-brand-coral">{title}</h3>
                   </motion.div>
 
                   {activitePrincipale && (
-                    <motion.div
-                      className="rounded-full shadow-lg px-6 py-3 border border-border w-fit"
-                      style={{ backgroundColor: "#E75754" }}
-                      whileHover={{ boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)" }}
-                    >
-                      <p className="text-lg md:text-xl font-semibold text-white uppercase">{activitePrincipale}</p>
+                    <motion.div>
+                      <p className="md:text-lg font-black text-brand-teal uppercase">
+                        {activitePrincipale}
+                      </p>
                     </motion.div>
                   )}
 
                   <motion.div
-                    className="bg-card rounded-2xl shadow-lg p-6 md:p-8 border border-border"
-                    whileHover={{ boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)" }}
+                    className="bg-card rounded-2xl p-4"
+                    whileHover={{
+                      boxShadow:
+                        "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+                    }}
                     transition={{ duration: 0.3 }}
                   >
                     {description ? (

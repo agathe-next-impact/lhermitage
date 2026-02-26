@@ -1,3 +1,4 @@
+import Link from "next/link"
 import CardNav from "@/components/layout/card-nav"
 import { wpApi } from "@/lib/wordpress/api"
 import type { WPMenuItem } from "@/lib/wordpress/types"
@@ -152,33 +153,24 @@ export async function SiteHeader() {
     ]
   }
 
-  const imageCard: CardNavItem = {
-    label: "Découvrir",
-    bgColor: "#DC6F45",
-    textColor: "#ffffff",
-    image:
-      globalOptions.miniature_du_megamenu?.image?.sizes?.medium ||
-      globalOptions.miniature_du_megamenu?.image?.url ||
-      "/rural-retreat-hermitage-building-nature.jpg",
-    imageAlt: globalOptions.miniature_du_megamenu?.image?.alt || "Vue de l'Hermitage",
-    ctaLabel: globalOptions.miniature_du_megamenu?.titre_cta_1 || "Découvrir le lieu",
-    ctaHref: transformWordPressUrl(
-      globalOptions.miniature_du_megamenu?.lien_cta_1?.url || "/visite-virtuelle"
-    ),
-    ctaTarget: globalOptions.miniature_du_megamenu?.lien_cta_1?.target,
-    cta2Label: globalOptions.miniature_du_megamenu?.titre_cta_2,
-    cta2Href: globalOptions.miniature_du_megamenu?.lien_cta_2?.url
-      ? transformWordPressUrl(globalOptions.miniature_du_megamenu.lien_cta_2.url)
-      : undefined,
-    cta2Target: globalOptions.miniature_du_megamenu?.lien_cta_2?.target,
-  }
-
-  navItems.push(imageCard)
-
   const ctaButton = globalOptions.lien_du_cta_de_barre_superieure
 
   return (
     <header className="fixed top-0 z-40 w-full bg-transparent">
+      <div className="flex items-center justify-between gap-4 bg-[#E75754] text-sm uppercase font-extrabold px-4 py-1.5 text-white">
+        <Link href="/visite-virtuelle" className="hover:underline">
+          Visiter
+        </Link>
+        <div>
+          <Link href="/soutenir" className="hover:underline">
+            Soutenir
+          </Link>
+          &nbsp;|&nbsp;
+          <Link href="/simulateur" className="hover:underline">
+            Réserver
+          </Link>
+        </div>
+      </div>
       <CardNav
         centerLogo="/logo-arcs-coral.png"
         centerLogoAlt="Logo ARCS"

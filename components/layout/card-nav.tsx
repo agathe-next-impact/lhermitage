@@ -94,7 +94,7 @@ const CardNav: React.FC<CardNavProps> = ({
 
       contentEl.offsetHeight
 
-      const topBar = 60
+      const topBar = 40
       const padding = isMobile ? 96 : 24
       const contentHeight = contentEl.scrollHeight
 
@@ -131,7 +131,7 @@ const CardNav: React.FC<CardNavProps> = ({
 
     console.log(`createTimeline: Found ${validCards.length} cards`)
 
-    gsap.set(navEl, { height: 60, overflow: "hidden" })
+    gsap.set(navEl, { height: 40, overflow: "hidden" })
     gsap.set(validCards, { y: 50, opacity: 0 })
 
     const tl = gsap.timeline({ paused: true })
@@ -200,7 +200,7 @@ const CardNav: React.FC<CardNavProps> = ({
     closeTl.to(
       navEl,
       {
-        height: 60,
+        height: 40,
         duration: 0.2,
         ease: "power3.inOut",
         overwrite: true,
@@ -387,18 +387,20 @@ const CardNav: React.FC<CardNavProps> = ({
         style={{ backgroundColor: baseColor }}
       >
         <div className="card-nav-top">
-          <div
-            className={`hamburger-menu ${isHamburgerOpen ? "open" : ""}`}
-            onClick={toggleMenu}
-            role="button"
-            aria-label={isExpanded ? "Close menu" : "Open menu"}
-            tabIndex={0}
-            style={{ color: menuColor || "#000" }}
-          >
-            <div className="hamburger-line" />
-            <div className="hamburger-line" />
+          <div className="flex">
+            <div
+              className={`hamburger-menu ${isHamburgerOpen ? "open" : ""}`}
+              onClick={toggleMenu}
+              role="button"
+              aria-label={isExpanded ? "Close menu" : "Open menu"}
+              tabIndex={0}
+              style={{ color: menuColor || "#000" }}
+            >
+              <div className="hamburger-line" />
+              <div className="hamburger-line" />
+            </div>
+            <span className="hamburger-label">{isExpanded ? "Fermer" : "Menu"}</span>
           </div>
-
           {centerLogo && (
             <Link href="/" className="card-nav-center-logo" aria-label="Retour à l'accueil">
               <Image
@@ -411,15 +413,6 @@ const CardNav: React.FC<CardNavProps> = ({
               />
             </Link>
           )}
-
-          <Link
-            href={ctaHref}
-            target={ctaTarget}
-            className="card-nav-cta-button rounded-full"
-            style={{ backgroundColor: buttonBgColor, color: buttonTextColor }}
-          >
-            {ctaLabel}
-          </Link>
         </div>
 
         <div className="card-nav-content" aria-hidden={!isExpanded}>

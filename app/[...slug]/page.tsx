@@ -149,7 +149,7 @@ export default async function CatchAllPage({ params }: PageProps) {
     )
   } else if (isEquipePage) {
     content = (
-      <div className="relative z-10 mx-auto px-4 py-2">
+      <div className="relative z-10 mx-auto">
         {page.content.rendered && (
           <div
             className="prose prose-stone max-w-none mb-6"

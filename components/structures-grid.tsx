@@ -94,7 +94,7 @@ function FillerCard({ count, color, image }: { count: number; color: string; ima
   const span = 3 - remainder
   return (
     <div
-      className={`hidden lg:flex items-end justify-end rounded-[15px] p-6 overflow-hidden ${span === 2 ? "lg:col-span-2" : ""}`}
+      className={`hidden lg:flex items-end justify-end rounded-[15px] overflow-hidden ${span === 2 ? "lg:col-span-2" : ""}`}
       style={{ backgroundColor: color }}
     >
       <Image

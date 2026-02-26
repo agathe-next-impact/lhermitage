@@ -44,7 +44,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="min-h-screen bg-background font-sans antialiased">
         <Providers>
           <SiteHeader />
-          <main className="mb-12">{children}</main>
+          <main className="mt-6 mb-12">{children}</main>
         </Providers>
       </body>
     </html>

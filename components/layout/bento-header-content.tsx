@@ -127,7 +127,7 @@ export function BentoHeaderContent({
 
         {/* Contenu de page — colonnes 2-4 (ou décalé si pas d'image) */}
         <div
-          className={`col-span-1 bg-white m-2 p-4 rounded-xl ${columnImage ? "md:col-span-3" : "md:col-start-2 md:col-span-3"} md:-mt-36 relative z-10`}
+          className={`col-span-1 rounded-xl ${columnImage ? "md:col-span-3" : "md:col-start-2 md:col-span-3"} md:-mt-40 pt-3 relative z-10`}
         >
           {children}
         </div>
