@@ -25,7 +25,7 @@ export const PAGE_COLORS: Record<string, string> = {
 
   "/participer": BRAND_COLORS.coral,
 
-  "/simulateur": BRAND_COLORS.dark,
+  "/reserver": BRAND_COLORS.coral,
 }
 
 export function getColorForPath(pathname: string): string | undefined {

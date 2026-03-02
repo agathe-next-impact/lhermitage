@@ -293,15 +293,28 @@ const CardNav: React.FC<CardNavProps> = ({
     }
   }, [isExpanded])
 
+  const [isNavHidden, setIsNavHidden] = useState(false)
+  const lastScrollY = useRef(0)
+
   useEffect(() => {
     const handleScroll = () => {
-      const scrolled = window.scrollY > 50
+      const currentY = window.scrollY
+      const scrolled = currentY > 50
       setIsScrolled((prev) => (prev === scrolled ? prev : scrolled))
+
+      if (!isExpanded) {
+        if (currentY > lastScrollY.current && currentY > 100) {
+          setIsNavHidden(true)
+        } else {
+          setIsNavHidden(false)
+        }
+      }
+      lastScrollY.current = currentY
     }
 
     window.addEventListener("scroll", handleScroll, { passive: true })
     return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+  }, [isExpanded])
 
   const toggleMenu = () => {
     console.log(
@@ -379,7 +392,7 @@ const CardNav: React.FC<CardNavProps> = ({
 
   return (
     <div
-      className={`card-nav-container ${className} ${hasBeenHovered ? "expanded" : ""} ${isScrolled ? "scrolled" : ""}`}
+      className={`card-nav-container ${className} ${hasBeenHovered ? "expanded" : ""} ${isScrolled ? "scrolled" : ""} ${isNavHidden ? "nav-hidden" : ""}`}
     >
       <nav
         ref={navRef}
@@ -474,10 +487,11 @@ const CardNav: React.FC<CardNavProps> = ({
                     <>
                       <div
                         className="nav-card-header"
-                        onClick={() => toggleCard(idx)}
-                        role="button"
-                        tabIndex={0}
-                        aria-expanded={!isCollapsed}
+                        onClick={() => {
+                          const isMobile = window.matchMedia("(max-width: 768px)").matches
+                          if (!isMobile) return
+                          toggleCard(idx)
+                        }}
                       >
                         <div className="nav-card-label">{item.label}</div>
                         <ChevronDown

@@ -5,6 +5,7 @@ import { Open_Sans, Inter } from "next/font/google"
 import "./globals.css"
 import { SiteHeader } from "@/components/layout/site-header"
 import { Providers } from "@/components/providers"
+import { Toaster } from "sonner"
 
 const openSans = Open_Sans({
   subsets: ["latin"],
@@ -45,6 +46,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <Providers>
           <SiteHeader />
           <main className="mt-6 mb-12">{children}</main>
+          <Toaster richColors position="top-right" />
         </Providers>
       </body>
     </html>

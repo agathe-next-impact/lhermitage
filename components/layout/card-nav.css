@@ -10,6 +10,15 @@
     margin-top 0.5s ease;
 }
 
+/* Hide/show header on scroll direction */
+header:has(.card-nav-container.nav-hidden) {
+  transform: translateY(-100%);
+}
+
+header {
+  transition: transform 0.3s ease;
+}
+
 /* Expand to full width on hover and maintain it */
 .card-nav-container.expanded {
   max-width: calc(100% - 1rem);
@@ -192,13 +201,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  cursor: pointer;
+  cursor: default;
   user-select: none;
   transition: opacity 0.2s ease;
 }
 
 .nav-card-header:hover {
-  opacity: 0.8;
+  opacity: 1;
 }
 
 /* Add chevron icon styles */
@@ -506,6 +515,14 @@
 }
 
 @media (max-width: 768px) {
+  .nav-card-header {
+    cursor: pointer;
+  }
+
+  .nav-card-header:hover {
+    opacity: 0.8;
+  }
+
   /* Update mobile container to use full width */
   .card-nav-container {
     max-width: 100%;

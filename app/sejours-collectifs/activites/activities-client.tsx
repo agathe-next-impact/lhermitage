@@ -56,7 +56,7 @@ export function ActivitiesClient({ categories, activities }: ActivitiesClientPro
       acc[categoryName].activities.push(activity)
       return acc
     },
-    {} as Record<string, { slug: string; activities: Activity[] }>,
+    {} as Record<string, { slug: string; activities: Activity[] }>
   )
 
   const sortedCategories = Object.keys(activitiesByCategory).sort().reverse()
@@ -85,12 +85,8 @@ export function ActivitiesClient({ categories, activities }: ActivitiesClientPro
                     style={{ backgroundColor: color }}
                   >
                     <div className="px-2 pb-6">
-                      <h3 className="text-xl font-bold mb-3 text-white">
-                        {activity.title}
-                      </h3>
-                      <p className="text-white/80 text-sm mb-4 line-clamp-4">
-                        {description}
-                      </p>
+                      <h3 className="text-xl font-bold mb-3 text-white">{activity.title}</h3>
+                      <p className="text-white/80 text-sm mb-4 line-clamp-4">{description}</p>
 
                       <Button
                         asChild
@@ -116,6 +112,45 @@ export function ActivitiesClient({ categories, activities }: ActivitiesClientPro
                   </MinimalCard>
                 )
               })}
+
+              {/* Bento filler — md (2-col) */}
+              {categoryData.activities.length % 2 !== 0 && (
+                <div
+                  className="hidden md:flex lg:hidden rounded-xl relative overflow-hidden items-end justify-end p-4"
+                  style={{ backgroundColor: color }}
+                >
+                  <Image
+                    src="/logo-hermitage-new.png"
+                    alt="L'Hermitage"
+                    width={120}
+                    height={120}
+                    className="object-contain"
+                  />
+                </div>
+              )}
+
+              {/* Bento filler — lg (3-col) */}
+              {(() => {
+                const lgRemaining = (3 - (categoryData.activities.length % 3)) % 3
+                if (lgRemaining === 0) return null
+                const logoSize = lgRemaining === 2 ? 240 : 120
+                return (
+                  <div
+                    className={`hidden lg:flex rounded-xl relative overflow-hidden items-end justify-end p-4 ${
+                      lgRemaining === 2 ? "lg:col-span-2" : ""
+                    }`}
+                    style={{ backgroundColor: color }}
+                  >
+                    <Image
+                      src="/logo-hermitage-new.png"
+                      alt="L'Hermitage"
+                      width={logoSize}
+                      height={logoSize}
+                      className="object-contain"
+                    />
+                  </div>
+                )
+              })()}
             </div>
           </div>
         )

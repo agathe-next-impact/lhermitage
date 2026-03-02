@@ -23,7 +23,7 @@ export default async function VisiteVirtuellePage() {
         image="/rural-retreat-landscape.jpg"
       />
       <BentoHeaderContent title="Explorez l'Hermitage à travers un parcours virtuel immersif">
-        <div className="container mx-auto px-4 py-12">
+        <div className="container mx-auto p-2">
           <GuidedTourClient mapPinPoints={mapPinPoints} />
         </div>
       </BentoHeaderContent>

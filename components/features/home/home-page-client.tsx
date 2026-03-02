@@ -21,7 +21,7 @@ export function HomePageClient({
   const videoUrl = homepage.acf?.video || null
 
   return (
-    <div className="mt-[78px] flex flex-col">
+    <div className="mt-[90px] flex flex-col">
       {/* Hero Section - Grid 4 colonnes × 5 lignes */}
       <section className="w-[calc(100%-1rem)] mx-auto relative h-[calc(100vh-82px)] grid grid-cols-4 grid-rows-5">
         {/* Vidéo : couvre toute la grille en fond */}

@@ -48,7 +48,7 @@ export async function SiteHeader() {
     globalOptions = {
       lien_du_cta_de_barre_superieure: {
         title: "Réserver",
-        url: "/simulateur",
+        url: "/reserver",
         target: "",
       },
       miniature_du_megamenu: {
@@ -166,7 +166,7 @@ export async function SiteHeader() {
             Soutenir
           </Link>
           &nbsp;|&nbsp;
-          <Link href="/simulateur" className="hover:underline">
+          <Link href="/reserver" className="hover:underline">
             Réserver
           </Link>
         </div>
@@ -180,7 +180,7 @@ export async function SiteHeader() {
         buttonBgColor="#E75754"
         buttonTextColor="#ffffff"
         ctaLabel={ctaButton?.title || "Réserver"}
-        ctaHref={transformWordPressUrl(ctaButton?.url || "/simulateur")}
+        ctaHref={transformWordPressUrl(ctaButton?.url || "/reserver")}
         ctaTarget={ctaButton?.target}
         ease="power3.out"
       />

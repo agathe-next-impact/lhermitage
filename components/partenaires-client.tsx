@@ -5,9 +5,9 @@ import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
 import { OrbitingCircles } from "@/components/ui/orbiting-circles"
 import type { WPPost, PartenaireACF, WPTerm } from "@/lib/wordpress/types"
-import { cn, stripHtml } from "@/lib/utils"
+import { cn } from "@/lib/utils"
 import { sanitizeUrl } from "@/lib/wordpress/sanitize"
-import { HeroCard } from "@/components/features/home/hero-card"
+import { MinimalCard } from "@/components/ui/minimal-card"
 import { useIsMounted } from "@/hooks/use-is-mounted"
 
 interface PartenairesClientProps {
@@ -17,28 +17,31 @@ interface PartenairesClientProps {
 
 const CATEGORY_COLORS = [
   {
-    selected: "bg-[#56939f] text-white border-[#56939f] hover:bg-[#46838f]", // brand-teal
-    outline: "text-[#56939f] border-[#56939f] hover:bg-[#56939f] hover:text-white",
+    selected: "bg-[#56939f] text-white border-[#56939f] hover:bg-[#56939f]", // brand-teal
+    outline: "bg-[#56939f]/80 text-white border-[#56939f] hover:bg-[#56939f]",
   },
   {
-    selected: "bg-[#78ad7d] text-white border-[#78ad7d] hover:bg-[#689d6d]", // brand-green
-    outline: "text-[#78ad7d] border-[#78ad7d] hover:bg-[#78ad7d] hover:text-white",
+    selected: "bg-[#78ad7d] text-white border-[#78ad7d] hover:bg-[#78ad7d]", // brand-green
+    outline: "bg-[#78ad7d]/80 text-white border-[#78ad7d] hover:bg-[#78ad7d]",
   },
   {
-    selected: "bg-[#c14c66] text-white border-[#c14c66] hover:bg-[#b13c56]", // brand-pink
-    outline: "text-[#c14c66] border-[#c14c66] hover:bg-[#c14c66] hover:text-white",
+    selected: "bg-[#c14c66] text-white border-[#c14c66] hover:bg-[#c14c66]", // brand-pink
+    outline: "bg-[#c14c66]/80 text-white border-[#c14c66] hover:bg-[#c14c66]",
   },
   {
-    selected: "bg-[#dc6f45] text-white border-[#dc6f45] hover:bg-[#cc5f35]", // brand-orange
-    outline: "text-[#dc6f45] border-[#dc6f45] hover:bg-[#dc6f45] hover:text-white",
+    selected: "bg-[#dc6f45] text-white border-[#dc6f45] hover:bg-[#dc6f45]", // brand-orange
+    outline: "bg-[#dc6f45]/80 text-white border-[#dc6f45] hover:bg-[#dc6f45]",
   },
   {
-    selected: "bg-[#2a4a51] text-white border-[#2a4a51] hover:bg-[#1a3a41]", // brand-dark
-    outline: "text-[#2a4a51] border-[#2a4a51] hover:bg-[#2a4a51] hover:text-white",
+    selected: "bg-[#2a4a51] text-white border-[#2a4a51] hover:bg-[#2a4a51]", // brand-dark
+    outline: "bg-[#2a4a51]/80 text-white border-[#2a4a51] hover:bg-[#2a4a51]",
   },
 ]
 
-const BOULE_STYLE = "rounded-full bg-white shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-gray-100 aspect-square"
+const CATEGORY_HEX = ["#56939f", "#78ad7d", "#c14c66", "#dc6f45", "#2a4a51"]
+
+const BOULE_STYLE =
+  "rounded-full bg-white shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-gray-100 aspect-square"
 
 export function PartenairesClient({ partenaires, categories }: PartenairesClientProps) {
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
@@ -49,7 +52,9 @@ export function PartenairesClient({ partenaires, categories }: PartenairesClient
     ? partenaires.filter((p) => {
         // Check standard WP term embedding
         const terms = p._embedded?.["wp:term"]?.flat() || []
-        return terms.some((term) => term.id === selectedCategory && term.taxonomy === "type-de-partenaire")
+        return terms.some(
+          (term) => term.id === selectedCategory && term.taxonomy === "type-de-partenaire"
+        )
       })
     : partenaires
 
@@ -67,15 +72,15 @@ export function PartenairesClient({ partenaires, categories }: PartenairesClient
   return (
     <div className="flex flex-col gap-8">
       {/* Taxonomy Filter Badges */}
-      <div className="container mx-auto px-4">
-        <div className="flex flex-wrap justify-center gap-2">
+      <div>
+        <div className="flex flex-wrap gap-2">
           <Badge
             variant={selectedCategory === null ? "default" : "outline"}
             className={cn(
-              "cursor-pointer text-sm py-2 px-4 transition-all rounded-full",
+              "cursor-pointer text-sm py-2 px-4 transition-all rounded-lg",
               selectedCategory === null
-                ? "bg-[#e75754] hover:bg-[#d64643] text-white border-[#e75754]"
-                : "text-[#e75754] border-[#e75754] hover:bg-[#e75754] hover:text-white bg-transparent",
+                ? "bg-[#e75754] text-white border-[#e75754] hover:bg-[#e75754]"
+                : "bg-[#e75754]/80 text-white border-[#e75754] hover:bg-[#e75754]"
             )}
             onClick={() => setSelectedCategory(null)}
           >
@@ -90,8 +95,8 @@ export function PartenairesClient({ partenaires, categories }: PartenairesClient
                 key={category.id}
                 variant={isSelected ? "default" : "outline"}
                 className={cn(
-                  "cursor-pointer text-sm py-2 px-4 transition-all rounded-full",
-                  isSelected ? colorTheme.selected : colorTheme.outline,
+                  "cursor-pointer text-sm py-2 px-4 transition-all rounded-lg",
+                  isSelected ? colorTheme.selected : colorTheme.outline
                 )}
                 onClick={() => setSelectedCategory(category.id)}
               >
@@ -102,8 +107,8 @@ export function PartenairesClient({ partenaires, categories }: PartenairesClient
         </div>
       </div>
 
-      {/* Galaxy Orbiting Circles */}
-      <div className="relative mb-8 flex h-[700px] w-full flex-col items-center justify-center overflow-hidden border-y bg-background/50 pb-32 [perspective:1000px]">
+      {/* Galaxy Orbiting Circles — full bleed */}
+      <div className="relative mb-8 flex h-[700px] w-screen left-1/2 -ml-[50vw] flex-col items-center justify-center overflow-hidden bg-background/50 pb-32 [perspective:1000px]">
         {/* Layer 1 - Inner - Tilted Left */}
         <div
           className="absolute flex size-full items-center justify-center [transform-style:preserve-3d]"
@@ -123,7 +128,7 @@ export function PartenairesClient({ partenaires, categories }: PartenairesClient
                 style={{ transform: "rotateX(-60deg) rotateZ(-30deg)" }}
                 className={cn(
                   "flex size-14 items-center justify-center p-2 transition-transform hover:scale-110",
-                  BOULE_STYLE,
+                  BOULE_STYLE
                 )}
                 title={partenaire.title.rendered}
               >
@@ -165,14 +170,16 @@ export function PartenairesClient({ partenaires, categories }: PartenairesClient
                 style={{ transform: "rotateX(-60deg) rotateZ(30deg)" }}
                 className={cn(
                   "flex size-16 items-center justify-center p-2 transition-transform hover:scale-110",
-                  BOULE_STYLE,
+                  BOULE_STYLE
                 )}
                 title={partenaire.title.rendered}
               >
                 {partenaire.acf?.logo ? (
                   <Image
                     src={partenaire.acf.logo.url || "/placeholder.svg"}
-                    alt={partenaire.acf.logo.alt || partenaire.acf?.nom || partenaire.title.rendered}
+                    alt={
+                      partenaire.acf.logo.alt || partenaire.acf?.nom || partenaire.title.rendered
+                    }
                     width={45}
                     height={45}
                     className="h-full w-full object-contain"
@@ -206,14 +213,16 @@ export function PartenairesClient({ partenaires, categories }: PartenairesClient
                 style={{ transform: "rotateX(-60deg)" }}
                 className={cn(
                   "flex size-20 items-center justify-center p-3 transition-transform hover:scale-110",
-                  BOULE_STYLE,
+                  BOULE_STYLE
                 )}
                 title={partenaire.title.rendered}
               >
                 {partenaire.acf?.logo ? (
                   <Image
                     src={partenaire.acf.logo.url || "/placeholder.svg"}
-                    alt={partenaire.acf.logo.alt || partenaire.acf?.nom || partenaire.title.rendered}
+                    alt={
+                      partenaire.acf.logo.alt || partenaire.acf?.nom || partenaire.title.rendered
+                    }
                     width={55}
                     height={55}
                     className="h-full w-full object-contain"
@@ -248,14 +257,16 @@ export function PartenairesClient({ partenaires, categories }: PartenairesClient
                 style={{ transform: "rotateX(-60deg) rotateZ(-15deg)" }}
                 className={cn(
                   "flex size-22 items-center justify-center p-3 transition-transform hover:scale-110",
-                  BOULE_STYLE,
+                  BOULE_STYLE
                 )}
                 title={partenaire.title.rendered}
               >
                 {partenaire.acf?.logo ? (
                   <Image
                     src={partenaire.acf.logo.url || "/placeholder.svg"}
-                    alt={partenaire.acf.logo.alt || partenaire.acf?.nom || partenaire.title.rendered}
+                    alt={
+                      partenaire.acf.logo.alt || partenaire.acf?.nom || partenaire.title.rendered
+                    }
                     width={60}
                     height={60}
                     className="h-full w-full object-contain"
@@ -289,14 +300,16 @@ export function PartenairesClient({ partenaires, categories }: PartenairesClient
                 style={{ transform: "rotateX(-60deg) rotateZ(15deg)" }}
                 className={cn(
                   "flex size-24 items-center justify-center p-4 transition-transform hover:scale-110",
-                  BOULE_STYLE,
+                  BOULE_STYLE
                 )}
                 title={partenaire.title.rendered}
               >
                 {partenaire.acf?.logo ? (
                   <Image
                     src={partenaire.acf.logo.url || "/placeholder.svg"}
-                    alt={partenaire.acf.logo.alt || partenaire.acf?.nom || partenaire.title.rendered}
+                    alt={
+                      partenaire.acf.logo.alt || partenaire.acf?.nom || partenaire.title.rendered
+                    }
                     width={70}
                     height={70}
                     className="h-full w-full object-contain"
@@ -313,23 +326,55 @@ export function PartenairesClient({ partenaires, categories }: PartenairesClient
       </div>
 
       <div className="container mx-auto px-4">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
           {filteredPartenaires.map((partenaire) => {
             const category = partenaire._embedded?.["wp:term"]?.[0]?.[0]
+            const catIndex = category ? categories.findIndex((c) => c.id === category.id) : -1
+            const bgColor = catIndex >= 0 ? CATEGORY_HEX[catIndex % CATEGORY_HEX.length] : "#e75754"
+            const logo =
+              partenaire._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
+              partenaire.acf?.logo?.url
+            const name = partenaire.acf?.nom || partenaire.title.rendered
+            const url = partenaire.acf?.lien?.url ? sanitizeUrl(partenaire.acf.lien.url) : undefined
 
-            return (
-              <HeroCard
+            const card = (
+              <MinimalCard
                 key={partenaire.id}
-                title={partenaire.acf?.nom || partenaire.title.rendered}
-                description={partenaire.acf?.descriptif ? stripHtml(partenaire.acf.descriptif) : undefined}
-                image={partenaire._embedded?.["wp:featuredmedia"]?.[0]?.source_url || partenaire.acf?.logo?.url}
-                imageAlt={partenaire.acf?.logo?.alt || partenaire.title.rendered}
-                imageFit="contain"
-                link={partenaire.acf?.lien?.url ? sanitizeUrl(partenaire.acf.lien.url) : undefined}
-                linkText={partenaire.acf?.lien ? "Visiter le site" : undefined}
-                category={category?.name}
-                categorySlug={category?.slug}
-              />
+                className="flex flex-col items-center p-4 shadow-sm hover:shadow-md transition-shadow break-inside-avoid"
+                style={{ backgroundColor: bgColor }}
+              >
+                {logo && (
+                  <div className="flex items-center justify-center p-2">
+                    <Image
+                      src={logo}
+                      alt={partenaire.acf?.logo?.alt || name}
+                      width={120}
+                      height={120}
+                      className="w-auto object-contain"
+                    />
+                  </div>
+                )}
+                <h3 className="text-sm font-semibold text-white text-center leading-tight mt-2">
+                  {name}
+                </h3>
+                {category?.name && (
+                  <span className="text-xs text-white/70 mt-1">{category.name}</span>
+                )}
+              </MinimalCard>
+            )
+
+            return url ? (
+              <a
+                key={partenaire.id}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="break-inside-avoid block"
+              >
+                {card}
+              </a>
+            ) : (
+              card
             )
           })}
         </div>
@@ -337,4 +382,3 @@ export function PartenairesClient({ partenaires, categories }: PartenairesClient
     </div>
   )
 }
-
