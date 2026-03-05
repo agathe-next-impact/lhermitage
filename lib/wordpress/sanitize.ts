@@ -1,24 +1,54 @@
-import DOMPurify from "isomorphic-dompurify"
+import sanitize from "sanitize-html"
 
 /** Tags HTML autorisés pour le contenu WordPress */
 const ALLOWED_TAGS = [
-  "p", "br", "strong", "b", "em", "i", "u", "s",
-  "h1", "h2", "h3", "h4", "h5", "h6",
-  "ul", "ol", "li",
-  "blockquote", "pre", "code",
-  "a", "img",
-  "table", "thead", "tbody", "tfoot", "tr", "td", "th", "caption",
-  "div", "span", "figure", "figcaption",
-  "hr", "sup", "sub",
+  "p",
+  "br",
+  "strong",
+  "b",
+  "em",
+  "i",
+  "u",
+  "s",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "ul",
+  "ol",
+  "li",
+  "blockquote",
+  "pre",
+  "code",
+  "a",
+  "img",
+  "table",
+  "thead",
+  "tbody",
+  "tfoot",
+  "tr",
+  "td",
+  "th",
+  "caption",
+  "div",
+  "span",
+  "figure",
+  "figcaption",
+  "hr",
+  "sup",
+  "sub",
 ]
 
-/** Attributs autorisés */
-const ALLOWED_ATTR = [
-  "href", "title", "alt", "src", "width", "height",
-  "class", "id", "target", "rel",
-  "colspan", "rowspan", "scope",
-  "loading", "decoding",
-]
+/** Attributs autorisés par tag */
+const ALLOWED_ATTR: Record<string, string[]> = {
+  a: ["href", "title", "target", "rel", "class", "id"],
+  img: ["src", "alt", "title", "width", "height", "loading", "decoding", "class"],
+  td: ["colspan", "rowspan", "scope"],
+  th: ["colspan", "rowspan", "scope"],
+  "*": ["class", "id"],
+}
 
 /**
  * Sanitize du HTML provenant de WordPress (content.rendered, ACF descriptif, etc.).
@@ -26,10 +56,10 @@ const ALLOWED_ATTR = [
  */
 export function sanitizeHtml(dirty: string): string {
   if (!dirty) return ""
-  return DOMPurify.sanitize(dirty, {
-    ALLOWED_TAGS,
-    ALLOWED_ATTR,
-    ALLOW_DATA_ATTR: false,
+  return sanitize(dirty, {
+    allowedTags: ALLOWED_TAGS,
+    allowedAttributes: ALLOWED_ATTR,
+    disallowedTagsMode: "discard",
   })
 }
 
