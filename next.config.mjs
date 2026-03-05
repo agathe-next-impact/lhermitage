@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    serverComponentsExternalPackages: ['sanitize-html'],
+  },
   typescript: {
     // ✅ TypeScript strict mode activé - Toutes les erreurs corrigées !
     ignoreBuildErrors: false,

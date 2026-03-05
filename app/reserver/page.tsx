@@ -6,6 +6,8 @@ import { getColorForPath } from "@/lib/page-colors"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 import type { Metadata } from "next"
 
+export const dynamic = "force-static"
+
 export const metadata: Metadata = {
   title: "Réserver — L'Hermitage",
   description: "Réservez votre séjour, événement ou collaboration à L'Hermitage, tiers-lieu rural.",
