@@ -2,7 +2,6 @@ import { PageHeader } from "@/components/layout/page-header"
 import { BentoHeaderContent } from "@/components/layout/bento-header-content"
 import { ContactForm } from "./contact-form"
 import { wpApi } from "@/lib/wordpress/api"
-import { getColorForPath } from "@/lib/page-colors"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 import type { Metadata } from "next"
 
@@ -22,7 +21,6 @@ export default async function ReserverPage() {
         title={page?.title.rendered || "Réserver"}
         subtitle={page?.acf?.hero?.["sous-titre"]}
         image={page?.acf?.hero?.image?.url || "/rural-retreat-landscape.jpg"}
-        color={getColorForPath("/reserver")}
       />
 
       <BentoHeaderContent title={page?.acf?.hero?.["sous-titre"] || "Parlons de votre projet"}>

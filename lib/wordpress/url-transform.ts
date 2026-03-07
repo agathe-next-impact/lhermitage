@@ -5,6 +5,17 @@
 
 import { sanitizeUrl } from "./sanitize"
 
+/**
+ * WordPress path → Next.js route mapping.
+ * When a WordPress page hierarchy differs from the dedicated Next.js route,
+ * add an entry here so all links (menu, ACF, content) point to the right page.
+ * Keys: WordPress pathname (without leading/trailing slashes).
+ * Values: Next.js route (with leading slash).
+ */
+const WP_TO_NEXTJS_ROUTES: Record<string, string> = {
+  "soutenir-le-projet/devenir-societaire-cooperative-fonciere": "/participer/devenir-societaire",
+}
+
 const WP_API_URL = process.env.WP_API_URL || "https://admin.hermitagelelab.com/wp-json/wp/v2"
 
 // Extract the WordPress base URL from the API URL
@@ -27,17 +38,19 @@ const primaryHostname = (() => {
 export function transformWordPressUrl(url: string): string {
   if (!url) return "/"
 
-  // If it's already a relative URL, return as is
+  // If it's already a relative URL, check route mapping then return
   if (url.startsWith("/")) {
-    return url
+    const wpPath = url.replace(/^\/+|\/+$/g, "")
+    return WP_TO_NEXTJS_ROUTES[wpPath] || url
   }
 
   // Parse the URL to check if it's a known WordPress domain
   try {
     const parsed = new URL(url)
     if (parsed.hostname === primaryHostname) {
-      // Extract just the pathname — works regardless of domain
-      return parsed.pathname || "/"
+      const pathname = parsed.pathname || "/"
+      const wpPath = pathname.replace(/^\/+|\/+$/g, "")
+      return WP_TO_NEXTJS_ROUTES[wpPath] || pathname
     }
   } catch {
     // Not a valid URL, return as-is

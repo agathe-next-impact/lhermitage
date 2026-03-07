@@ -9,7 +9,9 @@ import { REVALIDATION } from "@/lib/constants"
 
 export const revalidate = REVALIDATION.listing
 
-const getPage = cache(() => getPageByPath("participer/devenir-societaire"))
+const getPage = cache(() =>
+  getPageByPath("soutenir-le-projet/devenir-societaire-cooperative-fonciere")
+)
 
 export async function generateMetadata(): Promise<Metadata> {
   try {

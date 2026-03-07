@@ -1,7 +1,6 @@
 import { SejourPricingCard } from "@/components/features/sejours/sejour-pricing-card"
 import { PageHeader } from "@/components/layout/page-header"
 import { wpApi } from "@/lib/wordpress/api"
-import { getColorForPath } from "@/lib/page-colors"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 
 interface SejoursListingProps {
@@ -36,7 +35,6 @@ export async function SejoursListing({
         title={page?.title?.rendered || fallbackTitle}
         subtitle={page?.acf?.hero?.["sous-titre"]}
         image={typeof page?.acf?.hero?.image === "string" ? page.acf.hero.image : page?.acf?.hero?.image?.url || "/group-retreat-activities.jpg"}
-        color={getColorForPath(routePath)}
       />
 
       <div className="relative z-10 container mx-auto px-4 py-16">

@@ -2,10 +2,10 @@
 
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { useMemo, useRef, type ReactNode } from "react"
+import { useRef, type ReactNode } from "react"
 import { usePathname } from "next/navigation"
-import { getColorForPath } from "@/lib/page-colors"
-import { BRAND_COLORS } from "@/lib/theme/colors"
+import { getColorForPath, MENU_COLOR_SEQUENCE } from "@/lib/page-colors"
+import { useMenuColor } from "@/components/menu-colors-provider"
 
 interface BentoHeaderContentProps {
   title?: string
@@ -16,21 +16,13 @@ interface BentoHeaderContentProps {
   children?: ReactNode
 }
 
-const brandColors = [
-  BRAND_COLORS.coral,
-  BRAND_COLORS.teal,
-  BRAND_COLORS.green,
-  BRAND_COLORS.rose,
-  BRAND_COLORS.orange,
-]
-
-function getMainBlobColor(title: string): string {
+function getHashColor(title: string): string {
   let hash = 0
   for (let i = 0; i < title.length; i++) {
     hash = (hash << 5) - hash + title.charCodeAt(i)
     hash = hash & hash
   }
-  return brandColors[Math.abs(hash) % brandColors.length]
+  return MENU_COLOR_SEQUENCE[Math.abs(hash) % MENU_COLOR_SEQUENCE.length]
 }
 
 export function BentoHeaderContent({
@@ -43,10 +35,8 @@ export function BentoHeaderContent({
 }: BentoHeaderContentProps) {
   const pathname = usePathname()
   const lBlockRef = useRef<HTMLDivElement>(null)
-  const mainBlobColor = useMemo(() => {
-    if (color) return color
-    return getColorForPath(pathname) || getMainBlobColor(title || pathname)
-  }, [pathname, color, title])
+  const menuColor = useMenuColor(pathname)
+  const mainBlobColor = color || menuColor || getColorForPath(pathname) || getHashColor(title || pathname)
 
   return (
     <div className={`w-[calc(100%-1rem)] mt-2 mx-auto relative ${className}`}>

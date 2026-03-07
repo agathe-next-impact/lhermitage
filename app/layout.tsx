@@ -44,9 +44,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className="min-h-screen bg-background font-sans antialiased">
         <Providers>
-          <SiteHeader />
-          <main className="mt-6 mb-12">{children}</main>
-          <Toaster richColors position="top-right" />
+          <SiteHeader>
+            <main className="mt-6 mb-12">{children}</main>
+            <Toaster richColors position="top-right" />
+          </SiteHeader>
         </Providers>
       </body>
     </html>

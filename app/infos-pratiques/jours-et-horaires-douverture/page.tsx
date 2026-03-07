@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PageHeader } from "@/components/layout/page-header"
 import { BentoHeaderContent } from "@/components/layout/bento-header-content"
 import { wpApi } from "@/lib/wordpress/api"
-import { getColorForPath } from "@/lib/page-colors"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 
 export default async function HorairesPage() {
@@ -15,7 +14,6 @@ export default async function HorairesPage() {
         title={page?.title.rendered || "Jours et horaires d'ouverture"}
         subtitle={page?.acf?.hero?.["sous-titre"]}
         image={page?.acf?.hero?.image?.url || "/rural-retreat-landscape.jpg"}
-        color={getColorForPath("/infos-pratiques/jours-et-horaires-douverture")}
       />
 
       <BentoHeaderContent title={page?.acf?.hero?.["sous-titre"]}>

@@ -1,11 +1,10 @@
 "use client"
 import { motion } from "framer-motion"
-import { useMemo } from "react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
-import { getColorForPath } from "@/lib/page-colors"
-import { BRAND_COLORS } from "@/lib/theme/colors"
+import { getColorForPath, MENU_COLOR_SEQUENCE } from "@/lib/page-colors"
+import { useMenuColor } from "@/components/menu-colors-provider"
 
 interface PageHeaderProps {
   title: string
@@ -16,21 +15,13 @@ interface PageHeaderProps {
   children?: React.ReactNode
 }
 
-const brandColors = [
-  BRAND_COLORS.coral,
-  BRAND_COLORS.teal,
-  BRAND_COLORS.green,
-  BRAND_COLORS.rose,
-  BRAND_COLORS.orange,
-]
-
-function getMainBlobColor(title: string): string {
+function getHashColor(title: string): string {
   let hash = 0
   for (let i = 0; i < title.length; i++) {
     hash = (hash << 5) - hash + title.charCodeAt(i)
     hash = hash & hash
   }
-  return brandColors[Math.abs(hash) % brandColors.length]
+  return MENU_COLOR_SEQUENCE[Math.abs(hash) % MENU_COLOR_SEQUENCE.length]
 }
 
 export function PageHeader({
@@ -42,12 +33,9 @@ export function PageHeader({
   children,
 }: PageHeaderProps) {
   const pathname = usePathname()
-  const colorFromPath = useMemo(() => {
-    if (color) return color
-    return getColorForPath(pathname)
-  }, [pathname, color])
+  const menuColor = useMenuColor(pathname)
 
-  const mainBlobColor = colorFromPath || getMainBlobColor(title)
+  const mainBlobColor = color || menuColor || getColorForPath(pathname) || getHashColor(title)
 
   return (
     <div className={`w-[calc(100%-1rem)] mt-3 mx-auto relative pt-16 ${className}`}>
