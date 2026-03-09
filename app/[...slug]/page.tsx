@@ -5,7 +5,7 @@ import type React from "react"
 import { wpApi, getPageByPath } from "@/lib/wordpress/api"
 import { PageHeader } from "@/components/layout/page-header"
 import { BentoHeaderContent } from "@/components/layout/bento-header-content"
-import type { HistoireACF, TeamMemberACF, WPPost } from "@/lib/wordpress/types"
+import type { HistoireACF, TeamMemberACF, PatrimoineACF, WPPost } from "@/lib/wordpress/types"
 import { REVALIDATION } from "@/lib/constants"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 
@@ -14,6 +14,9 @@ const HistoireTimeline = dynamic(() =>
   import("@/components/histoire-timeline").then((m) => m.HistoireTimeline)
 )
 const TeamMasonry = dynamic(() => import("@/components/team-masonry").then((m) => m.TeamMasonry))
+const PatrimoinePage = dynamic(() =>
+  import("@/components/patrimoine-page").then((m) => m.PatrimoinePage)
+)
 export const revalidate = REVALIDATION.listing
 
 interface PageProps {
@@ -157,6 +160,12 @@ export default async function CatchAllPage({ params }: PageProps) {
           />
         )}
         <TeamMasonry members={teamMembers} />
+      </div>
+    )
+  } else if (page.acf?.patrimoine?.sections && page.acf.patrimoine.sections.length > 0) {
+    content = (
+      <div className="relative z-10">
+        <PatrimoinePage acf={page.acf.patrimoine as PatrimoineACF} />
       </div>
     )
   } else {

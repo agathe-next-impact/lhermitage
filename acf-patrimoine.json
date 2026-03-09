@@ -1,0 +1,251 @@
+[
+    {
+        "key": "group_patrimoine_page",
+        "title": "Page Patrimoine",
+        "fields": [
+            {
+                "key": "field_patrimoine_sections",
+                "label": "Sections",
+                "name": "sections",
+                "type": "repeater",
+                "instructions": "Sections chronologiques de la page patrimoine. Chaque section = une \u00e9poque ou th\u00e9matique.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": { "width": "", "class": "", "id": "" },
+                "layout": "block",
+                "button_label": "Ajouter une section",
+                "min": 0,
+                "max": 0,
+                "sub_fields": [
+                    {
+                        "key": "field_patrimoine_section_annee",
+                        "label": "Ann\u00e9e / P\u00e9riode",
+                        "name": "annee",
+                        "type": "text",
+                        "instructions": "Ex : 1914\u20131918, Aujourd\u2019hui, Demain",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": { "width": "25", "class": "", "id": "" },
+                        "default_value": "",
+                        "maxlength": "",
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": ""
+                    },
+                    {
+                        "key": "field_patrimoine_section_titre",
+                        "label": "Titre",
+                        "name": "titre",
+                        "type": "text",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": { "width": "75", "class": "", "id": "" },
+                        "default_value": "",
+                        "maxlength": "",
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": ""
+                    },
+                    {
+                        "key": "field_patrimoine_section_accroche",
+                        "label": "Accroche",
+                        "name": "accroche",
+                        "type": "textarea",
+                        "instructions": "Phrase d\u2019accroche affich\u00e9e en surtitre de la section",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": { "width": "", "class": "", "id": "" },
+                        "default_value": "",
+                        "maxlength": "",
+                        "rows": 2,
+                        "placeholder": "",
+                        "new_lines": ""
+                    },
+                    {
+                        "key": "field_patrimoine_section_contenu",
+                        "label": "Contenu",
+                        "name": "contenu",
+                        "type": "wysiwyg",
+                        "instructions": "Contenu riche de la section (texte, listes, liens\u2026)",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": { "width": "", "class": "", "id": "" },
+                        "default_value": "",
+                        "tabs": "all",
+                        "toolbar": "full",
+                        "media_upload": 1,
+                        "delay": 0
+                    },
+                    {
+                        "key": "field_patrimoine_section_citation",
+                        "label": "Citation",
+                        "name": "citation",
+                        "type": "textarea",
+                        "instructions": "Citation optionnelle mise en exergue",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": { "width": "", "class": "", "id": "" },
+                        "default_value": "",
+                        "maxlength": "",
+                        "rows": 2,
+                        "placeholder": "",
+                        "new_lines": ""
+                    },
+                    {
+                        "key": "field_patrimoine_section_image",
+                        "label": "Image",
+                        "name": "image",
+                        "type": "image",
+                        "instructions": "Illustration principale de la section",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": { "width": "50", "class": "", "id": "" },
+                        "return_format": "array",
+                        "library": "all",
+                        "min_width": "",
+                        "min_height": "",
+                        "min_size": "",
+                        "max_width": "",
+                        "max_height": "",
+                        "max_size": "",
+                        "mime_types": "",
+                        "preview_size": "medium"
+                    },
+                    {
+                        "key": "field_patrimoine_section_video",
+                        "label": "URL vid\u00e9o",
+                        "name": "video_url",
+                        "type": "url",
+                        "instructions": "URL YouTube ou Vimeo (optionnel)",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": { "width": "50", "class": "", "id": "" },
+                        "default_value": "",
+                        "placeholder": "https://www.youtube.com/watch?v=..."
+                    }
+                ]
+            },
+            {
+                "key": "field_patrimoine_valeurs",
+                "label": "Valeurs",
+                "name": "valeurs",
+                "type": "repeater",
+                "instructions": "Valeurs / manifeste affich\u00e9es en fin de page",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": { "width": "", "class": "", "id": "" },
+                "layout": "table",
+                "button_label": "Ajouter une valeur",
+                "min": 0,
+                "max": 0,
+                "sub_fields": [
+                    {
+                        "key": "field_patrimoine_valeur_titre",
+                        "label": "Titre",
+                        "name": "titre",
+                        "type": "text",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": { "width": "30", "class": "", "id": "" },
+                        "default_value": "",
+                        "maxlength": "",
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": ""
+                    },
+                    {
+                        "key": "field_patrimoine_valeur_descriptif",
+                        "label": "Descriptif",
+                        "name": "descriptif",
+                        "type": "textarea",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": { "width": "70", "class": "", "id": "" },
+                        "default_value": "",
+                        "maxlength": "",
+                        "rows": 2,
+                        "placeholder": "",
+                        "new_lines": ""
+                    }
+                ]
+            },
+            {
+                "key": "field_patrimoine_publics",
+                "label": "Publics / Appel \u00e0 l\u2019action",
+                "name": "publics",
+                "type": "repeater",
+                "instructions": "Tableau des publics cibles et propositions associ\u00e9es",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": { "width": "", "class": "", "id": "" },
+                "layout": "table",
+                "button_label": "Ajouter un public",
+                "min": 0,
+                "max": 0,
+                "sub_fields": [
+                    {
+                        "key": "field_patrimoine_public_nom",
+                        "label": "Public",
+                        "name": "public",
+                        "type": "text",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": { "width": "30", "class": "", "id": "" },
+                        "default_value": "",
+                        "maxlength": "",
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": ""
+                    },
+                    {
+                        "key": "field_patrimoine_public_proposition",
+                        "label": "Proposition",
+                        "name": "proposition",
+                        "type": "text",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": { "width": "70", "class": "", "id": "" },
+                        "default_value": "",
+                        "maxlength": "",
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": ""
+                    }
+                ]
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "page"
+                },
+                {
+                    "param": "page_template",
+                    "operator": "==",
+                    "value": "default"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": "Champs de la page Patrimoine (sections chronologiques, valeurs, publics). Affich\u00e9 sur toutes les pages — seules celles qui remplissent ces champs les utilisent.",
+        "show_in_rest": 0,
+        "display_title": "",
+        "show_in_graphql": 1,
+        "graphql_field_name": "pagePatrimoine",
+        "map_graphql_types_from_location_rules": 0,
+        "graphql_types": ""
+    }
+]

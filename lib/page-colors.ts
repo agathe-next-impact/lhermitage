@@ -31,6 +31,8 @@ export const PAGE_COLORS: Record<string, string> = {
   "/visite-virtuelle": BRAND_COLORS.rose,
   "/lhistoire-du-lieu": BRAND_COLORS.rose,
   "/le-domaine": BRAND_COLORS.rose,
+  "/un-patrimoine": BRAND_COLORS.rose,
+  "/patrimoine": BRAND_COLORS.rose,
 
   "/infos-pratiques": BRAND_COLORS.orange,
   "/services": BRAND_COLORS.orange,

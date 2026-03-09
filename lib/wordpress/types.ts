@@ -106,6 +106,8 @@ export interface PageACF {
       image_de_section?: WPImage
     }
   }
+  // Page Patrimoine fields
+  patrimoine?: PatrimoineACF
   [key: string]: any
 }
 
@@ -204,6 +206,22 @@ export interface HistoireACF {
     descriptif?: string
     image?: WPImage
   }>
+}
+
+export interface PatrimoineSection {
+  annee?: string
+  titre?: string
+  accroche?: string
+  contenu?: string
+  citation?: string
+  image?: WPImage
+  video_url?: string
+}
+
+export interface PatrimoineACF {
+  sections?: PatrimoineSection[]
+  valeurs?: Array<{ titre?: string; descriptif?: string }>
+  publics?: Array<{ public?: string; proposition?: string }>
 }
 
 export interface WPPost<T = any> {

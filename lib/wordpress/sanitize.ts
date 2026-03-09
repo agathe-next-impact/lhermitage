@@ -1,4 +1,4 @@
-import DOMPurify from "isomorphic-dompurify"
+import sanitize from "sanitize-html"
 
 /** Tags HTML autorisés pour le contenu WordPress */
 const ALLOWED_TAGS = [
@@ -41,24 +41,26 @@ const ALLOWED_TAGS = [
   "sub",
 ]
 
-/** Attributs autorisés par tag */
-const ALLOWED_ATTR = [
-  "href",
-  "title",
-  "target",
-  "rel",
-  "class",
-  "id",
-  "src",
-  "alt",
-  "width",
-  "height",
-  "loading",
-  "decoding",
-  "colspan",
-  "rowspan",
-  "scope",
-]
+/** Attributs autorisés (appliqués à tous les tags) */
+const ALLOWED_ATTR = {
+  "*": [
+    "href",
+    "title",
+    "target",
+    "rel",
+    "class",
+    "id",
+    "src",
+    "alt",
+    "width",
+    "height",
+    "loading",
+    "decoding",
+    "colspan",
+    "rowspan",
+    "scope",
+  ],
+}
 
 /**
  * Sanitize du HTML provenant de WordPress (content.rendered, ACF descriptif, etc.).
@@ -66,9 +68,10 @@ const ALLOWED_ATTR = [
  */
 export function sanitizeHtml(dirty: string): string {
   if (!dirty) return ""
-  return DOMPurify.sanitize(dirty, {
-    ALLOWED_TAGS,
-    ALLOWED_ATTR,
+  return sanitize(dirty, {
+    allowedTags: ALLOWED_TAGS,
+    allowedAttributes: ALLOWED_ATTR,
+    disallowedTagsMode: "discard",
   })
 }
 

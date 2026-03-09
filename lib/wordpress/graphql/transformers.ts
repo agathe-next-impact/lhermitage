@@ -231,18 +231,22 @@ export function transformPage(
     if (dsData.bandeau) {
       pageAcf.bandeau = {
         titre: dsData.bandeau.titre,
-        cta: dsData.bandeau.cta ? {
-          url: transformWordPressUrl(dsData.bandeau.cta.url),
-          title: dsData.bandeau.cta.title,
-          target: dsData.bandeau.cta.target,
-        } : undefined,
-        galerie: dsData.bandeau.images?.nodes ? {
-          images: dsData.bandeau.images.nodes.map((img: any) => ({
-            ID: img.databaseId,
-            url: rewriteWordPressAssetUrl(img.sourceUrl),
-            alt: img.altText || "",
-          })),
-        } : undefined,
+        cta: dsData.bandeau.cta
+          ? {
+              url: transformWordPressUrl(dsData.bandeau.cta.url),
+              title: dsData.bandeau.cta.title,
+              target: dsData.bandeau.cta.target,
+            }
+          : undefined,
+        galerie: dsData.bandeau.images?.nodes
+          ? {
+              images: dsData.bandeau.images.nodes.map((img: any) => ({
+                ID: img.databaseId,
+                url: rewriteWordPressAssetUrl(img.sourceUrl),
+                alt: img.altText || "",
+              })),
+            }
+          : undefined,
       }
     }
 
@@ -292,6 +296,24 @@ export function transformPage(
             image_de_section: transformAcfMediaEdge(psData.structuresHebergees.imageDeSection),
           }
         : undefined,
+    }
+  }
+
+  // "pagePatrimoine" — patrimoine page sections, valeurs, publics
+  const patData = gqlPage.pagePatrimoine
+  if (patData?.sections && Array.isArray(patData.sections) && patData.sections.length > 0) {
+    pageAcf.patrimoine = {
+      sections: patData.sections.map((item: any) => ({
+        annee: item.annee,
+        titre: item.titre,
+        accroche: item.accroche,
+        contenu: transformContentLinks(item.contenu || ""),
+        citation: item.citation,
+        image: item.image ? transformAcfMediaEdge(item.image) : undefined,
+        video_url: item.videoUrl,
+      })),
+      valeurs: patData.valeurs || [],
+      publics: patData.publics || [],
     }
   }
 

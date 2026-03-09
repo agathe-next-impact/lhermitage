@@ -127,6 +127,29 @@ export const PAGE_FIELDS = gql`
         }
       }
     }
+    pagePatrimoine {
+      sections {
+        annee
+        titre
+        accroche
+        contenu
+        citation
+        image {
+          node {
+            ...ImageFields
+          }
+        }
+        videoUrl
+      }
+      valeurs {
+        titre
+        descriptif
+      }
+      publics {
+        public
+        proposition
+      }
+    }
   }
   ${FEATURED_IMAGE_FRAGMENT}
 `
