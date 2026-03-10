@@ -81,6 +81,7 @@ export async function generateStaticParams() {
       // otherwise the catch-all SSG overwrites them with generic WordPress content
       const dedicatedRoutes = [
         "hebergements",
+        "reserver",
         "sejours-collectifs",
         "sejours-collectifs/activites",
         "sejours-collectifs/nos-sejours",
