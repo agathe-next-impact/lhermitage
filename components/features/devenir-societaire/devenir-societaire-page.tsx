@@ -5,7 +5,10 @@ import { DevenirSocietaireMotivations } from "@/components/features/devenir-soci
 import { WordPressLink } from "@/components/content/wordpress-link"
 import Image from "next/image"
 import { motion } from "framer-motion"
+import { usePathname } from "next/navigation"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
+import { getColorForPath } from "@/lib/page-colors"
+import { useMenuColor } from "@/components/menu-colors-provider"
 
 interface Props {
   page: any // WordPress page with ACF data
@@ -35,7 +38,9 @@ export function DevenirSocietairePage({ page }: Props) {
     societaireData.motivation_4 ? { number: 4, text: societaireData.motivation_4 } : null,
   ].filter(Boolean) as Array<{ number: number; text: string }>
 
-  const sectionColor = "#E75754"
+  const pathname = usePathname()
+  const menuColor = useMenuColor(pathname)
+  const sectionColor = menuColor || getColorForPath(pathname) || "#E75754"
   const greenColor = "#78AD7D"
 
   const pourquoiRejoindreColors = [
@@ -47,30 +52,19 @@ export function DevenirSocietairePage({ page }: Props) {
   ]
 
   return (
-    <div className="overflow-x-hidden px-2">
-      <div className="max-w-7xl mx-auto space-y-16">
+    <div className="overflow-x-hidden pl-4 pt-4">
+      <div className="max-w-7xl space-y-16">
         {/* Qu'est-ce que la SCIC */}
         {scicInfo.titre &&
           scicInfo.caracteristiques_de_la_scic &&
           Array.isArray(scicInfo.caracteristiques_de_la_scic) &&
           scicInfo.caracteristiques_de_la_scic.length > 0 && (
             <div className="space-y-6 mt-2">
-              <h3
-                className="text-2xl md:text-3xl font-bold uppercase"
-                style={{ color: sectionColor }}
-              >
-                {scicInfo.titre}
-              </h3>
               <div className="space-y-6">
                 {scicInfo.caracteristiques_de_la_scic.map((item: any, idx: number) => (
-                  <div key={idx} className="bg-brand-gray/5 p-4 md:p-6 rounded-lg">
+                  <div key={idx} className="bg-brand-gray/5 rounded-lg space-y-4">
                     {item.caracteristique?.titre && (
-                      <h4
-                        className="font-bold mb-2 uppercase tracking-wide text-base md:text-lg"
-                        style={{ color: sectionColor }}
-                      >
-                        {item.caracteristique.titre}
-                      </h4>
+                      <h3 className="text-2xl md:text-3xl">{item.caracteristique.titre}</h3>
                     )}
                     {item.caracteristique?.descriptif && (
                       <div
@@ -89,10 +83,7 @@ export function DevenirSocietairePage({ page }: Props) {
         {/* Pourquoi rejoindre */}
         {pourquoiRejoindre.titre && (
           <div className="space-y-6">
-            <h3
-              className="text-2xl md:text-3xl font-bold uppercase"
-              style={{ color: sectionColor }}
-            >
+            <h3 className="text-2xl md:text-3xl" style={{ color: sectionColor }}>
               {pourquoiRejoindre.titre}
             </h3>
             {pourquoiRejoindre.raisons &&
@@ -179,10 +170,7 @@ export function DevenirSocietairePage({ page }: Props) {
         {motivations.length > 0 && (
           <div className="space-y-6">
             {societaireData.titre && (
-              <h3
-                className="text-2xl md:text-3xl font-bold uppercase"
-                style={{ color: sectionColor }}
-              >
+              <h3 className="text-2xl md:text-3xl" style={{ color: sectionColor }}>
                 {societaireData.titre}
               </h3>
             )}
@@ -197,7 +185,7 @@ export function DevenirSocietairePage({ page }: Props) {
           style={{ backgroundColor: greenColor }}
         >
           <div className="max-w-7xl px-4 md:px-8 lg:px-12">
-            <h3 className="text-2xl md:text-3xl font-bold uppercase" style={{ color: greenColor }}>
+            <h3 className="text-2xl md:text-3xl" style={{ color: greenColor }}>
               Informations de sociétariat
             </h3>
             <div className="grid grid-cols-1 gap-6 md:gap-8">

@@ -36,7 +36,8 @@ export function BentoHeaderContent({
   const pathname = usePathname()
   const lBlockRef = useRef<HTMLDivElement>(null)
   const menuColor = useMenuColor(pathname)
-  const mainBlobColor = color || menuColor || getColorForPath(pathname) || getHashColor(title || pathname)
+  const mainBlobColor =
+    color || menuColor || getColorForPath(pathname) || getHashColor(title || pathname)
 
   return (
     <div className={`w-[calc(100%-1rem)] mt-2 mx-auto relative ${className}`}>
@@ -93,7 +94,7 @@ export function BentoHeaderContent({
           {/* Titre en bas-gauche du L */}
           {title && (
             <div className="absolute bottom-0 left-0 w-full md:w-1/4 h-36 p-4 md:p-6 flex flex-col justify-end">
-              <h2 className="font-sans sm:text-lg md:text-xl lg:text-3xl font-extrabold uppercase text-white leading-tight drop-shadow-sm">
+              <h2 className="font-sans sm:text-lg md:text-xl lg:text-3xl text-white leading-tight drop-shadow-sm">
                 {title}
               </h2>
               {subtitle && <p className="text-xs md:text-sm text-white/80 mt-2">{subtitle}</p>}

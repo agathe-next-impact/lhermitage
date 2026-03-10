@@ -54,6 +54,12 @@ export const PAGE_FIELDS = gql`
     pageDAccueil {
       slogan
       video
+      videoAutoHerbegee {
+        node {
+          mediaItemUrl
+          mimeType
+        }
+      }
     }
     pageHistorique {
       timeline {
@@ -128,6 +134,10 @@ export const PAGE_FIELDS = gql`
       }
     }
     pagePatrimoine {
+      introduction {
+        citation
+        texte
+      }
       sections {
         annee
         titre

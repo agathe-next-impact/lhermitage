@@ -83,7 +83,7 @@ export function TeamMasonry({ members }: TeamMasonryProps) {
 
                   {activitePrincipale && (
                     <motion.div>
-                      <p className="md:text-lg font-black text-brand-teal uppercase">
+                      <p className="md:text-lg font-black text-brand-coral uppercase">
                         {activitePrincipale}
                       </p>
                     </motion.div>

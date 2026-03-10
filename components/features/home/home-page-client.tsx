@@ -19,6 +19,7 @@ export function HomePageClient({
   evenements,
 }: HomePageClientProps) {
   const videoUrl = homepage.acf?.video || null
+  const selfHostedVideo = homepage.acf?.video_auto_hebergee || null
 
   return (
     <div className="mt-[90px] flex flex-col">
@@ -31,6 +32,16 @@ export function HomePageClient({
         >
           {videoUrl ? (
             <VideoBackground videoUrl={videoUrl} />
+          ) : selfHostedVideo ? (
+            <video
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover z-0"
+            >
+              <source src={selfHostedVideo.url} type={selfHostedVideo.mime_type} />
+            </video>
           ) : (
             <Image
               src="/rural-retreat-center-in-nature-with-mountains.jpg"

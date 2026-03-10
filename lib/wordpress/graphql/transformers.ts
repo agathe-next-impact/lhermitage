@@ -199,6 +199,13 @@ export function transformPage(
   if (accueilData) {
     if (accueilData.slogan) pageAcf.slogan = accueilData.slogan
     if (accueilData.video) pageAcf.video = accueilData.video
+    const selfHosted = accueilData.videoAutoHerbegee?.node
+    if (selfHosted?.mediaItemUrl) {
+      pageAcf.video_auto_hebergee = {
+        url: selfHosted.mediaItemUrl,
+        mime_type: selfHosted.mimeType || "video/mp4",
+      }
+    }
   }
 
   // Try page-specific ACF field groups that may have sous-titre
@@ -303,6 +310,12 @@ export function transformPage(
   const patData = gqlPage.pagePatrimoine
   if (patData?.sections && Array.isArray(patData.sections) && patData.sections.length > 0) {
     pageAcf.patrimoine = {
+      introduction: patData.introduction
+        ? {
+            citation: patData.introduction.citation,
+            texte: transformContentLinks(patData.introduction.texte || ""),
+          }
+        : undefined,
       sections: patData.sections.map((item: any) => ({
         annee: item.annee,
         titre: item.titre,

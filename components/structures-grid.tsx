@@ -102,7 +102,7 @@ function FillerCard({ count, color, image }: { count: number; color: string; ima
         alt=""
         width={340}
         height={120}
-        className="object-contain opacity-30 brightness-0 invert"
+        className="object-contain opacity-30 brightness-0 invert pr-4 pb-4"
       />
     </div>
   )
@@ -122,13 +122,13 @@ export function StructuresGrid({
       {internalStructures.length > 0 && (
         <BentoHeaderContent
           title={sectionInternes?.titre_de_section || "Structures internes"}
-          color={BRAND_COLORS.green}
+          color={BRAND_COLORS.rose}
           columnImage={sectionInternes?.image_de_section?.url}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 pt-2 pl-2">
             {internalStructures.map((structure) => {
               const categorySlug = structure._embedded?.["wp:term"]?.[0]?.[0]?.slug
-              const categoryColor = categorySlug ? getCategoryColor(categorySlug) : "#e75754"
+              const categoryColor = BRAND_COLORS.rose
 
               return (
                 <StructureCard
@@ -138,7 +138,7 @@ export function StructuresGrid({
                 />
               )
             })}
-            <FillerCard count={internalStructures.length} color={BRAND_COLORS.coral} />
+            <FillerCard count={internalStructures.length} color={BRAND_COLORS.green} />
           </div>
         </BentoHeaderContent>
       )}
@@ -147,7 +147,7 @@ export function StructuresGrid({
       {hostedStructures.length > 0 && (
         <BentoHeaderContent
           title={sectionHebergees?.titre_de_section || "Structures hébergées"}
-          color={BRAND_COLORS.green}
+          color={BRAND_COLORS.teal}
           columnImage={sectionHebergees?.image_de_section?.url}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 pt-2 pl-2">

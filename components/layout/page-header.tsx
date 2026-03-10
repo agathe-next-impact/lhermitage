@@ -112,7 +112,7 @@ export function PageHeader({
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <h1 className="font-sans text-xs sm:text-sm md:text-lg lg:text-xl xl:text-4xl font-extrabold uppercase text-white leading-tight drop-shadow-sm">
+            <h1 className="font-sans text-xs sm:text-sm md:text-lg lg:text-xl xl:text-4xl text-white leading-tight drop-shadow-sm">
               {title}
             </h1>
           </motion.div>

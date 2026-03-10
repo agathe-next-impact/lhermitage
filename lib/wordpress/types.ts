@@ -59,6 +59,7 @@ export interface PageACF {
   // Homepage fields
   slogan?: string
   video?: string
+  video_auto_hebergee?: { url: string; mime_type: string }
   // Hero section
   hero?: {
     "sous-titre"?: string
@@ -219,6 +220,10 @@ export interface PatrimoineSection {
 }
 
 export interface PatrimoineACF {
+  introduction?: {
+    citation?: string
+    texte?: string
+  }
   sections?: PatrimoineSection[]
   valeurs?: Array<{ titre?: string; descriptif?: string }>
   publics?: Array<{ public?: string; proposition?: string }>
