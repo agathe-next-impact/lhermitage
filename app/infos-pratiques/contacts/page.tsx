@@ -6,7 +6,7 @@ import { wpApi } from "@/lib/wordpress/api"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 
 export default async function ContactsPage() {
-  const page = await wpApi.getPageBySlug("contacts")
+  const page = await wpApi.getPageByPath("infos-pratiques/contacts")
 
   return (
     <div>
@@ -57,7 +57,10 @@ export default async function ContactsPage() {
           </div>
 
           {page?.content.rendered && (
-            <div className="prose prose-stone max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }} />
+            <div
+              className="prose prose-stone max-w-none"
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }}
+            />
           )}
         </div>
       </BentoHeaderContent>

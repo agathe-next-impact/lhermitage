@@ -12,6 +12,7 @@ import type {
   EvenementACF,
   PartenaireACF,
   EspaceDeTravailACF,
+  SeminairesACF,
 } from "./types"
 import { gqlRequest, gqlRequestList } from "./graphql/client"
 import {
@@ -25,10 +26,16 @@ import {
   transformTeamMemberAcf,
   transformEspaceDeTravailAcf,
   transformSejourAcf,
+  transformSeminairesData,
   transformMenuItems,
   transformTerm,
 } from "./graphql/transformers"
-import { GET_PAGE_BY_SLUG, GET_PAGE_BY_ID, GET_ALL_PAGES } from "./graphql/queries/pages"
+import {
+  GET_PAGE_BY_SLUG,
+  GET_PAGE_BY_ID,
+  GET_ALL_PAGES,
+  GET_ALL_PAGE_PATHS,
+} from "./graphql/queries/pages"
 import {
   GET_HEBERGEMENTS,
   GET_HEBERGEMENT_BY_SLUG,
@@ -42,6 +49,7 @@ import {
   GET_TEAM_MEMBERS,
 } from "./graphql/queries/posts"
 import { GET_SEJOURS, GET_SEJOUR_BY_SLUG } from "./graphql/queries/sejours"
+import { GET_PAGE_SEMINAIRES } from "./graphql/queries/seminaires"
 import { GET_MENU } from "./graphql/queries/menu"
 import { GET_TYPES_DE_PARTENAIRE } from "./graphql/queries/taxonomy"
 import { rewriteWordPressAssetUrl } from "./url-transform"
@@ -78,6 +86,35 @@ export class WordPressAPI {
     return allPages
   }
 
+  // Lightweight version of getPages() — only fetches link/slug for generateStaticParams
+  async getPagePaths(): Promise<{ link: string; slug: string }[]> {
+    const allPaths: { link: string; slug: string }[] = []
+    let hasMore = true
+    let after: string | null = null
+
+    type PathsResponse = {
+      pages: {
+        pageInfo: { hasNextPage: boolean; endCursor: string }
+        nodes: { databaseId: number; slug: string; link: string; status: string }[]
+      }
+    }
+
+    while (hasMore) {
+      const data: PathsResponse = await gqlRequestList<PathsResponse>(GET_ALL_PAGE_PATHS, {
+        first: 100,
+        after,
+      })
+
+      const nodes = data.pages?.nodes || []
+      allPaths.push(...nodes.map((n) => ({ link: n.link, slug: n.slug })))
+
+      hasMore = data.pages?.pageInfo?.hasNextPage || false
+      after = data.pages?.pageInfo?.endCursor || null
+    }
+
+    return allPaths
+  }
+
   async getPageBySlug(slug: string): Promise<WPPage | null> {
     try {
       const data = await gqlRequest<{ page: any | null }>(GET_PAGE_BY_SLUG, { slug })
@@ -90,17 +127,21 @@ export class WordPressAPI {
 
   async getPageByPath(path: string): Promise<WPPage | null> {
     const cleanPath = path.replace(/^\/+|\/+$/g, "")
-    const segments = cleanPath.split("/").filter(Boolean)
-    const slug = segments[segments.length - 1]
+    if (!cleanPath) return null
 
-    if (!slug) return null
-
-    // WPGraphQL URI type handles full paths
-    // Try full path first, then fall back to slug only
+    // WPGraphQL URI idType handles full paths — use it directly.
+    // No slug-only fallback to avoid matching a wrong page with the same slug
+    // under a different parent hierarchy.
     const page = await this.getPageBySlug(cleanPath)
     if (page) return page
 
-    return this.getPageBySlug(slug)
+    // Only fall back to slug-only for single-segment paths (no ambiguity)
+    const segments = cleanPath.split("/").filter(Boolean)
+    if (segments.length > 1) {
+      return this.getPageBySlug(segments[segments.length - 1])
+    }
+
+    return null
   }
 
   async getPageById(id: number): Promise<WPPage> {
@@ -340,6 +381,19 @@ export class WordPressAPI {
     } catch (error) {
       logger.error("Error fetching team members:", error)
       return []
+    }
+  }
+
+  // --- Séminaires (separate query to avoid breaking pages if ACF not imported) ---
+
+  async getSeminairesData(path: string): Promise<SeminairesACF | null> {
+    try {
+      const data = await gqlRequest<{ page: any | null }>(GET_PAGE_SEMINAIRES, { slug: path })
+      if (!data.page?.pageSeminaires) return null
+      return transformSeminairesData(data.page.pageSeminaires)
+    } catch {
+      // ACF field group not yet imported — silently return null
+      return null
     }
   }
 

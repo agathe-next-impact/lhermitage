@@ -6,7 +6,7 @@ import { wpApi } from "@/lib/wordpress/api"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 
 export default async function HorairesPage() {
-  const page = await wpApi.getPageBySlug("jours-et-horaires-douverture")
+  const page = await wpApi.getPageByPath("infos-pratiques/jours-et-horaires-douverture")
 
   return (
     <div>

@@ -6,7 +6,7 @@ import { PartenairesClient } from "@/components/partenaires-client"
 
 export default async function PartenairesPage() {
   const [page, partenaires, categories] = await Promise.all([
-    wpApi.getPageBySlug("partenaires"),
+    wpApi.getPageByPath("ecosysteme-innovant/partenaires"),
     wpApi.getPartenaires(),
     wpApi.getTaxonomyTerms("type-de-partenaire"),
   ])

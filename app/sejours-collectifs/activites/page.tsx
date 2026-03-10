@@ -21,7 +21,7 @@ function getCategoryColor(slug: string): string {
 
 export default async function ActivitesPage() {
   const [page, activites] = await Promise.all([
-    wpApi.getPageBySlug("activites"),
+    wpApi.getPageByPath("sejours-collectifs/activites"),
     wpApi.getActivites(),
   ])
 

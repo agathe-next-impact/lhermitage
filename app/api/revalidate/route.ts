@@ -16,7 +16,7 @@ import { NextRequest, NextResponse } from "next/server"
 const POST_TYPE_PATHS: Record<string, { listing: string; detail: string }> = {
   hebergement: { listing: "/hebergements", detail: "/hebergement" },
   activite: { listing: "/sejours-collectifs/activites", detail: "/activite" },
-  sejour: { listing: "/sejours-collectifs/nos-sejours", detail: "/sejour" },
+  sejour: { listing: "/sejours-collectifs/packs-de-sejours", detail: "/sejour" },
   structure: { listing: "/ecosysteme-innovant/structures", detail: "/structure" },
   evenement: { listing: "/ecosysteme-innovant/evenements", detail: "" },
   partenaire: { listing: "/ecosysteme-innovant/partenaires", detail: "" },

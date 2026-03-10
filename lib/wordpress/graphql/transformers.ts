@@ -13,6 +13,8 @@ import type {
   PartenaireACF,
   TeamMemberACF,
   EspaceDeTravailACF,
+  ServiceACF,
+  SeminairesACF,
   GlobalOptionsACF,
   WPLink,
   WPGoogleMap,
@@ -497,6 +499,121 @@ export function transformEspaceDeTravailAcf(gqlPost: Record<string, any>): Espac
         }
       : undefined,
     localisation: transformGoogleMap(merged.localisation),
+  }
+}
+
+export function transformServiceAcf(_gqlPost: Record<string, any>): ServiceACF {
+  // Service CPT has no dedicated ACF field group — title serves as nom
+  return {
+    nom: _gqlPost.title || undefined,
+  }
+}
+
+// --- Séminaires page transformer (standalone, called from separate query) ---
+
+export function transformSeminairesData(semData: Record<string, any>): SeminairesACF | null {
+  const hero = semData.heroSeminaires
+  const promesse = semData.promesse
+  const espaces = semData.espacesTravail
+  const activites = semData.activitesTeambuilding
+  const resto = semData.restauration
+  const hebs = semData.hebergementsSeminaires
+  const temos = semData.temoignages
+  const contact = semData.contact
+
+  const hasSeminairesContent =
+    hero?.accroche ||
+    promesse?.titre ||
+    espaces?.titre ||
+    activites?.titre ||
+    resto?.services?.nodes?.length
+
+  if (!hasSeminairesContent) return null
+
+  return {
+    hero_seminaires: hero
+      ? {
+          video: hero.video?.node?.mediaItemUrl
+            ? {
+                url: rewriteWordPressAssetUrl(hero.video.node.mediaItemUrl),
+                mime_type: hero.video.node.mimeType || "video/mp4",
+              }
+            : undefined,
+          image: transformAcfMediaEdge(hero.image),
+          accroche: hero.accroche,
+          sous_titre: hero.sousTitre,
+          cta_texte: hero.ctaTexte,
+          cta_lien: transformLink(hero.ctaLien),
+        }
+      : undefined,
+    promesse: promesse
+      ? {
+          titre: promesse.titre,
+          storytelling: transformContentLinks(promesse.storytelling || ""),
+          image: transformAcfMediaEdge(promesse.image),
+          chiffres_cles: promesse.chiffresCles || [],
+        }
+      : undefined,
+    espaces_travail: espaces
+      ? {
+          titre: espaces.titre,
+          introduction: espaces.introduction,
+          espaces: (espaces.espaces?.nodes || []).map((node: any) =>
+            transformPost(node, transformEspaceDeTravailAcf(node), "espace_de_travail")
+          ),
+          facilitation: espaces.facilitation
+            ? {
+                titre: espaces.facilitation.titre,
+                contenu: transformContentLinks(espaces.facilitation.contenu || ""),
+                badge: espaces.facilitation.badge,
+              }
+            : undefined,
+        }
+      : undefined,
+    activites_teambuilding: activites
+      ? {
+          titre: activites.titre,
+          sous_titre: activites.sousTitre,
+          activites: (activites.activites?.nodes || []).map((node: any) =>
+            transformPost(node, transformActiviteAcf(node), "activite")
+          ),
+        }
+      : undefined,
+    restauration: resto
+      ? {
+          services: (resto.services?.nodes || []).map((node: any) =>
+            transformPost(node, transformServiceAcf(node), "service")
+          ),
+        }
+      : undefined,
+    hebergements_seminaires: hebs
+      ? {
+          titre: hebs.titre,
+          sous_titre: hebs.sousTitre,
+          hebergements: (hebs.hebergements?.nodes || []).map((node: any) =>
+            transformPost(node, transformHebergementAcf(node), "hebergement")
+          ),
+        }
+      : undefined,
+    temoignages: temos
+      ? {
+          titre: temos.titre,
+          citations: temos.citations || [],
+          logos: transformAcfMediaConnection(temos.logos),
+        }
+      : undefined,
+    contact: contact
+      ? {
+          titre: contact.titre,
+          conciergerie: transformContentLinks(contact.conciergerie || ""),
+          nom_contact: contact.nomContact,
+          email: contact.email,
+          telephone: contact.telephone,
+          photo: transformAcfMediaEdge(contact.photo),
+          cta_texte: contact.ctaTexte,
+          cta_lien: transformLink(contact.ctaLien),
+        }
+      : undefined,
   }
 }
 

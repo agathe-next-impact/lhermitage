@@ -5,9 +5,33 @@ import type React from "react"
 import { wpApi, getPageByPath } from "@/lib/wordpress/api"
 import { PageHeader } from "@/components/layout/page-header"
 import { BentoHeaderContent } from "@/components/layout/bento-header-content"
-import type { HistoireACF, TeamMemberACF, PatrimoineACF, WPPost } from "@/lib/wordpress/types"
+import type {
+  HistoireACF,
+  TeamMemberACF,
+  PatrimoineACF,
+  SeminairesACF,
+  WPPost,
+} from "@/lib/wordpress/types"
 import { REVALIDATION } from "@/lib/constants"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
+
+// Routes with dedicated page.tsx files — excluded from catch-all SSG
+const DEDICATED_ROUTES = [
+  "hebergements",
+  "reserver",
+  "sejours-collectifs",
+  "sejours-collectifs/activites",
+  "sejours-collectifs/packs-de-sejours",
+  "sejours-individuels",
+  "ecosysteme-innovant/structures",
+  "ecosysteme-innovant/partenaires",
+  "ecosysteme-innovant/evenements",
+  "services",
+  "infos-pratiques/contacts",
+  "infos-pratiques/jours-et-horaires-douverture",
+  "infos-pratiques/localisation",
+  "participer/devenir-societaire",
+]
 
 // Code-split: ces composants lourds ne sont chargés que pour leur page spécifique
 const HistoireTimeline = dynamic(() =>
@@ -16,6 +40,9 @@ const HistoireTimeline = dynamic(() =>
 const TeamMasonry = dynamic(() => import("@/components/team-masonry").then((m) => m.TeamMasonry))
 const PatrimoinePage = dynamic(() =>
   import("@/components/patrimoine-page").then((m) => m.PatrimoinePage)
+)
+const SeminairesPage = dynamic(() =>
+  import("@/components/seminaires-page").then((m) => m.SeminairesPage)
 )
 export const revalidate = REVALIDATION.listing
 
@@ -70,48 +97,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export async function generateStaticParams() {
   try {
-    const pages = await wpApi.getPages()
+    // Use lightweight query — only fetches link/slug, not full ACF fields
+    const pages = await wpApi.getPagePaths()
+    const wpBaseUrl =
+      process.env.WP_API_URL?.replace("/wp-json/wp/v2", "") || "https://admin.hermitagelelab.com"
 
-    const filteredPages = pages.filter((page) => {
-      const wpBaseUrl =
-        process.env.WP_API_URL?.replace("/wp-json/wp/v2", "") || "https://admin.hermitagelelab.com"
-      const pagePath = page.link.replace(wpBaseUrl, "").replace(/^\/+|\/+$/g, "")
-
-      // Exclude paths that have dedicated page.tsx routes —
-      // otherwise the catch-all SSG overwrites them with generic WordPress content
-      const dedicatedRoutes = [
-        "hebergements",
-        "reserver",
-        "sejours-collectifs",
-        "sejours-collectifs/activites",
-        "sejours-collectifs/nos-sejours",
-        "sejours-collectifs/packs-de-sejours",
-        "sejours-individuels",
-        "ecosysteme-innovant/structures",
-        "ecosysteme-innovant/partenaires",
-        "ecosysteme-innovant/evenements",
-        "services",
-        "infos-pratiques/contacts",
-        "infos-pratiques/jours-et-horaires-douverture",
-        "infos-pratiques/localisation",
-        "participer/devenir-societaire",
-      ]
-
-      if (!pagePath || dedicatedRoutes.includes(pagePath)) return false
-
-      return true
-    })
-
-    return filteredPages.map((page) => {
-      const wpBaseUrl =
-        process.env.WP_API_URL?.replace("/wp-json/wp/v2", "") || "https://admin.hermitagelelab.com"
-      const pagePath = page.link.replace(wpBaseUrl, "").replace(/^\/+|\/+$/g, "")
-      const slugArray = pagePath.split("/").filter(Boolean)
-
-      return {
-        slug: slugArray,
-      }
-    })
+    return pages
+      .map((page) => page.link.replace(wpBaseUrl, "").replace(/^\/+|\/+$/g, ""))
+      .filter((pagePath) => pagePath && !DEDICATED_ROUTES.includes(pagePath))
+      .map((pagePath) => ({
+        slug: pagePath.split("/").filter(Boolean),
+      }))
   } catch (error) {
     console.error("Error in generateStaticParams:", error)
     return []
@@ -127,6 +123,7 @@ export default async function CatchAllPage({ params }: PageProps) {
   const isEquipePage = fullPath === "tiers-lieu-rural/lequipe"
   let page = null
   let teamMembers: WPPost<TeamMemberACF>[] = []
+  let seminairesData: SeminairesACF | null = null
 
   try {
     const [fetchedPage, fetchedTeamMembers] = await Promise.all([
@@ -135,12 +132,22 @@ export default async function CatchAllPage({ params }: PageProps) {
     ])
     page = fetchedPage
     teamMembers = fetchedTeamMembers
+
+    // Only fetch séminaires data if the page exists (avoids useless GraphQL call on every catch-all page)
+    if (page) {
+      seminairesData = await wpApi.getSeminairesData(fullPath)
+    }
   } catch (error) {
     notFound()
   }
 
   if (!page) {
     notFound()
+  }
+
+  // Séminaires page has its own full-screen hero — return early without PageHeader wrapper
+  if (seminairesData) {
+    return <SeminairesPage acf={seminairesData} />
   }
 
   let content: React.ReactNode = null

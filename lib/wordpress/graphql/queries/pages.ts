@@ -21,11 +21,7 @@ export const GET_PAGE_BY_ID = gql`
 
 export const GET_ALL_PAGES = gql`
   query GetAllPages($first: Int!, $after: String) {
-    pages(
-      first: $first
-      after: $after
-      where: { orderby: { field: MENU_ORDER, order: ASC } }
-    ) {
+    pages(first: $first, after: $after, where: { orderby: { field: MENU_ORDER, order: ASC } }) {
       pageInfo {
         hasNextPage
         endCursor
@@ -36,4 +32,22 @@ export const GET_ALL_PAGES = gql`
     }
   }
   ${PAGE_FIELDS}
+`
+
+// Lightweight query for generateStaticParams — only fetches link, no ACF fields
+export const GET_ALL_PAGE_PATHS = gql`
+  query GetAllPagePaths($first: Int!, $after: String) {
+    pages(first: $first, after: $after, where: { orderby: { field: MENU_ORDER, order: ASC } }) {
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      nodes {
+        databaseId
+        slug
+        link
+        status
+      }
+    }
+  }
 `

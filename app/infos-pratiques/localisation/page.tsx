@@ -6,7 +6,7 @@ import { wpApi } from "@/lib/wordpress/api"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 
 export default async function LocalisationPage() {
-  const page = await wpApi.getPageBySlug("localisation")
+  const page = await wpApi.getPageByPath("infos-pratiques/localisation")
 
   return (
     <div>
@@ -33,7 +33,9 @@ export default async function LocalisationPage() {
                 </div>
                 <div>
                   <h3 className="mb-2 font-semibold">En train</h3>
-                  <p className="text-muted-foreground">Gare la plus proche et navettes disponibles</p>
+                  <p className="text-muted-foreground">
+                    Gare la plus proche et navettes disponibles
+                  </p>
                 </div>
                 <div>
                   <h3 className="mb-2 font-semibold">En avion</h3>

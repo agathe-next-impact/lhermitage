@@ -109,10 +109,17 @@ export interface PageACF {
   }
   // Page Patrimoine fields
   patrimoine?: PatrimoineACF
+  // Page Séminaires fields
+  seminaires?: SeminairesACF
   [key: string]: any
 }
 
 export interface ActiviteACF {
+  nom?: string
+  descriptif?: string
+}
+
+export interface ServiceACF {
   nom?: string
   descriptif?: string
 }
@@ -207,6 +214,71 @@ export interface HistoireACF {
     descriptif?: string
     image?: WPImage
   }>
+}
+
+/* ─── Séminaires & Séjours Entreprises ─── */
+
+export interface SeminairesACF {
+  hero_seminaires?: {
+    video?: { url: string; mime_type?: string }
+    image?: WPImage
+    accroche?: string
+    sous_titre?: string
+    cta_texte?: string
+    cta_lien?: WPLink
+  }
+  promesse?: {
+    titre?: string
+    storytelling?: string
+    image?: WPImage
+    chiffres_cles?: Array<{
+      valeur?: string
+      unite?: string
+      label?: string
+    }>
+  }
+  espaces_travail?: {
+    titre?: string
+    introduction?: string
+    espaces?: WPPost<EspaceDeTravailACF>[]
+    facilitation?: {
+      titre?: string
+      contenu?: string
+      badge?: string
+    }
+  }
+  activites_teambuilding?: {
+    titre?: string
+    sous_titre?: string
+    activites?: WPPost<ActiviteACF>[]
+  }
+  restauration?: {
+    services?: WPPost<ServiceACF>[]
+  }
+  hebergements_seminaires?: {
+    titre?: string
+    sous_titre?: string
+    hebergements?: WPPost<HebergementACF>[]
+  }
+  temoignages?: {
+    titre?: string
+    citations?: Array<{
+      citation?: string
+      auteur?: string
+      role?: string
+    }>
+    logos?: WPImage[]
+  }
+  contact?: {
+    titre?: string
+    conciergerie?: string
+    nom_contact?: string
+    email?: string
+    telephone?: string
+    photo?: WPImage
+    cta_texte?: string
+    cta_lien?: WPLink
+  }
 }
 
 export interface PatrimoineSection {

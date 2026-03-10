@@ -6,7 +6,10 @@ import { wpApi } from "@/lib/wordpress/api"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 
 export default async function EvenementsPage() {
-  const [page, evenements] = await Promise.all([wpApi.getPageBySlug("evenements"), wpApi.getEvenements()])
+  const [page, evenements] = await Promise.all([
+    wpApi.getPageByPath("ecosysteme-innovant/evenements"),
+    wpApi.getEvenements(),
+  ])
 
   return (
     <div>

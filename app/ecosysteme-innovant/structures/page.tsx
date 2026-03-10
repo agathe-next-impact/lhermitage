@@ -8,7 +8,7 @@ export const revalidate = REVALIDATION.frequent
 
 export default async function StructuresPage() {
   const [page, structures] = await Promise.all([
-    wpApi.getPageBySlug("structures"),
+    wpApi.getPageByPath("ecosysteme-innovant/structures"),
     wpApi.getStructures(),
   ])
 
