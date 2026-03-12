@@ -121,6 +121,7 @@ export default async function CatchAllPage({ params }: PageProps) {
 
   const isHistoirePage = fullPath === "tiers-lieu-rural/lhistoire-du-lieu"
   const isEquipePage = fullPath === "tiers-lieu-rural/lequipe"
+  const isSeminairesPage = fullPath.startsWith("seminaires")
   let page = null
   let teamMembers: WPPost<TeamMemberACF>[] = []
   let seminairesData: SeminairesACF | null = null
@@ -133,8 +134,8 @@ export default async function CatchAllPage({ params }: PageProps) {
     page = fetchedPage
     teamMembers = fetchedTeamMembers
 
-    // Only fetch séminaires data if the page exists (avoids useless GraphQL call on every catch-all page)
-    if (page) {
+    // Only fetch séminaires data for séminaires pages (avoids overriding patrimoine and other pages)
+    if (page && isSeminairesPage) {
       seminairesData = await wpApi.getSeminairesData(fullPath)
     }
   } catch (error) {
