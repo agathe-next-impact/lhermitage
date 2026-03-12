@@ -391,6 +391,38 @@ export interface WPTerm {
   taxonomy: string
 }
 
+export interface FooterLink {
+  label: string
+  url: string
+}
+
+export interface FooterColumn {
+  title: string
+  links: FooterLink[]
+}
+
+export interface FooterOptions {
+  logo: {
+    url: string
+    alt: string
+  }
+  description: string
+  copyright: string
+  social: {
+    facebook?: string
+    instagram?: string
+    linkedin?: string
+    youtube?: string
+    twitter?: string
+  }
+  columns: FooterColumn[]
+  contact: {
+    adresse: string
+    telephone: string
+    email: string
+  }
+}
+
 export interface TeamMemberACF {
   binome_seul?: boolean // true = binôme, false = seul
   descriptif?: string

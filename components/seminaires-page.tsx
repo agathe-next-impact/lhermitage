@@ -1,6 +1,7 @@
 "use client"
 
 import Image from "next/image"
+import Link from "next/link"
 import { motion, useInView } from "framer-motion"
 import { usePathname } from "next/navigation"
 import { useRef, useState, useCallback, useEffect } from "react"
@@ -263,6 +264,14 @@ export function SeminairesPage({ acf }: SeminairesPageProps) {
                     }}
                   />
                 )}
+                <Link
+                  href="/sejours-collectifs/activites"
+                  className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 rounded-full text-sm font-semibold text-white transition-all hover:scale-105 hover:brightness-110 shadow-sm"
+                  style={{ backgroundColor: BRAND_COLORS.teal }}
+                >
+                  Voir toutes les activités
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                </Link>
               </motion.div>
 
               {/* Cartes activités */}
@@ -326,6 +335,14 @@ export function SeminairesPage({ acf }: SeminairesPageProps) {
                 <h2 className="text-2xl md:text-3xl font-bold text-brand-orange mb-3">
                   Se Restaurer
                 </h2>
+                <Link
+                  href="/services"
+                  className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 rounded-full text-sm font-semibold text-white transition-all hover:scale-105 hover:brightness-110 shadow-sm"
+                  style={{ backgroundColor: BRAND_COLORS.orange }}
+                >
+                  Voir tous les services
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                </Link>
               </motion.div>
 
               {/* Cartes services */}
@@ -399,6 +416,14 @@ export function SeminairesPage({ acf }: SeminairesPageProps) {
                     }}
                   />
                 )}
+                <Link
+                  href="/hebergements"
+                  className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 rounded-full text-sm font-semibold text-white transition-all hover:scale-105 hover:brightness-110 shadow-sm"
+                  style={{ backgroundColor: BRAND_COLORS.rose }}
+                >
+                  Voir tous les hébergements
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                </Link>
               </motion.div>
 
               {/* Cartes hébergements */}

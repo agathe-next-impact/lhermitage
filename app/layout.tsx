@@ -4,6 +4,7 @@ import type { Metadata } from "next"
 import { Open_Sans, Inter } from "next/font/google"
 import "./globals.css"
 import { SiteHeader } from "@/components/layout/site-header"
+import { SiteFooter } from "@/components/layout/footer"
 import { Providers } from "@/components/providers"
 import { Toaster } from "sonner"
 
@@ -46,6 +47,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <Providers>
           <SiteHeader>
             <main className="mt-6 mb-12">{children}</main>
+            <SiteFooter />
             <Toaster richColors position="top-right" />
           </SiteHeader>
         </Providers>

@@ -30,7 +30,9 @@
       "Bash(# Check if partenaires \\(excluded from catch-all\\) works, and evenements \\(NOT excluded\\) doesn''t curl -s \"\"https://v0-headless-word-press-app.vercel.app/ecosysteme-innovant/partenaires\"\")",
       "Bash(curl -s -X POST \"https://admin.hermitagelelab.com/graphql\" -H \"Content-Type: application/json\" -d \"{\"\"query\"\":\"\"{ simulateurSettings { simulateurSettings { pageServices { nom descriptif services { nonExistent123 } fieldGroupName } menuTitle pageTitle } } }\"\"}\")",
       "Bash(node -e \":*)",
-      "Bash(node -e \"try { require\\(''isomorphic-dompurify''\\); console.log\\(''isomorphic-dompurify OK''\\) } catch\\(e\\) { console.log\\(''FAIL:'', e.message\\) }\")"
+      "Bash(node -e \"try { require\\(''isomorphic-dompurify''\\); console.log\\(''isomorphic-dompurify OK''\\) } catch\\(e\\) { console.log\\(''FAIL:'', e.message\\) }\")",
+      "Bash(xargs ls:*)",
+      "WebFetch(domain:flowbite.com)"
     ]
   }
 }

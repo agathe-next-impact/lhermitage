@@ -13,6 +13,7 @@ import type {
   PartenaireACF,
   EspaceDeTravailACF,
   SeminairesACF,
+  FooterOptions,
 } from "./types"
 import { gqlRequest, gqlRequestList } from "./graphql/client"
 import {
@@ -534,6 +535,67 @@ export class WordPressAPI {
     } catch (error) {
       logger.error("Error fetching menu:", error)
       return []
+    }
+  }
+
+  // --- Footer ---
+
+  async getFooterOptions(): Promise<FooterOptions> {
+    try {
+      const wpUrl = process.env.WP_GRAPHQL_URL?.replace("/graphql", "") || "https://wp-asso.com"
+      const res = await fetch(`${wpUrl}/wp-json/lhermitage/v1/footer`, {
+        next: { revalidate: 3600 },
+      })
+      if (!res.ok) throw new Error(`Footer API returned ${res.status}`)
+      return await res.json()
+    } catch (error) {
+      logger.warn("Footer options not available, using fallbacks:", error)
+      return {
+        logo: {
+          url: "/logo-hermitage.svg",
+          alt: "L'Hermitage",
+        },
+        description:
+          "L'Hermitage est un tiers-lieu rural dédié aux transitions écologiques et sociales, situé à Autrêches dans l'Oise.",
+        copyright: `© ${new Date().getFullYear()} L'Hermitage. Tous droits réservés.`,
+        social: {
+          facebook: "https://www.facebook.com/lhermitagetierslieu",
+          instagram: "https://www.instagram.com/lhermitage_tiers_lieu",
+          linkedin: "https://www.linkedin.com/company/l-hermitage-tiers-lieu",
+          youtube: "https://www.youtube.com/@lhermitage",
+        },
+        columns: [
+          {
+            title: "Séjours",
+            links: [
+              { label: "Séjours Collectifs", url: "/sejours-collectifs" },
+              { label: "Hébergements", url: "/hebergements" },
+              { label: "Activités", url: "/sejours-collectifs/activites" },
+            ],
+          },
+          {
+            title: "Écosystème",
+            links: [
+              { label: "Structures", url: "/ecosysteme-innovant/structures-hebergees" },
+              { label: "Partenaires", url: "/ecosysteme-innovant/partenaires" },
+              { label: "Événements", url: "/ecosysteme-innovant/evenements" },
+            ],
+          },
+          {
+            title: "L'Hermitage",
+            links: [
+              { label: "Notre histoire", url: "/histoire" },
+              { label: "Devenir sociétaire", url: "/devenir-societaire" },
+              { label: "Contact", url: "/contact" },
+            ],
+          },
+        ],
+        contact: {
+          adresse: "L'Hermitage, 60350 Autrêches",
+          telephone: "03 44 42 62 62",
+          email: "contact@lhermitage.fr",
+        },
+      }
     }
   }
 
