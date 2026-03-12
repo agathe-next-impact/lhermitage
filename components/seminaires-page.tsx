@@ -7,13 +7,13 @@ import { useRef, useState, useCallback, useEffect } from "react"
 import { decodeHtmlEntities } from "@/lib/wordpress/decode"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 import { BRAND_COLORS } from "@/lib/theme/colors"
+import { MinimalCard } from "@/components/ui/minimal-card"
 import { getColorForPath } from "@/lib/page-colors"
 import { useMenuColor } from "@/components/menu-colors-provider"
 import type {
   SeminairesACF,
   WPPost,
   EspaceDeTravailACF,
-  ActiviteACF,
   HebergementACF,
   ServiceACF,
 } from "@/lib/wordpress/types"
@@ -37,20 +37,20 @@ function AnimatedCounter({ value, color }: { value: string; color: string }) {
   const ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: true, margin: "-50px" })
   const numericMatch = value.match(/^(\d+)(.*)$/)
+  const target = numericMatch ? parseInt(numericMatch[1], 10) : 0
+  const suffix = numericMatch ? numericMatch[2] || "" : ""
   const isNumeric = !!numericMatch
   const [displayValue, setDisplayValue] = useState("0")
 
   useEffect(() => {
-    if (!isInView || !isNumeric || !numericMatch) return
+    if (!isInView || !isNumeric) return
 
-    const target = parseInt(numericMatch[1], 10)
-    const suffix = numericMatch[2] || ""
     const duration = 1500
     const steps = 40
     const stepDuration = duration / steps
+    const increment = target / steps
 
     let current = 0
-    const increment = target / steps
 
     const timer = setInterval(() => {
       current += increment
@@ -62,7 +62,7 @@ function AnimatedCounter({ value, color }: { value: string; color: string }) {
     }, stepDuration)
 
     return () => clearInterval(timer)
-  }, [isInView, isNumeric, numericMatch, value])
+  }, [isInView, isNumeric, target, suffix])
 
   return (
     <div ref={ref} className="text-4xl md:text-5xl font-black" style={{ color }}>
@@ -146,9 +146,10 @@ function EspacesCarousel({
             </h4>
 
             {acf?.descriptif && (
-              <p className="text-white/90 text-sm md:text-base mb-4 leading-relaxed">
-                {decodeHtmlEntities(acf.descriptif)}
-              </p>
+              <div
+                className="text-white/90 text-sm md:text-base mb-4 leading-relaxed prose prose-invert prose-sm max-w-none"
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(acf.descriptif) }}
+              />
             )}
           </div>
         </motion.div>
@@ -157,69 +158,10 @@ function EspacesCarousel({
   )
 }
 
-/* ───────────────────────── Filtre activités ───────────────────────── */
-
-function ActivitesGrid({
-  activites,
-  sectionColor,
-}: {
-  activites: WPPost<ActiviteACF>[] | undefined
-  sectionColor: string
-}) {
-  const items = activites || []
-
-  if (items.length === 0) return null
-
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-      {items.map((activite, i) => {
-        const color = SECTION_COLORS[i % SECTION_COLORS.length]
-        const featuredImage = activite._embedded?.["wp:featuredmedia"]?.[0]
-
-        return (
-          <motion.div
-            key={activite.id}
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3, delay: i * 0.05 }}
-            viewport={{ once: true }}
-            className="group relative rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-            style={{ border: `1px solid ${color}20` }}
-          >
-            {featuredImage && (
-              <div className="relative h-36">
-                <Image
-                  src={featuredImage.source_url || "/placeholder.svg"}
-                  alt={featuredImage.alt_text || activite.acf?.nom || ""}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-              </div>
-            )}
-            <div className="p-4">
-              <h5 className="font-bold text-sm mb-1" style={{ color }}>
-                {activite.acf?.nom || activite.title.rendered}
-              </h5>
-              {activite.acf?.descriptif && (
-                <p className="text-xs text-brand-gray/70 line-clamp-3">
-                  {decodeHtmlEntities(activite.acf.descriptif)}
-                </p>
-              )}
-            </div>
-          </motion.div>
-        )
-      })}
-    </div>
-  )
-}
-
 /* ───────────────────────── Page complète ───────────────────────── */
 
 export function SeminairesPage({ acf }: SeminairesPageProps) {
   const {
-    hero_seminaires,
     promesse,
     espaces_travail,
     activites_teambuilding,
@@ -234,117 +176,285 @@ export function SeminairesPage({ acf }: SeminairesPageProps) {
   const sectionColor = menuColor || getColorForPath(pathname) || BRAND_COLORS.green
 
   return (
-    <div className="overflow-x-hidden">
-      {/* ─── 1. HERO SECTION ─── */}
-      {hero_seminaires && (
-        <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
-          {/* Background video or image */}
-          {hero_seminaires.video?.url ? (
-            <video
-              autoPlay
-              muted
-              loop
-              playsInline
-              poster={hero_seminaires.image?.url}
-              className="absolute inset-0 w-full h-full object-cover"
-            >
-              <source
-                src={hero_seminaires.video.url}
-                type={hero_seminaires.video.mime_type || "video/mp4"}
-              />
-            </video>
-          ) : hero_seminaires.image ? (
-            <Image
-              src={hero_seminaires.image.url || "/placeholder.svg"}
-              alt={hero_seminaires.image.alt || ""}
-              fill
-              className="object-cover"
-              priority
-              quality={90}
-            />
-          ) : (
-            <div className="absolute inset-0" style={{ backgroundColor: sectionColor }} />
-          )}
-
-          {/* Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10" />
-
-          {/* Content */}
-          <div className="relative z-10 text-center text-white px-6 max-w-4xl mx-auto">
-            {hero_seminaires.accroche && (
-              <motion.h1
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7 }}
-                className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight"
-              >
-                {decodeHtmlEntities(hero_seminaires.accroche)}
-              </motion.h1>
-            )}
-
-            {hero_seminaires.sous_titre && (
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.2 }}
-                className="text-lg md:text-xl text-white/90 mb-8 max-w-2xl mx-auto"
-              >
-                {decodeHtmlEntities(hero_seminaires.sous_titre)}
-              </motion.p>
-            )}
-
-            {hero_seminaires.cta_texte && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.4 }}
-              >
-                <a
-                  href={hero_seminaires.cta_lien?.url || "#contact"}
-                  target={hero_seminaires.cta_lien?.target || undefined}
-                  className="inline-block px-8 py-4 rounded-full text-lg font-semibold transition-all hover:scale-105 hover:brightness-110 shadow-lg"
-                  style={{ backgroundColor: sectionColor }}
-                >
-                  {hero_seminaires.cta_texte}
-                </a>
-              </motion.div>
-            )}
-          </div>
-
-          {/* Scroll hint */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.5 }}
-            className="absolute bottom-8 left-1/2 -translate-x-1/2"
-          >
-            <motion.div
-              animate={{ y: [0, 8, 0] }}
-              transition={{ repeat: Infinity, duration: 1.5 }}
-              className="w-6 h-10 rounded-full border-2 border-white/50 flex items-start justify-center p-1.5"
-            >
-              <div className="w-1.5 h-3 rounded-full bg-white/70" />
-            </motion.div>
-          </motion.div>
-        </section>
-      )}
-
-      <div className="max-w-7xl mx-auto px-6 space-y-20 py-16">
-        {/* ─── 2. LA PROMESSE ─── */}
-        {promesse && (
-          <section className="space-y-8">
-            {promesse.titre && (
+    <div className="pl-6 pt-4">
+      <div className="max-w-7xl space-y-16">
+        {/* ─── 3. ESPACES DE TRAVAIL ─── */}
+        {espaces_travail && (
+          <section className="space-y-6">
+            {espaces_travail.titre && (
               <motion.h2
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="text-3xl md:text-4xl font-bold"
-                style={{ color: sectionColor }}
+                className="text-2xl md:text-3xl text-brand-dark"
               >
-                {decodeHtmlEntities(promesse.titre)}
+                {decodeHtmlEntities(espaces_travail.titre)}
               </motion.h2>
             )}
 
+            {espaces_travail.introduction && (
+              <div
+                className="text-lg text-brand-gray/80 prose prose-stone prose-lg max-w-3xl [&_p]:m-0"
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(espaces_travail.introduction) }}
+              />
+            )}
+
+            <EspacesCarousel espaces={espaces_travail.espaces} sectionColor={sectionColor} />
+
+            {/* Facilitation stratégique */}
+            {espaces_travail.facilitation && (
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="relative p-6 md:p-8 rounded-2xl overflow-hidden"
+                style={{ backgroundColor: BRAND_COLORS.darkBlue }}
+              >
+                <div className="text-white">
+                  {espaces_travail.facilitation.titre && (
+                    <h3 className="text-2xl font-bold mb-4">
+                      {espaces_travail.facilitation.titre}
+                    </h3>
+                  )}
+                  {espaces_travail.facilitation.contenu && (
+                    <div
+                      className="prose prose-invert prose-sm md:prose-base max-w-none mb-4"
+                      dangerouslySetInnerHTML={{
+                        __html: sanitizeHtml(espaces_travail.facilitation.contenu),
+                      }}
+                    />
+                  )}
+                  {espaces_travail.facilitation.badge && (
+                    <span
+                      className="inline-block px-4 py-2 rounded-full text-sm font-bold"
+                      style={{ backgroundColor: "white", color: BRAND_COLORS.darkBlue }}
+                    >
+                      {espaces_travail.facilitation.badge}
+                    </span>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </section>
+        )}
+
+        {/* ─── 4. ACTIVITÉS TEAM BUILDING ─── */}
+        {activites_teambuilding && (
+          <section>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {/* Titre + description */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="rounded-2xl p-6 md:p-8 flex flex-col justify-center"
+                style={{ backgroundColor: `${BRAND_COLORS.teal}10` }}
+              >
+                {activites_teambuilding.titre && (
+                  <h2 className="text-2xl md:text-3xl font-bold text-brand-teal mb-3">
+                    {decodeHtmlEntities(activites_teambuilding.titre)}
+                  </h2>
+                )}
+                {activites_teambuilding.sous_titre && (
+                  <div
+                    className="text-base text-brand-gray/70 [&_p]:m-0"
+                    dangerouslySetInnerHTML={{
+                      __html: sanitizeHtml(activites_teambuilding.sous_titre),
+                    }}
+                  />
+                )}
+              </motion.div>
+
+              {/* Cartes activités */}
+              {(activites_teambuilding.activites || []).slice(0, 3).map((activite, i) => {
+                const featuredImage = activite._embedded?.["wp:featuredmedia"]?.[0]
+                return (
+                  <motion.div
+                    key={activite.id}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3, delay: i * 0.05 }}
+                    viewport={{ once: true }}
+                  >
+                    <MinimalCard
+                      className="h-full flex flex-col justify-between p-2 pt-6 shadow-sm hover:shadow-md transition-shadow"
+                      style={{ backgroundColor: BRAND_COLORS.teal }}
+                    >
+                      <div className="px-2 pb-4">
+                        <h5 className="text-base font-bold mb-1 text-white">
+                          {activite.acf?.nom || activite.title.rendered}
+                        </h5>
+                        {activite.acf?.descriptif && (
+                          <div
+                            className="text-white/80 text-xs line-clamp-3 [&_p]:m-0"
+                            dangerouslySetInnerHTML={{
+                              __html: sanitizeHtml(activite.acf.descriptif),
+                            }}
+                          />
+                        )}
+                      </div>
+                      {featuredImage && (
+                        <Image
+                          src={featuredImage.source_url || "/placeholder.svg"}
+                          alt={featuredImage.alt_text || activite.acf?.nom || ""}
+                          width={600}
+                          height={400}
+                          className="rounded-xl object-cover w-full h-36"
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                        />
+                      )}
+                    </MinimalCard>
+                  </motion.div>
+                )
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* ─── 5. RESTAURATION ─── */}
+        {restauration && restauration.services && restauration.services.length > 0 && (
+          <section>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {/* Titre + description */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="rounded-2xl p-6 md:p-8 flex flex-col justify-center"
+                style={{ backgroundColor: `${BRAND_COLORS.orange}10` }}
+              >
+                <h2 className="text-2xl md:text-3xl font-bold text-brand-orange mb-3">
+                  Se Restaurer
+                </h2>
+              </motion.div>
+
+              {/* Cartes services */}
+              {restauration.services.slice(0, 3).map((service, idx) => {
+                const featuredImage = service._embedded?.["wp:featuredmedia"]?.[0]
+                return (
+                  <motion.div
+                    key={service.id}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3, delay: idx * 0.05 }}
+                    viewport={{ once: true }}
+                  >
+                    <MinimalCard
+                      className="h-full flex flex-col justify-between p-2 pt-6 shadow-sm hover:shadow-md transition-shadow"
+                      style={{ backgroundColor: BRAND_COLORS.orange }}
+                    >
+                      <div className="px-2 pb-4">
+                        <h5 className="text-base font-bold mb-1 text-white">
+                          {service.acf?.nom || service.title.rendered}
+                        </h5>
+                        {service.acf?.descriptif && (
+                          <div
+                            className="text-white/80 text-xs line-clamp-3 [&_p]:m-0"
+                            dangerouslySetInnerHTML={{
+                              __html: sanitizeHtml(service.acf.descriptif),
+                            }}
+                          />
+                        )}
+                      </div>
+                      {featuredImage && (
+                        <Image
+                          src={featuredImage.source_url || "/placeholder.svg"}
+                          alt={featuredImage.alt_text || service.acf?.nom || ""}
+                          width={600}
+                          height={400}
+                          className="rounded-xl object-cover w-full h-36"
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                        />
+                      )}
+                    </MinimalCard>
+                  </motion.div>
+                )
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* ─── 6. HÉBERGEMENTS ─── */}
+        {hebergements_seminaires && (
+          <section>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {/* Titre + description */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="rounded-2xl p-6 md:p-8 flex flex-col justify-center"
+                style={{ backgroundColor: `${BRAND_COLORS.rose}10` }}
+              >
+                {hebergements_seminaires.titre && (
+                  <h2 className="text-2xl md:text-3xl font-bold text-brand-pink mb-3">
+                    {decodeHtmlEntities(hebergements_seminaires.titre)}
+                  </h2>
+                )}
+                {hebergements_seminaires.sous_titre && (
+                  <div
+                    className="text-base text-brand-gray/70 [&_p]:m-0"
+                    dangerouslySetInnerHTML={{
+                      __html: sanitizeHtml(hebergements_seminaires.sous_titre),
+                    }}
+                  />
+                )}
+              </motion.div>
+
+              {/* Cartes hébergements */}
+              {(hebergements_seminaires.hebergements || []).slice(0, 3).map((heb, idx) => {
+                const featuredImage = heb._embedded?.["wp:featuredmedia"]?.[0]
+                const photos = heb.acf?.photos || heb.acf?.images || []
+                const mainImage = featuredImage
+                  ? { url: featuredImage.source_url, alt: featuredImage.alt_text }
+                  : photos[0]
+                    ? { url: photos[0].url, alt: photos[0].alt }
+                    : null
+
+                return (
+                  <motion.div
+                    key={heb.id}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3, delay: idx * 0.05 }}
+                    viewport={{ once: true }}
+                  >
+                    <MinimalCard
+                      className="h-full flex flex-col justify-between p-2 pt-6 shadow-sm hover:shadow-md transition-shadow"
+                      style={{ backgroundColor: BRAND_COLORS.rose }}
+                    >
+                      <div className="px-2 pb-4">
+                        <h5 className="text-base font-bold mb-1 text-white">
+                          {heb.acf?.nom || heb.title.rendered}
+                        </h5>
+                        {heb.acf?.descriptif && (
+                          <div
+                            className="text-white/80 text-xs line-clamp-3 [&_p]:m-0"
+                            dangerouslySetInnerHTML={{ __html: sanitizeHtml(heb.acf.descriptif) }}
+                          />
+                        )}
+                      </div>
+                      {mainImage && (
+                        <Image
+                          src={mainImage.url || "/placeholder.svg"}
+                          alt={mainImage.alt || heb.acf?.nom || ""}
+                          width={600}
+                          height={400}
+                          className="rounded-xl object-cover w-full h-36"
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                        />
+                      )}
+                    </MinimalCard>
+                  </motion.div>
+                )
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* ─── LA PROMESSE ─── */}
+        {promesse && (
+          <section className="space-y-8">
             <div className="flex flex-col md:flex-row gap-8 items-center">
               {promesse.storytelling && (
                 <motion.div
@@ -407,218 +517,6 @@ export function SeminairesPage({ acf }: SeminairesPageProps) {
           </section>
         )}
 
-        {/* ─── 3. ESPACES DE TRAVAIL ─── */}
-        {espaces_travail && (
-          <section className="space-y-6">
-            {espaces_travail.titre && (
-              <motion.h2
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="text-3xl md:text-4xl font-bold"
-                style={{ color: sectionColor }}
-              >
-                {decodeHtmlEntities(espaces_travail.titre)}
-              </motion.h2>
-            )}
-
-            {espaces_travail.introduction && (
-              <p className="text-lg text-brand-gray/80 max-w-3xl">
-                {decodeHtmlEntities(espaces_travail.introduction)}
-              </p>
-            )}
-
-            <EspacesCarousel espaces={espaces_travail.espaces} sectionColor={sectionColor} />
-
-            {/* Facilitation stratégique */}
-            {espaces_travail.facilitation && (
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="relative p-6 md:p-8 rounded-2xl overflow-hidden"
-                style={{ backgroundColor: BRAND_COLORS.darkBlue }}
-              >
-                <div className="text-white">
-                  {espaces_travail.facilitation.titre && (
-                    <h3 className="text-2xl font-bold mb-4">
-                      {espaces_travail.facilitation.titre}
-                    </h3>
-                  )}
-                  {espaces_travail.facilitation.contenu && (
-                    <div
-                      className="prose prose-invert prose-sm md:prose-base max-w-none mb-4"
-                      dangerouslySetInnerHTML={{
-                        __html: sanitizeHtml(espaces_travail.facilitation.contenu),
-                      }}
-                    />
-                  )}
-                  {espaces_travail.facilitation.badge && (
-                    <span
-                      className="inline-block px-4 py-2 rounded-full text-sm font-bold"
-                      style={{ backgroundColor: BRAND_COLORS.orange, color: "white" }}
-                    >
-                      {espaces_travail.facilitation.badge}
-                    </span>
-                  )}
-                </div>
-              </motion.div>
-            )}
-          </section>
-        )}
-
-        {/* ─── 4. ACTIVITÉS TEAM BUILDING ─── */}
-        {activites_teambuilding && (
-          <section className="space-y-6">
-            {activites_teambuilding.titre && (
-              <motion.h2
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="text-3xl md:text-4xl font-bold"
-                style={{ color: sectionColor }}
-              >
-                {decodeHtmlEntities(activites_teambuilding.titre)}
-              </motion.h2>
-            )}
-            {activites_teambuilding.sous_titre && (
-              <p className="text-lg text-brand-gray/70">
-                {decodeHtmlEntities(activites_teambuilding.sous_titre)}
-              </p>
-            )}
-
-            <ActivitesGrid
-              activites={activites_teambuilding.activites}
-              sectionColor={sectionColor}
-            />
-          </section>
-        )}
-
-        {/* ─── 5. RESTAURATION ─── */}
-        {restauration && restauration.services && restauration.services.length > 0 && (
-          <section className="space-y-6">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-3xl md:text-4xl font-bold"
-              style={{ color: sectionColor }}
-            >
-              Se Restaurer
-            </motion.h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {restauration.services.map((service, idx) => {
-                const color = SECTION_COLORS[idx % SECTION_COLORS.length]
-                const featuredImage = service._embedded?.["wp:featuredmedia"]?.[0]
-                return (
-                  <motion.div
-                    key={service.id}
-                    initial={{ opacity: 0, y: 15 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: idx * 0.08 }}
-                    viewport={{ once: true }}
-                    className="rounded-xl shadow-sm hover:shadow-md transition-shadow bg-white overflow-hidden"
-                    style={{ borderLeft: `4px solid ${color}` }}
-                  >
-                    {featuredImage && (
-                      <div className="relative h-32">
-                        <Image
-                          src={featuredImage.source_url || "/placeholder.svg"}
-                          alt={featuredImage.alt_text || ""}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 768px) 100vw, 33vw"
-                        />
-                      </div>
-                    )}
-                    <div className="p-5">
-                      <h4 className="font-bold text-base mb-1" style={{ color }}>
-                        {service.acf?.nom || service.title.rendered}
-                      </h4>
-                      {service.acf?.descriptif && (
-                        <p className="text-sm text-brand-gray/70">
-                          {decodeHtmlEntities(service.acf.descriptif)}
-                        </p>
-                      )}
-                    </div>
-                  </motion.div>
-                )
-              })}
-            </div>
-          </section>
-        )}
-
-        {/* ─── 6. HÉBERGEMENTS ─── */}
-        {hebergements_seminaires && (
-          <section className="space-y-6">
-            {hebergements_seminaires.titre && (
-              <motion.h2
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="text-3xl md:text-4xl font-bold"
-                style={{ color: sectionColor }}
-              >
-                {decodeHtmlEntities(hebergements_seminaires.titre)}
-              </motion.h2>
-            )}
-            {hebergements_seminaires.sous_titre && (
-              <p className="text-lg text-brand-gray/70">
-                {decodeHtmlEntities(hebergements_seminaires.sous_titre)}
-              </p>
-            )}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {(hebergements_seminaires.hebergements || []).map((heb, idx) => {
-                const color = SECTION_COLORS[idx % SECTION_COLORS.length]
-                const featuredImage = heb._embedded?.["wp:featuredmedia"]?.[0]
-                const photos = heb.acf?.photos || heb.acf?.images || []
-                const mainImage = featuredImage
-                  ? { url: featuredImage.source_url, alt: featuredImage.alt_text }
-                  : photos[0]
-                    ? { url: photos[0].url, alt: photos[0].alt }
-                    : null
-
-                return (
-                  <motion.div
-                    key={heb.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: idx * 0.1 }}
-                    viewport={{ once: true }}
-                    className="rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-shadow"
-                    whileHover={{ scale: 1.01, transition: { duration: 0.2 } }}
-                  >
-                    {mainImage && (
-                      <div className="relative h-48 md:h-56">
-                        <Image
-                          src={mainImage.url || "/placeholder.svg"}
-                          alt={mainImage.alt || heb.acf?.nom || ""}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 768px) 100vw, 50vw"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                      </div>
-                    )}
-                    <div className="p-5">
-                      <h4 className="text-xl font-bold mb-2" style={{ color }}>
-                        {heb.acf?.nom || heb.title.rendered}
-                      </h4>
-                      {heb.acf?.descriptif && (
-                        <p className="text-sm text-brand-gray/70 leading-relaxed">
-                          {decodeHtmlEntities(heb.acf.descriptif)}
-                        </p>
-                      )}
-                    </div>
-                  </motion.div>
-                )
-              })}
-            </div>
-          </section>
-        )}
-
         {/* ─── 7. TÉMOIGNAGES ─── */}
         {temoignages && (
           <section
@@ -643,9 +541,13 @@ export function SeminairesPage({ acf }: SeminairesPageProps) {
                     viewport={{ once: true }}
                     className="p-5 md:p-6 rounded-xl bg-white/95 backdrop-blur-sm shadow-lg"
                   >
-                    <p className="text-brand-gray italic text-sm md:text-base mb-3 leading-relaxed">
-                      &laquo; {temo.citation && decodeHtmlEntities(temo.citation)} &raquo;
-                    </p>
+                    <div className="text-brand-gray italic text-sm md:text-base mb-3 leading-relaxed [&_p]:m-0 [&_p]:inline">
+                      &laquo;{" "}
+                      {temo.citation && (
+                        <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(temo.citation) }} />
+                      )}{" "}
+                      &raquo;
+                    </div>
                     <footer className="flex items-center gap-2">
                       <div
                         className="w-8 h-0.5 rounded-full"

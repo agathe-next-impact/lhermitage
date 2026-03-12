@@ -145,14 +145,15 @@ export default async function CatchAllPage({ params }: PageProps) {
     notFound()
   }
 
-  // Séminaires page has its own full-screen hero — return early without PageHeader wrapper
-  if (seminairesData) {
-    return <SeminairesPage acf={seminairesData} />
-  }
-
   let content: React.ReactNode = null
 
-  if (isHistoirePage && page.acf) {
+  if (seminairesData) {
+    content = (
+      <div className="relative z-10">
+        <SeminairesPage acf={seminairesData} />
+      </div>
+    )
+  } else if (isHistoirePage && page.acf) {
     content = (
       <div className="relative z-10">
         <HistoireTimeline acf={page.acf as HistoireACF} />
@@ -189,14 +190,17 @@ export default async function CatchAllPage({ params }: PageProps) {
     )
   }
 
+  const heroTitle = seminairesData?.hero_seminaires?.accroche || page.title.rendered
+  const heroSubtitle = seminairesData?.hero_seminaires?.sous_titre || page.acf?.hero?.["sous-titre"]
+  const heroImage =
+    seminairesData?.hero_seminaires?.image?.url ||
+    page.acf?.hero?.image?.url ||
+    "/rural-retreat-landscape.jpg"
+
   return (
     <div>
-      <PageHeader
-        title={page.title.rendered}
-        subtitle={page.acf?.hero?.["sous-titre"]}
-        image={page.acf?.hero?.image?.url || "/rural-retreat-landscape.jpg"}
-      />
-      <BentoHeaderContent title={page.acf?.hero?.["sous-titre"]}>{content}</BentoHeaderContent>
+      <PageHeader title={heroTitle} subtitle={heroSubtitle} image={heroImage} />
+      <BentoHeaderContent title={heroSubtitle}>{content}</BentoHeaderContent>
     </div>
   )
 }

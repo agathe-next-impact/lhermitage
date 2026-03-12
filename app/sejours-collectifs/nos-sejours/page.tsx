@@ -3,6 +3,7 @@ import dynamic from "next/dynamic"
 import { wpApi } from "@/lib/wordpress/api"
 import { PageHeader } from "@/components/layout/page-header"
 import { BentoHeaderContent } from "@/components/layout/bento-header-content"
+import { SejoursHeader } from "@/components/layout/sejours-header"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 import { REVALIDATION } from "@/lib/constants"
 
@@ -18,26 +19,44 @@ export default async function NosSejoursPage() {
     wpApi.getSeminairesData("sejours-collectifs/nos-sejours"),
   ])
 
-  // Séminaires ACF data found → render full SeminairesPage component
-  if (seminairesData) {
-    return <SeminairesPage acf={seminairesData} />
-  }
-
-  // Fallback: render standard WordPress page content
-  if (!page) {
+  if (!page && !seminairesData) {
     notFound()
   }
 
+  const pageTitle = page?.title.rendered || "Nos Séjours"
+  const bentoTitle = page?.acf?.hero?.["sous-titre"]
+
+  // Séminaires ACF → header plein écran avec vidéo/image
+  if (seminairesData) {
+    return (
+      <div>
+        <SejoursHeader
+          title={pageTitle}
+          video={seminairesData.hero_seminaires?.video}
+          image={seminairesData.hero_seminaires?.image}
+          accroche={seminairesData.hero_seminaires?.accroche}
+          sousTitre={seminairesData.hero_seminaires?.sous_titre}
+          ctaTexte={seminairesData.hero_seminaires?.cta_texte}
+          ctaLien={seminairesData.hero_seminaires?.cta_lien}
+        />
+        <BentoHeaderContent title={seminairesData.promesse?.titre || bentoTitle}>
+          <div className="relative z-10">
+            <SeminairesPage acf={seminairesData} />
+          </div>
+        </BentoHeaderContent>
+      </div>
+    )
+  }
+
+  // Fallback : page WordPress standard
+  const heroImage = page?.acf?.hero?.image?.url || "/group-retreat-activities.jpg"
+
   return (
     <div>
-      <PageHeader
-        title={page.title.rendered || "Nos Séjours"}
-        subtitle={page.acf?.hero?.["sous-titre"]}
-        image={page.acf?.hero?.image?.url || "/group-retreat-activities.jpg"}
-      />
-      <BentoHeaderContent title={page.acf?.hero?.["sous-titre"]}>
+      <PageHeader title={pageTitle} subtitle={bentoTitle} image={heroImage} />
+      <BentoHeaderContent title={bentoTitle}>
         <div className="container mx-auto px-4 py-16">
-          {page.content?.rendered && (
+          {page?.content?.rendered && (
             <div
               className="prose prose-stone mx-auto max-w-3xl"
               dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }}

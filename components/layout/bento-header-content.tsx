@@ -40,14 +40,14 @@ export function BentoHeaderContent({
     color || menuColor || getColorForPath(pathname) || getHashColor(title || pathname)
 
   return (
-    <div className={`w-[calc(100%-1rem)] mt-2 mx-auto relative ${className}`}>
-      <div className="grid grid-cols-1 md:grid-cols-4">
+    <div className={`w-[calc(100%-1rem)] mt-2 mx-auto relative overflow-visible ${className}`}>
+      <div className="grid grid-cols-1 md:grid-cols-4 overflow-visible">
         {/* Bloc L continu — un seul élément croppé par overlay */}
         <motion.div
           ref={lBlockRef}
           className="col-span-1 md:col-span-4 relative rounded-xl overflow-hidden border-b-2 border-background"
           style={{
-            height: "calc(clamp(160px, 35vh, 80px) + 9rem)",
+            height: "calc(clamp(80px, 35vh, 160px) + 9rem)",
             backgroundColor: mainBlobColor,
           }}
           initial={{ clipPath: "inset(0 0 100% 0)" }}
