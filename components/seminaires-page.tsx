@@ -248,17 +248,17 @@ export function SeminairesPage({ acf }: SeminairesPageProps) {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="rounded-2xl p-6 md:p-8 flex flex-col justify-center"
-                style={{ backgroundColor: `${BRAND_COLORS.teal}10` }}
+                className="rounded-2xl p-6 md:p-8 flex flex-col justify-end"
+                style={{ backgroundColor: BRAND_COLORS.teal }}
               >
                 {activites_teambuilding.titre && (
-                  <h2 className="text-2xl md:text-3xl font-bold text-brand-teal mb-3">
+                  <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
                     {decodeHtmlEntities(activites_teambuilding.titre)}
                   </h2>
                 )}
                 {activites_teambuilding.sous_titre && (
                   <div
-                    className="text-base text-brand-gray/70 [&_p]:m-0"
+                    className="text-base text-white/80 [&_p]:m-0"
                     dangerouslySetInnerHTML={{
                       __html: sanitizeHtml(activites_teambuilding.sous_titre),
                     }}
@@ -266,11 +266,23 @@ export function SeminairesPage({ acf }: SeminairesPageProps) {
                 )}
                 <Link
                   href="/sejours-collectifs/activites"
-                  className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 rounded-full text-sm font-semibold text-white transition-all hover:scale-105 hover:brightness-110 shadow-sm"
-                  style={{ backgroundColor: BRAND_COLORS.teal }}
+                  className="w-max inline-flex items-end gap-2 mt-4 px-5 py-2.5 rounded-full text-sm font-semibold transition-all hover:scale-105 hover:brightness-110 shadow-sm"
+                  style={{ backgroundColor: "white", color: BRAND_COLORS.teal }}
                 >
                   Voir toutes les activités
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M5 12h14" />
+                    <path d="m12 5 7 7-7 7" />
+                  </svg>
                 </Link>
               </motion.div>
 
@@ -287,15 +299,18 @@ export function SeminairesPage({ acf }: SeminairesPageProps) {
                   >
                     <MinimalCard
                       className="h-full flex flex-col justify-between p-2 pt-6 shadow-sm hover:shadow-md transition-shadow"
-                      style={{ backgroundColor: BRAND_COLORS.teal }}
+                      style={{ backgroundColor: `${BRAND_COLORS.teal}15` }}
                     >
                       <div className="px-2 pb-4">
-                        <h5 className="text-base font-bold mb-1 text-white">
+                        <h5
+                          className="text-base font-bold mb-1"
+                          style={{ color: BRAND_COLORS.teal }}
+                        >
                           {activite.acf?.nom || activite.title.rendered}
                         </h5>
                         {activite.acf?.descriptif && (
                           <div
-                            className="text-white/80 text-xs line-clamp-3 [&_p]:m-0"
+                            className="text-brand-gray/70 text-xs line-clamp-3 [&_p]:m-0"
                             dangerouslySetInnerHTML={{
                               __html: sanitizeHtml(activite.acf.descriptif),
                             }}
@@ -329,19 +344,29 @@ export function SeminairesPage({ acf }: SeminairesPageProps) {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="rounded-2xl p-6 md:p-8 flex flex-col justify-center"
-                style={{ backgroundColor: `${BRAND_COLORS.orange}10` }}
+                className="rounded-2xl p-6 md:p-8 flex flex-col justify-end"
+                style={{ backgroundColor: BRAND_COLORS.orange }}
               >
-                <h2 className="text-2xl md:text-3xl font-bold text-brand-orange mb-3">
-                  Se Restaurer
-                </h2>
+                <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">Se Restaurer</h2>
                 <Link
                   href="/services"
-                  className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 rounded-full text-sm font-semibold text-white transition-all hover:scale-105 hover:brightness-110 shadow-sm"
-                  style={{ backgroundColor: BRAND_COLORS.orange }}
+                  className="w-max inline-flex items-end gap-2 mt-4 px-5 py-2.5 rounded-full text-sm font-semibold transition-all hover:scale-105 hover:brightness-110 shadow-sm"
+                  style={{ backgroundColor: "white", color: BRAND_COLORS.orange }}
                 >
                   Voir tous les services
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M5 12h14" />
+                    <path d="m12 5 7 7-7 7" />
+                  </svg>
                 </Link>
               </motion.div>
 
@@ -358,15 +383,18 @@ export function SeminairesPage({ acf }: SeminairesPageProps) {
                   >
                     <MinimalCard
                       className="h-full flex flex-col justify-between p-2 pt-6 shadow-sm hover:shadow-md transition-shadow"
-                      style={{ backgroundColor: BRAND_COLORS.orange }}
+                      style={{ backgroundColor: `${BRAND_COLORS.orange}15` }}
                     >
                       <div className="px-2 pb-4">
-                        <h5 className="text-base font-bold mb-1 text-white">
+                        <h5
+                          className="text-base font-bold mb-1"
+                          style={{ color: BRAND_COLORS.orange }}
+                        >
                           {service.acf?.nom || service.title.rendered}
                         </h5>
                         {service.acf?.descriptif && (
                           <div
-                            className="text-white/80 text-xs line-clamp-3 [&_p]:m-0"
+                            className="text-brand-gray/70 text-xs line-clamp-3 [&_p]:m-0"
                             dangerouslySetInnerHTML={{
                               __html: sanitizeHtml(service.acf.descriptif),
                             }}
@@ -400,17 +428,17 @@ export function SeminairesPage({ acf }: SeminairesPageProps) {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="rounded-2xl p-6 md:p-8 flex flex-col justify-center"
-                style={{ backgroundColor: `${BRAND_COLORS.rose}10` }}
+                className="rounded-2xl p-6 md:p-8 flex flex-col justify-end"
+                style={{ backgroundColor: BRAND_COLORS.rose }}
               >
                 {hebergements_seminaires.titre && (
-                  <h2 className="text-2xl md:text-3xl font-bold text-brand-pink mb-3">
+                  <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
                     {decodeHtmlEntities(hebergements_seminaires.titre)}
                   </h2>
                 )}
                 {hebergements_seminaires.sous_titre && (
                   <div
-                    className="text-base text-brand-gray/70 [&_p]:m-0"
+                    className="text-base text-white/80 [&_p]:m-0"
                     dangerouslySetInnerHTML={{
                       __html: sanitizeHtml(hebergements_seminaires.sous_titre),
                     }}
@@ -418,11 +446,23 @@ export function SeminairesPage({ acf }: SeminairesPageProps) {
                 )}
                 <Link
                   href="/hebergements"
-                  className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 rounded-full text-sm font-semibold text-white transition-all hover:scale-105 hover:brightness-110 shadow-sm"
-                  style={{ backgroundColor: BRAND_COLORS.rose }}
+                  className="w-max inline-flex items-end gap-2 mt-4 px-5 py-2.5 rounded-full text-sm font-semibold transition-all hover:scale-105 hover:brightness-110 shadow-sm"
+                  style={{ backgroundColor: "white", color: BRAND_COLORS.rose }}
                 >
                   Voir tous les hébergements
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M5 12h14" />
+                    <path d="m12 5 7 7-7 7" />
+                  </svg>
                 </Link>
               </motion.div>
 
@@ -446,15 +486,18 @@ export function SeminairesPage({ acf }: SeminairesPageProps) {
                   >
                     <MinimalCard
                       className="h-full flex flex-col justify-between p-2 pt-6 shadow-sm hover:shadow-md transition-shadow"
-                      style={{ backgroundColor: BRAND_COLORS.rose }}
+                      style={{ backgroundColor: `${BRAND_COLORS.rose}15` }}
                     >
                       <div className="px-2 pb-4">
-                        <h5 className="text-base font-bold mb-1 text-white">
+                        <h5
+                          className="text-base font-bold mb-1"
+                          style={{ color: BRAND_COLORS.rose }}
+                        >
                           {heb.acf?.nom || heb.title.rendered}
                         </h5>
                         {heb.acf?.descriptif && (
                           <div
-                            className="text-white/80 text-xs line-clamp-3 [&_p]:m-0"
+                            className="text-brand-gray/70 text-xs line-clamp-3 [&_p]:m-0"
                             dangerouslySetInnerHTML={{ __html: sanitizeHtml(heb.acf.descriptif) }}
                           />
                         )}
@@ -480,7 +523,7 @@ export function SeminairesPage({ acf }: SeminairesPageProps) {
         {/* ─── LA PROMESSE ─── */}
         {promesse && (
           <section className="space-y-8">
-            <div className="flex flex-col md:flex-row gap-8 items-center">
+            <div className="flex flex-col md:flex-row gap-8 items-stretch">
               {promesse.storytelling && (
                 <motion.div
                   initial={{ opacity: 0, x: -20 }}
@@ -495,7 +538,7 @@ export function SeminairesPage({ acf }: SeminairesPageProps) {
                   initial={{ opacity: 0, x: 20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
-                  className="md:w-1/2 relative rounded-2xl overflow-hidden aspect-[4/3]"
+                  className="md:w-1/2 relative rounded-2xl overflow-hidden min-h-[300px]"
                 >
                   <Image
                     src={promesse.image.url || "/placeholder.svg"}
@@ -593,28 +636,34 @@ export function SeminairesPage({ acf }: SeminairesPageProps) {
                 ))}
               </div>
             )}
+          </section>
+        )}
 
-            {/* Logos partenaires */}
-            {temoignages.logos && temoignages.logos.length > 0 && (
-              <div>
-                <p className="text-white/70 text-sm uppercase tracking-wider mb-4">
-                  Ils nous font confiance
-                </p>
-                <div className="flex flex-wrap items-center gap-6">
-                  {temoignages.logos.map((logo, idx) => (
-                    <div key={idx} className="relative h-10 w-24 bg-white/90 rounded-lg p-2">
-                      <Image
-                        src={logo.url || "/placeholder.svg"}
-                        alt={logo.alt || "Partenaire"}
-                        fill
-                        className="object-contain p-1"
-                        sizes="96px"
-                      />
-                    </div>
-                  ))}
+        {/* ─── LOGOS PARTENAIRES ─── */}
+        {temoignages?.logos && temoignages.logos.length > 0 && (
+          <section
+            className="relative p-6 md:p-10 rounded-2xl overflow-hidden"
+            style={{ backgroundColor: `${BRAND_COLORS.teal}15` }}
+          >
+            <p
+              className="text-sm uppercase tracking-wider mb-4"
+              style={{ color: BRAND_COLORS.teal }}
+            >
+              Ils nous font confiance
+            </p>
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
+              {temoignages.logos.map((logo, idx) => (
+                <div key={idx} className="relative h-14 bg-white rounded-lg p-2">
+                  <Image
+                    src={logo.url || "/placeholder.svg"}
+                    alt={logo.alt || "Partenaire"}
+                    fill
+                    className="object-contain p-2"
+                    sizes="(max-width: 640px) 30vw, (max-width: 768px) 22vw, 15vw"
+                  />
                 </div>
-              </div>
-            )}
+              ))}
+            </div>
           </section>
         )}
 
@@ -626,14 +675,11 @@ export function SeminairesPage({ acf }: SeminairesPageProps) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="relative p-8 md:p-12 rounded-2xl overflow-hidden"
-              style={{
-                backgroundColor: `${sectionColor}10`,
-                border: `2px solid ${sectionColor}30`,
-              }}
+              style={{ backgroundColor: sectionColor }}
             >
               <div className="flex flex-col md:flex-row gap-8 items-center">
                 {contact.photo && (
-                  <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden flex-shrink-0 ring-4 ring-white shadow-lg">
+                  <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden flex-shrink-0 ring-4 ring-white/30 shadow-lg">
                     <Image
                       src={contact.photo.url || "/placeholder.svg"}
                       alt={contact.photo.alt || contact.nom_contact || ""}
@@ -646,17 +692,14 @@ export function SeminairesPage({ acf }: SeminairesPageProps) {
 
                 <div className="flex-1 text-center md:text-left">
                   {contact.titre && (
-                    <h2
-                      className="text-2xl md:text-3xl font-bold mb-4"
-                      style={{ color: sectionColor }}
-                    >
+                    <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
                       {decodeHtmlEntities(contact.titre)}
                     </h2>
                   )}
 
                   {contact.conciergerie && (
                     <div
-                      className="prose prose-stone prose-sm md:prose-base max-w-none text-brand-gray/80 mb-6"
+                      className="prose prose-invert prose-sm md:prose-base max-w-none text-white/80 mb-6"
                       dangerouslySetInnerHTML={{ __html: sanitizeHtml(contact.conciergerie) }}
                     />
                   )}
@@ -665,8 +708,8 @@ export function SeminairesPage({ acf }: SeminairesPageProps) {
                     {contact.email && (
                       <a
                         href={`mailto:${contact.email}`}
-                        className="inline-flex items-center gap-2 px-5 py-3 rounded-full font-semibold text-white transition-all hover:scale-105 shadow-md"
-                        style={{ backgroundColor: sectionColor }}
+                        className="inline-flex items-center gap-2 px-5 py-3 rounded-full font-semibold transition-all hover:scale-105 shadow-md"
+                        style={{ backgroundColor: "white", color: sectionColor }}
                       >
                         <svg
                           width="18"
@@ -688,11 +731,10 @@ export function SeminairesPage({ acf }: SeminairesPageProps) {
                     {contact.telephone && (
                       <a
                         href={`tel:${contact.telephone.replace(/\s/g, "")}`}
-                        className="inline-flex items-center gap-2 px-5 py-3 rounded-full font-semibold transition-all hover:scale-105 shadow-md"
+                        className="inline-flex items-center gap-2 px-5 py-3 rounded-full font-semibold text-white transition-all hover:scale-105 shadow-md"
                         style={{
-                          backgroundColor: "white",
-                          color: sectionColor,
-                          border: `2px solid ${sectionColor}`,
+                          backgroundColor: "transparent",
+                          border: "2px solid rgba(255,255,255,0.5)",
                         }}
                       >
                         <svg
@@ -716,8 +758,8 @@ export function SeminairesPage({ acf }: SeminairesPageProps) {
                     <a
                       href={contact.cta_lien.url}
                       target={contact.cta_lien.target || undefined}
-                      className="inline-block mt-6 px-8 py-4 rounded-full text-lg font-bold text-white transition-all hover:scale-105 hover:brightness-110 shadow-lg"
-                      style={{ backgroundColor: BRAND_COLORS.orange }}
+                      className="inline-block mt-6 px-8 py-4 rounded-full text-lg font-bold transition-all hover:scale-105 hover:brightness-110 shadow-lg"
+                      style={{ backgroundColor: "white", color: sectionColor }}
                     >
                       {contact.cta_texte}
                     </a>

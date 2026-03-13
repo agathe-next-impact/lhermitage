@@ -542,7 +542,8 @@ export class WordPressAPI {
 
   async getFooterOptions(): Promise<FooterOptions> {
     try {
-      const wpUrl = process.env.WP_GRAPHQL_URL?.replace("/graphql", "") || "https://wp-asso.com"
+      const wpUrl =
+        process.env.WP_GRAPHQL_URL?.replace("/graphql", "") || "https://admin.hermitagelelab.com"
       const res = await fetch(`${wpUrl}/wp-json/lhermitage/v1/footer`, {
         next: { revalidate: 3600 },
       })

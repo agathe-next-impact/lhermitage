@@ -142,7 +142,7 @@ export const GET_PAGE_SEMINAIRES = gql`
             auteur
             role
           }
-          logos {
+          logos(first: 100) {
             nodes {
               ...ImageFields
             }
