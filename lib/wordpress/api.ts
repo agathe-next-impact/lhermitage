@@ -396,8 +396,8 @@ export class WordPressAPI {
       const data = await gqlRequest<{ page: any | null }>(GET_PAGE_SEMINAIRES, { slug: path })
       if (!data.page?.pageSeminaires) return null
       return transformSeminairesData(data.page.pageSeminaires)
-    } catch {
-      // ACF field group not yet imported — silently return null
+    } catch (error) {
+      logger.error("Failed to fetch seminaires data for path:", path, error instanceof Error ? error.message : error)
       return null
     }
   }
