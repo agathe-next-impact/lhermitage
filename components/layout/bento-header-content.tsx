@@ -45,9 +45,8 @@ export function BentoHeaderContent({
         {/* Bloc L continu — un seul élément croppé par overlay */}
         <motion.div
           ref={lBlockRef}
-          className="col-span-1 md:col-span-4 relative rounded-xl overflow-hidden border-b-2 border-background"
+          className="col-span-1 md:col-span-4 relative rounded-xl overflow-hidden border-b-2 border-background md:h-[calc(clamp(80px,35vh,160px)+9rem)]"
           style={{
-            height: "calc(clamp(80px, 35vh, 160px) + 9rem)",
             backgroundColor: mainBlobColor,
           }}
           initial={{ clipPath: "inset(0 0 100% 0)" }}
@@ -57,14 +56,18 @@ export function BentoHeaderContent({
             lBlockRef.current?.style.removeProperty("clip-path")
           }}
         >
-          <Image
-            src="/logo-arcs-light.png"
-            alt={title || "L'Hermitage"}
-            width={100}
-            height={100}
-            quality={100}
-            className="absolute bottom-20 left-6 w-24 h-full object-contain z-10"
-          />
+          {/* Logo — flow sur mobile, absolute sur md+ */}
+          <div className="p-4 md:absolute md:bottom-20 md:left-6 md:p-0 md:w-24 md:h-full z-10">
+            <Image
+              src="/logo-arcs-light.png"
+              alt={title || "L'Hermitage"}
+              width={100}
+              height={100}
+              quality={100}
+              className="w-12 md:w-24 h-auto md:h-full object-contain"
+            />
+          </div>
+
           {/* Overlay — masque le bas-droit pour former le L (desktop) */}
           <div
             className="hidden md:block absolute right-0 bottom-0 bg-background rounded-tl-[15px] pointer-events-none"
@@ -91,10 +94,10 @@ export function BentoHeaderContent({
             }}
           />
 
-          {/* Titre en bas-gauche du L */}
+          {/* Titre en bas-gauche du L — flow sur mobile, absolute sur md+ */}
           {title && (
-            <div className="absolute bottom-0 left-0 w-full md:w-1/4 h-36 p-4 md:p-6 flex flex-col justify-end">
-              <h2 className="font-sans sm:text-lg md:text-xl lg:text-3xl text-white leading-tight drop-shadow-sm">
+            <div className="relative md:absolute md:bottom-0 md:left-0 w-full md:w-1/4 md:h-36 px-4 pb-4 md:p-6 flex flex-col justify-end">
+              <h2 className="font-sans text-2xl sm:text-3xl md:text-xl lg:text-3xl text-white leading-tight drop-shadow-sm">
                 {title}
               </h2>
               {subtitle && <p className="text-xs md:text-sm text-white/80 mt-2">{subtitle}</p>}
@@ -118,7 +121,7 @@ export function BentoHeaderContent({
 
         {/* Contenu de page — colonnes 2-4 (ou décalé si pas d'image) */}
         <div
-          className={`col-span-1 rounded-xl ${columnImage ? "md:col-span-3" : "md:col-start-2 md:col-span-3"} md:-mt-40 pt-3 relative z-10`}
+          className={`col-span-1 rounded-xl ${columnImage ? "md:col-span-3" : "md:col-start-2 md:col-span-3"} md:-mt-40 pt-3 relative z-10 [&>div]:px-0 [&>div]:md:px-4`}
         >
           {children}
         </div>

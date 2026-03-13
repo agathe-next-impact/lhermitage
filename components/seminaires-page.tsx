@@ -177,7 +177,7 @@ export function SeminairesPage({ acf }: SeminairesPageProps) {
   const sectionColor = menuColor || getColorForPath(pathname) || BRAND_COLORS.green
 
   return (
-    <div className="pl-6 pt-4">
+    <div className="pt-4">
       <div className="max-w-7xl space-y-16">
         {/* ─── 3. ESPACES DE TRAVAIL ─── */}
         {espaces_travail && (
