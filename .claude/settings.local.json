@@ -32,7 +32,9 @@
       "Bash(node -e \":*)",
       "Bash(node -e \"try { require\\(''isomorphic-dompurify''\\); console.log\\(''isomorphic-dompurify OK''\\) } catch\\(e\\) { console.log\\(''FAIL:'', e.message\\) }\")",
       "Bash(xargs ls:*)",
-      "WebFetch(domain:flowbite.com)"
+      "WebFetch(domain:flowbite.com)",
+      "mcp__claude_ai_Vercel__list_teams",
+      "mcp__claude_ai_Vercel__web_fetch_vercel_url"
     ]
   }
 }

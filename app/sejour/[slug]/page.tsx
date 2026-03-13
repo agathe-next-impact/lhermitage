@@ -68,10 +68,10 @@ export default async function SejourPage({ params }: SejourPageProps) {
       <PageHeader title={title} image={featuredImage} />
       <BentoHeaderContent>
         <div className="container mx-auto px-4 py-12">
-          {sejour.content?.rendered && (
+          {(sejour.acf?.descriptif || sejour.content?.rendered) && (
             <div
               className="prose prose-stone max-w-none mb-12"
-              dangerouslySetInnerHTML={{ __html: sanitizeHtml(sejour.content.rendered) }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(sejour.acf?.descriptif || sejour.content?.rendered || "") }}
             />
           )}
 

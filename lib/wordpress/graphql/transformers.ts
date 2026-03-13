@@ -623,10 +623,40 @@ export function transformSejourAcf(gqlPost: Record<string, any>): SejourACF {
   const acf = gqlPost.sejours
   if (!acf) return { nom: gqlPost.title || "" }
 
-  return {
+  const result: SejourACF = {
     nom: acf.nom || gqlPost.title || "",
     descriptif: transformContentLinks(acf.descriptif || ""),
   }
+
+  // Transform relationship field: hebergement (ContentNode[] → WPPost<HebergementACF>[])
+  const hebNodes = acf.hebergement?.nodes
+  if (hebNodes?.length) {
+    result.hebergements = {
+      hebergements: hebNodes.map((node: any) => ({
+        hebergement: transformPost<HebergementACF>(
+          node,
+          transformHebergementAcf(node),
+          "hebergement"
+        ),
+      })),
+    }
+  }
+
+  // Transform relationship field: activite (ContentNode[] → WPPost<ActiviteACF>[])
+  const actNodes = acf.activite?.nodes
+  if (actNodes?.length) {
+    result.activites = {
+      activite: actNodes.map((node: any) => ({
+        activite: transformPost<ActiviteACF>(
+          node,
+          transformActiviteAcf(node),
+          "activite"
+        ),
+      })),
+    }
+  }
+
+  return result
 }
 
 // --- Menu transformer ---

@@ -121,7 +121,8 @@ export class WordPressAPI {
       const data = await gqlRequest<{ page: any | null }>(GET_PAGE_BY_SLUG, { slug })
       if (!data.page) return null
       return transformPage(data.page)
-    } catch {
+    } catch (error) {
+      logger.error("Failed to fetch page by slug:", slug, error instanceof Error ? error.message : error)
       return null
     }
   }
@@ -220,7 +221,8 @@ export class WordPressAPI {
         transformHebergementAcf(data.hBergement),
         "hebergement"
       )
-    } catch {
+    } catch (error) {
+      logger.error("Failed to fetch hebergement by slug:", slug, error instanceof Error ? error.message : error)
       return null
     }
   }
@@ -274,7 +276,8 @@ export class WordPressAPI {
         ]
       }
       return post
-    } catch {
+    } catch (error) {
+      logger.error("Failed to fetch activite by slug:", slug, error instanceof Error ? error.message : error)
       return null
     }
   }
@@ -308,7 +311,8 @@ export class WordPressAPI {
         transformStructureAcf(data.structure),
         "structure"
       )
-    } catch {
+    } catch (error) {
+      logger.error("Failed to fetch structure by slug:", slug, error instanceof Error ? error.message : error)
       return null
     }
   }
@@ -416,7 +420,8 @@ export class WordPressAPI {
       const data = await gqlRequest<{ sJour: any | null }>(GET_SEJOUR_BY_SLUG, { slug })
       if (!data.sJour) return null
       return transformPost<SejourACF>(data.sJour, transformSejourAcf(data.sJour), "sejour")
-    } catch {
+    } catch (error) {
+      logger.error("Failed to fetch sejour by slug:", slug, error instanceof Error ? error.message : error)
       return null
     }
   }
