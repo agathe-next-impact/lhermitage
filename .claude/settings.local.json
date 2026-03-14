@@ -34,7 +34,31 @@
       "Bash(xargs ls:*)",
       "WebFetch(domain:flowbite.com)",
       "mcp__claude_ai_Vercel__list_teams",
-      "mcp__claude_ai_Vercel__web_fetch_vercel_url"
+      "mcp__claude_ai_Vercel__web_fetch_vercel_url",
+      "Bash(git -C /c/dev/lhermitage log --all --oneline --grep=\"simulat\\\\|pricing\\\\|calculator\\\\|tarif\\\\|devis\\\\|quote\")",
+      "Bash(git -C /c/dev/lhermitage log --all --full-history -S \"simulator\" --oneline)",
+      "Bash(git -C /c/dev/lhermitage diff HEAD~10..HEAD --name-only)",
+      "Bash(git -C /c/dev/lhermitage show 85deb00 --stat)",
+      "Bash(git -C /c/dev/lhermitage show e80aa9e --stat)",
+      "Bash(git -C /c/dev/lhermitage log --all --oneline)",
+      "Bash(git -C /c/dev/lhermitage branch -a)",
+      "Bash(git -C /c/dev/lhermitage log --oneline)",
+      "Bash(git -C /c/dev/lhermitage show 85deb00:app/simulateur/page.tsx)",
+      "Bash(git -C /c/dev/lhermitage show 85deb00:lib/simulateur/types.ts)",
+      "Bash(git -C /c/dev/lhermitage show 85deb00:lib/simulateur/pricing.ts)",
+      "Bash(git -C /c/dev/lhermitage show 85deb00:lib/simulateur/store.ts)",
+      "Bash(git -C /c/dev/lhermitage show 85deb00:app/simulateur/actions/calculate-price.ts)",
+      "Bash(git -C /c/dev/lhermitage show 85deb00 --name-only)",
+      "Bash(git -C /c/dev/lhermitage show 85deb00:app/simulateur/profil/page.tsx)",
+      "Bash(git -C /c/dev/lhermitage show 85deb00:app/simulateur/recapitulatif/page.tsx)",
+      "Bash(git -C /c/dev/lhermitage show 85deb00:lib/simulateur/api.ts)",
+      "Bash(git -C /c/dev/lhermitage show 85deb00:components/features/simulateur/recapitulatif/budget-table.tsx)",
+      "Bash(git -C /c/dev/lhermitage show 85deb00:app/simulateur/layout.tsx)",
+      "Bash(git -C /c/dev/lhermitage show 85deb00:app/simulateur/actions/submit-quote.ts)",
+      "Bash(git -C /c/dev/lhermitage show 85deb00:app/simulateur/actions/generate-pdf.ts)",
+      "Bash(git -C /c/dev/lhermitage show 85deb00:components/features/simulateur/profil/profil-form.tsx)",
+      "Bash(git -C /c/dev/lhermitage show 85deb00:components/features/simulateur/recapitulatif/quote-form.tsx)",
+      "Bash(git -C /c/dev/lhermitage show 85deb00:wp-plugins/hermitage-simulateur/hermitage-simulateur.php)"
     ]
   }
 }
