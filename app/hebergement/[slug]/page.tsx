@@ -68,6 +68,36 @@ export default async function HebergementPage({ params }: HebergementPageProps) 
       <PageHeader title={title} image={featuredImage} />
       <BentoHeaderContent>
         <div className="container mx-auto px-4 py-12">
+          {/* Infos pratiques */}
+          {(hebergement.acf?.capacite_daccueil != null || hebergement.acf?.repartition_des_chambres || hebergement.acf?.disponibilite || hebergement.acf?.commodites) && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+              {hebergement.acf.capacite_daccueil != null && (
+                <div className="bg-stone-50 rounded-xl p-4">
+                  <p className="text-xs text-stone-500 uppercase tracking-wide mb-1">Capacité d&apos;accueil</p>
+                  <p className="text-lg font-semibold text-stone-800">{hebergement.acf.capacite_daccueil} personnes</p>
+                </div>
+              )}
+              {hebergement.acf.repartition_des_chambres && (
+                <div className="bg-stone-50 rounded-xl p-4">
+                  <p className="text-xs text-stone-500 uppercase tracking-wide mb-1">Chambres</p>
+                  <p className="text-lg font-semibold text-stone-800">{hebergement.acf.repartition_des_chambres}</p>
+                </div>
+              )}
+              {hebergement.acf.disponibilite && (
+                <div className="bg-stone-50 rounded-xl p-4">
+                  <p className="text-xs text-stone-500 uppercase tracking-wide mb-1">Disponibilité</p>
+                  <p className="text-lg font-semibold text-stone-800">{hebergement.acf.disponibilite}</p>
+                </div>
+              )}
+              {hebergement.acf.commodites && (
+                <div className="bg-stone-50 rounded-xl p-4">
+                  <p className="text-xs text-stone-500 uppercase tracking-wide mb-1">Commodités</p>
+                  <p className="text-lg font-semibold text-stone-800">{hebergement.acf.commodites}</p>
+                </div>
+              )}
+            </div>
+          )}
+
           {hebergement.acf?.descriptif && (
             <div
               className="prose prose-stone mb-8 max-w-none"

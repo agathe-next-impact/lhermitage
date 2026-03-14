@@ -24,6 +24,10 @@ export const GET_HEBERGEMENTS = gql`
         hebergements {
           nom
           descriptif
+          disponibilite
+          capaciteDaccueil
+          repartitionDesChambres
+          commodites
           photos {
             nodes {
               ...ImageFields
@@ -69,6 +73,10 @@ export const GET_HEBERGEMENT_BY_SLUG = gql`
       hebergements {
         nom
         descriptif
+        disponibilite
+        capaciteDaccueil
+        repartitionDesChambres
+        commodites
         photos {
           nodes {
             ...ImageFields

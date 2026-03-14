@@ -58,7 +58,8 @@
       "Bash(git -C /c/dev/lhermitage show 85deb00:app/simulateur/actions/generate-pdf.ts)",
       "Bash(git -C /c/dev/lhermitage show 85deb00:components/features/simulateur/profil/profil-form.tsx)",
       "Bash(git -C /c/dev/lhermitage show 85deb00:components/features/simulateur/recapitulatif/quote-form.tsx)",
-      "Bash(git -C /c/dev/lhermitage show 85deb00:wp-plugins/hermitage-simulateur/hermitage-simulateur.php)"
+      "Bash(git -C /c/dev/lhermitage show 85deb00:wp-plugins/hermitage-simulateur/hermitage-simulateur.php)",
+      "Bash(find /c/dev/lhermitage -type f \\\\\\(-name *.tsx -o -name *.ts -o -name *.jsx -o -name *.js \\\\\\))"
     ]
   }
 }

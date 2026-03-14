@@ -137,6 +137,10 @@ export interface EvenementACF {
 export interface HebergementACF {
   nom?: string
   descriptif?: string
+  disponibilite?: string
+  capacite_daccueil?: number
+  repartition_des_chambres?: string
+  commodites?: string
   photos?: WPImage[]
   video?: string
   visibilite?: boolean

@@ -384,6 +384,10 @@ export function transformHebergementAcf(gqlPost: Record<string, any>): Hebergeme
   return {
     nom: merged.nom,
     descriptif: transformContentLinks(merged.descriptif || ""),
+    disponibilite: mainAcf?.disponibilite,
+    capacite_daccueil: mainAcf?.capaciteDaccueil != null ? Number(mainAcf.capaciteDaccueil) : undefined,
+    repartition_des_chambres: mainAcf?.repartitionDesChambres,
+    commodites: mainAcf?.commodites,
     photos: transformAcfMediaConnection(merged.photos),
     video: merged.video,
     visibilite: merged.visibilite,
