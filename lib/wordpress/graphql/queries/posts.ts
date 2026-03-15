@@ -129,6 +129,7 @@ export const GET_ACTIVITES = gql`
             databaseId
             name
             slug
+            displayOrder
           }
         }
         activites {
@@ -160,6 +161,7 @@ export const GET_ACTIVITE_BY_SLUG = gql`
           databaseId
           name
           slug
+          displayOrder
         }
       }
       activites {

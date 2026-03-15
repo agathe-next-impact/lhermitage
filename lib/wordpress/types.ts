@@ -393,6 +393,7 @@ export interface WPTerm {
   name: string
   slug: string
   taxonomy: string
+  display_order?: number
 }
 
 export interface FooterLink {

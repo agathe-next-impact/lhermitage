@@ -49,12 +49,13 @@ export default async function ActivitesPage() {
           description:
             categoryData.description || `Découvrez nos activités de type ${categoryData.name}`,
           color: getCategoryColor(categoryData.slug),
+          displayOrder: categoryData.display_order ?? 0,
         })
       }
     }
   })
 
-  const categories = Array.from(categoriesMap.values()).sort((a, b) => b.name.localeCompare(a.name))
+  const categories = Array.from(categoriesMap.values()).sort((a, b) => a.displayOrder - b.displayOrder)
 
   const activitiesData = activites.map((activite) => {
     const categoryInfo = activite._embedded?.["wp:term"]?.[0]?.[0]

@@ -243,6 +243,7 @@ export class WordPressAPI {
               name: t.name,
               slug: t.slug,
               taxonomy: "type-dactivite",
+              display_order: t.displayOrder ?? 0,
             })),
           ]
         }
@@ -272,6 +273,7 @@ export class WordPressAPI {
             name: t.name,
             slug: t.slug,
             taxonomy: "type-dactivite",
+            display_order: t.displayOrder ?? 0,
           })),
         ]
       }

@@ -65,6 +65,9 @@
       "Bash(source c:/dev/lhermitage/.env)",
       "Bash(echo \"WP_API_URL=$WP_API_URL\")",
       "Bash(echo \"WORDPRESS_GRAPHQL_URL=$WORDPRESS_GRAPHQL_URL\")"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\agath\\Downloads"
     ]
   }
 }

@@ -295,7 +295,7 @@ export function HebergementsGrid({ hebergements }: HebergementsGridProps) {
       requestAnimationFrame(() => {
         const el = document.getElementById(`expanded-${expandedId}`)
         if (el) {
-          const offset = 16 // small breathing room above the card
+          const offset = 50 // breathing room above the card
           const targetY = el.getBoundingClientRect().top + window.scrollY - offset
           smoothScrollTo(targetY, 350)
         }

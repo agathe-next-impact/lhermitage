@@ -276,7 +276,11 @@ export function ActivitiesClient({ categories, activities }: ActivitiesClientPro
     {} as Record<string, { slug: string; activities: Activity[] }>
   )
 
-  const sortedCategories = Object.keys(activitiesByCategory).sort().reverse()
+  // Sort category keys by the order defined in the categories prop (from WordPress display_order)
+  const categoryOrder = categories.map((c) => c.name)
+  const sortedCategories = Object.keys(activitiesByCategory).sort(
+    (a, b) => (categoryOrder.indexOf(a) === -1 ? Infinity : categoryOrder.indexOf(a)) - (categoryOrder.indexOf(b) === -1 ? Infinity : categoryOrder.indexOf(b))
+  )
 
   /** Smooth scroll with custom duration & easing via rAF */
   const smoothScrollTo = useCallback((target: number, duration = 600) => {
@@ -323,7 +327,7 @@ export function ActivitiesClient({ categories, activities }: ActivitiesClientPro
     const timer = setTimeout(() => {
       const el = document.getElementById(`expanded-${expandedId}`)
       if (el) {
-        const targetY = el.getBoundingClientRect().top + window.scrollY
+        const targetY = el.getBoundingClientRect().top + window.scrollY - 50
         smoothScrollTo(targetY, 250)
       }
     }, 300)
