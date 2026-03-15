@@ -41,8 +41,13 @@ const CollapsedCard: React.FC<{
   return (
     <motion.div
       layoutId={`card-${hebergement.id}`}
-      className="h-full flex flex-col justify-between p-2 pt-6 shadow-sm hover:shadow-md rounded-xl overflow-hidden relative bg-brand-green"
+      className="h-full flex flex-col justify-between p-2 pt-6 shadow-sm hover:shadow-md rounded-xl overflow-hidden relative bg-brand-green cursor-pointer"
       transition={{ layout: { duration: 0.25, ease: [0.4, 0, 0.2, 1] } }}
+      data-hebergement-card
+      onClick={onExpand}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onExpand() }}
     >
       <div className="px-2 pb-6 flex flex-col items-start gap-3">
         <motion.h3
@@ -224,9 +229,19 @@ const ExpandedCard: React.FC<{
 export function HebergementsGrid({ hebergements }: HebergementsGridProps) {
   const [expandedId, setExpandedId] = useState<number | null>(null)
   const scrollYBeforeExpand = useRef<number>(0)
+  const scrollRafId = useRef<number>(0)
 
-  /** Smooth scroll with custom duration & easing via rAF */
+  /** Cancel any in-flight scroll animation */
+  const cancelScroll = useCallback(() => {
+    if (scrollRafId.current) {
+      cancelAnimationFrame(scrollRafId.current)
+      scrollRafId.current = 0
+    }
+  }, [])
+
+  /** Smooth scroll with custom duration & easing via rAF (cancellable) */
   const smoothScrollTo = useCallback((target: number, duration = 600) => {
+    cancelScroll()
     const start = window.scrollY
     const delta = target - start
     if (Math.abs(delta) < 1) return
@@ -240,50 +255,65 @@ export function HebergementsGrid({ hebergements }: HebergementsGridProps) {
       const elapsed = now - startTime
       const progress = Math.min(elapsed / duration, 1)
       window.scrollTo(0, start + delta * easeInOutCubic(progress))
-      if (progress < 1) requestAnimationFrame(step)
+      if (progress < 1) {
+        scrollRafId.current = requestAnimationFrame(step)
+      } else {
+        scrollRafId.current = 0
+      }
     }
 
-    requestAnimationFrame(step)
-  }, [])
+    scrollRafId.current = requestAnimationFrame(step)
+  }, [cancelScroll])
 
   const handleExpand = useCallback((id: number) => {
+    cancelScroll()
     setExpandedId((prev) => {
       if (prev === id) return prev
       // Only save scroll position when opening from fully closed state
+      // (switching between cards keeps the original saved position)
       if (prev === null) {
         scrollYBeforeExpand.current = window.scrollY
       }
       return id
     })
-  }, [])
+  }, [cancelScroll])
 
   const handleCollapse = useCallback(() => {
+    cancelScroll()
     const scrollTarget = scrollYBeforeExpand.current
     setExpandedId(null)
     setTimeout(() => {
       smoothScrollTo(scrollTarget, 500)
     }, 300)
-  }, [smoothScrollTo])
+  }, [cancelScroll, smoothScrollTo])
 
   useEffect(() => {
     if (expandedId === null) return
+    // Wait for Framer Motion layout animation (250ms) to settle,
+    // then use rAF to ensure the browser has repainted before measuring.
     const timer = setTimeout(() => {
-      const el = document.getElementById(`expanded-${expandedId}`)
-      if (el) {
-        const targetY = el.getBoundingClientRect().top + window.scrollY
-        smoothScrollTo(targetY, 250)
-      }
-    }, 300)
+      requestAnimationFrame(() => {
+        const el = document.getElementById(`expanded-${expandedId}`)
+        if (el) {
+          const offset = 16 // small breathing room above the card
+          const targetY = el.getBoundingClientRect().top + window.scrollY - offset
+          smoothScrollTo(targetY, 350)
+        }
+      })
+    }, 280)
     return () => clearTimeout(timer)
   }, [expandedId, smoothScrollTo])
+
+  // Cleanup scroll animation on unmount
+  useEffect(() => cancelScroll, [cancelScroll])
 
   useEffect(() => {
     if (expandedId === null) return
     function handleClickOutside(e: MouseEvent) {
       const el = document.getElementById(`expanded-${expandedId}`)
       const target = e.target as HTMLElement
-      // Don't close if clicking a "Découvrir" button on another card
-      if (target.closest("button")?.textContent?.includes("Découvrir")) return
+      // Don't close if clicking another collapsed card (it will handle expand itself)
+      if (target.closest("[data-hebergement-card]")) return
       if (el && !el.contains(target)) {
         handleCollapse()
       }

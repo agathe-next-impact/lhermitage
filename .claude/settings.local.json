@@ -60,7 +60,11 @@
       "Bash(git -C /c/dev/lhermitage show 85deb00:components/features/simulateur/recapitulatif/quote-form.tsx)",
       "Bash(git -C /c/dev/lhermitage show 85deb00:wp-plugins/hermitage-simulateur/hermitage-simulateur.php)",
       "Bash(find /c/dev/lhermitage -type f \\\\\\(-name *.tsx -o -name *.ts -o -name *.jsx -o -name *.js \\\\\\))",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(source c:/dev/lhermitage/.env.local)",
+      "Bash(source c:/dev/lhermitage/.env)",
+      "Bash(echo \"WP_API_URL=$WP_API_URL\")",
+      "Bash(echo \"WORDPRESS_GRAPHQL_URL=$WORDPRESS_GRAPHQL_URL\")"
     ]
   }
 }

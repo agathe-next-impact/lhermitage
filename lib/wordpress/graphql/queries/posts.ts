@@ -124,7 +124,7 @@ export const GET_ACTIVITES = gql`
             ...ImageFields
           }
         }
-        categories {
+        typesDactivites {
           nodes {
             databaseId
             name
@@ -155,7 +155,7 @@ export const GET_ACTIVITE_BY_SLUG = gql`
           ...ImageFields
         }
       }
-      categories {
+      typesDactivites {
         nodes {
           databaseId
           name

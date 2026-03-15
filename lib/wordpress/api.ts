@@ -234,15 +234,15 @@ export class WordPressAPI {
       return nodes.map((node) => {
         const post = transformPost<ActiviteACF>(node, transformActiviteAcf(node), "activite")
         // Inject taxonomy terms into _embedded["wp:term"] for filter compatibility
-        const catTerms = node.categories?.nodes
-        if (catTerms?.length) {
+        const typeTerms = node.typesDactivites?.nodes
+        if (typeTerms?.length) {
           if (!post._embedded) post._embedded = {}
           post._embedded["wp:term"] = [
-            catTerms.map((t: any) => ({
+            typeTerms.map((t: any) => ({
               id: t.databaseId,
               name: t.name,
               slug: t.slug,
-              taxonomy: "category",
+              taxonomy: "type-dactivite",
             })),
           ]
         }
@@ -263,15 +263,15 @@ export class WordPressAPI {
         transformActiviteAcf(data.activit),
         "activite"
       )
-      const catTerms = data.activit.categories?.nodes
-      if (catTerms?.length) {
+      const typeTerms = data.activit.typesDactivites?.nodes
+      if (typeTerms?.length) {
         if (!post._embedded) post._embedded = {}
         post._embedded["wp:term"] = [
-          catTerms.map((t: any) => ({
+          typeTerms.map((t: any) => ({
             id: t.databaseId,
             name: t.name,
             slug: t.slug,
-            taxonomy: "category",
+            taxonomy: "type-dactivite",
           })),
         ]
       }

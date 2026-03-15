@@ -8,6 +8,18 @@ import { REVALIDATION } from "@/lib/constants"
 
 export const revalidate = REVALIDATION.listing
 
+/** Extract <img> src/alt from HTML content */
+function extractImagesFromHtml(html: string): { src: string; alt: string }[] {
+  const images: { src: string; alt: string }[] = []
+  const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*>/gi
+  let match
+  while ((match = imgRegex.exec(html)) !== null) {
+    const altMatch = match[0].match(/alt=["']([^"']*)["']/)
+    images.push({ src: match[1], alt: altMatch?.[1] || "" })
+  }
+  return images
+}
+
 function getCategoryColor(slug: string): string {
   const colorMap: Record<string, string> = {
     "atelier-de-facilitation": "#C14C66",
@@ -50,11 +62,15 @@ export default async function ActivitesPage() {
       id: activite.id,
       title: activite.acf?.nom || activite.title.rendered,
       description: activite.acf?.descriptif ? stripHtml(activite.acf.descriptif) : undefined,
+      descriptionHtml: activite.acf?.descriptif,
       image: activite._embedded?.["wp:featuredmedia"]?.[0]?.source_url,
       imageAlt: activite._embedded?.["wp:featuredmedia"]?.[0]?.alt_text || activite.title.rendered,
       slug: activite.slug,
       categoryName: categoryInfo?.name,
       categorySlug: categoryInfo?.slug,
+      contentImages: activite.acf?.descriptif
+        ? extractImagesFromHtml(activite.acf.descriptif)
+        : [],
     }
   })
 
