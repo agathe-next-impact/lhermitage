@@ -139,6 +139,8 @@ export function PartenairesClient({ partenaires, categories }: PartenairesClient
                     width={40}
                     height={40}
                     className="h-full w-full object-contain"
+                    loading="lazy"
+                    quality={70}
                   />
                 ) : (
                   <span className="text-[10px] text-center font-bold text-gray-500 overflow-hidden text-ellipsis px-1">
@@ -183,6 +185,8 @@ export function PartenairesClient({ partenaires, categories }: PartenairesClient
                     width={45}
                     height={45}
                     className="h-full w-full object-contain"
+                    loading="lazy"
+                    quality={70}
                   />
                 ) : (
                   <span className="text-[10px] text-center font-bold text-gray-500 overflow-hidden text-ellipsis px-1">
@@ -226,6 +230,8 @@ export function PartenairesClient({ partenaires, categories }: PartenairesClient
                     width={55}
                     height={55}
                     className="h-full w-full object-contain"
+                    loading="lazy"
+                    quality={70}
                   />
                 ) : (
                   <span className="text-xs text-center font-bold text-gray-500 overflow-hidden text-ellipsis px-1">
@@ -270,6 +276,8 @@ export function PartenairesClient({ partenaires, categories }: PartenairesClient
                     width={60}
                     height={60}
                     className="h-full w-full object-contain"
+                    loading="lazy"
+                    quality={70}
                   />
                 ) : (
                   <span className="text-xs text-center font-bold text-gray-500 overflow-hidden text-ellipsis px-1">
@@ -313,6 +321,8 @@ export function PartenairesClient({ partenaires, categories }: PartenairesClient
                     width={70}
                     height={70}
                     className="h-full w-full object-contain"
+                    loading="lazy"
+                    quality={70}
                   />
                 ) : (
                   <span className="text-xs text-center font-bold text-gray-500 overflow-hidden text-ellipsis px-1">
@@ -351,6 +361,8 @@ export function PartenairesClient({ partenaires, categories }: PartenairesClient
                       width={120}
                       height={120}
                       className="w-auto object-contain"
+                      loading="lazy"
+                      quality={75}
                     />
                   </div>
                 )}

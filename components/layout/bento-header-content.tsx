@@ -48,6 +48,7 @@ export function BentoHeaderContent({
           className="col-span-1 md:col-span-4 relative rounded-xl overflow-hidden border-b-2 border-background md:h-[calc(clamp(80px,35vh,160px)+9rem)]"
           style={{
             backgroundColor: mainBlobColor,
+            opacity: 0.8,
           }}
           initial={{ clipPath: "inset(0 0 100% 0)" }}
           animate={{ clipPath: "inset(0 0 0% 0)" }}
@@ -63,7 +64,7 @@ export function BentoHeaderContent({
               alt={title || "L'Hermitage"}
               width={100}
               height={100}
-              quality={100}
+              quality={75}
               className="w-12 md:w-24 h-auto md:h-full object-contain"
             />
           </div>
@@ -111,10 +112,10 @@ export function BentoHeaderContent({
             <Image
               src={columnImage}
               alt={title || "L'Hermitage"}
-              width={400}
-              height={400}
-              quality={100}
-              className="absolute inset-0 h-full w-full object-cover rounded-xl"
+              fill
+              quality={80}
+              sizes="25vw"
+              className="object-cover rounded-xl"
             />
           </div>
         )}

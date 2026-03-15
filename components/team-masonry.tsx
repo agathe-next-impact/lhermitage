@@ -58,6 +58,8 @@ export function TeamMasonry({ members }: TeamMasonryProps) {
                         height={photo.height || 800}
                         className="w-full h-full object-cover"
                         sizes="(max-width: 768px) 100vw, 33vw"
+                        quality={80}
+                        loading="lazy"
                       />
                     ) : (
                       <div className="w-full aspect-[3/4] bg-muted flex items-center justify-center">

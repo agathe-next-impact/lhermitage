@@ -79,8 +79,9 @@ const StructureCard: React.FC<{
           alt={structure._embedded?.["wp:featuredmedia"]?.[0]?.alt_text || structure.title.rendered}
           width={600}
           height={400}
-          quality={100}
+          quality={80}
           sizes="(max-width: 768px) 100vw, 33vw"
+          loading="lazy"
           className="rounded-xl object-cover w-full h-48"
         />
       </div>

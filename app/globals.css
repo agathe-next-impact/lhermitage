@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: smooth;
+}
+
 :root {
   /* Brand colors - Extended palette for vivid and sophisticated design */
   --brand-coral: #e75754; /* Logo / Titres */

@@ -396,7 +396,7 @@ export function PatrimoinePage({ acf }: PatrimoinePageProps) {
                       className="relative w-6 h-6 flex-shrink-0 flex items-center justify-center mt-1"
                       style={{ transform: "rotate(-90deg)" }}
                     >
-                      <Image src="/logo-arcs-light.png" alt="" fill className="object-contain" />
+                      <Image src="/logo-arcs-light.png" alt="" fill sizes="24px" className="object-contain" />
                     </div>
                     <div>
                       {valeur.titre && (

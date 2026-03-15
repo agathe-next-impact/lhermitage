@@ -46,12 +46,6 @@ export function PageHeader({
           className="absolute inset-0 overflow-hidden rounded-2xl"
           style={{
             backgroundColor: mainBlobColor,
-            ...(image && {
-              backgroundImage: `url(${image})`,
-              backgroundAttachment: "fixed",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }),
           }}
           initial={{ clipPath: "inset(0 100% 0 0 round 16px)" }}
           animate={{ clipPath: "inset(0 0% 0 0 round 16px)" }}
@@ -64,7 +58,19 @@ export function PageHeader({
             }
           }}
           data-header-bg=""
-        />
+        >
+          {image && (
+            <Image
+              src={image}
+              alt=""
+              fill
+              className="object-cover"
+              sizes="100vw"
+              quality={80}
+              priority
+            />
+          )}
+        </motion.div>
 
         {/* Encoche logo – haut gauche */}
         <div className="absolute top-0 left-0 z-10 bg-background pr-2 pb-2 rounded-br-2xl">

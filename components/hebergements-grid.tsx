@@ -1,17 +1,15 @@
 "use client"
 
 import type React from "react"
-import { useState, useRef, useEffect, useCallback } from "react"
-import { motion, AnimatePresence, LayoutGroup } from "framer-motion"
+import { useState, useRef, useCallback, useEffect } from "react"
+import { motion, LayoutGroup } from "framer-motion"
 
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
-import Link from "next/link"
 import type { WPPost, HebergementACF } from "@/lib/wordpress/types"
-import { truncateText } from "@/lib/utils"
 import { BRAND_COLORS } from "@/lib/theme/colors"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
-import { X } from "lucide-react"
+import { X, Users, BedDouble, CalendarDays } from "lucide-react"
 
 interface HebergementsGridProps {
   hebergements: WPPost<HebergementACF>[]
@@ -38,49 +36,32 @@ const CollapsedCard: React.FC<{
   color: string
   onExpand: () => void
 }> = ({ hebergement, color, onExpand }) => {
-  const truncatedDescription = hebergement.acf?.descriptif
-    ? truncateText(hebergement.acf.descriptif, 120)
-    : ""
   const { url: imageUrl, alt: imageAlt } = getImage(hebergement)
 
   return (
     <motion.div
       layoutId={`card-${hebergement.id}`}
-      className="h-full flex flex-col justify-between p-2 pt-6 shadow-sm hover:shadow-md rounded-xl overflow-hidden relative"
-      style={{ backgroundColor: color }}
-      transition={{ layout: { duration: 0.5, ease: [0.4, 0, 0.2, 1] } }}
+      className="h-full flex flex-col justify-between p-2 pt-6 shadow-sm hover:shadow-md rounded-xl overflow-hidden relative bg-brand-green"
+      transition={{ layout: { duration: 0.25, ease: [0.4, 0, 0.2, 1] } }}
     >
-      <div className="px-2 pb-6">
+      <div className="px-2 pb-6 flex flex-col items-start gap-3">
         <motion.h3
           layoutId={`title-${hebergement.id}`}
-          className="text-xl font-bold mb-3 text-white"
+          className="text-2xl font-bold text-white"
         >
           {hebergement.acf?.nom || hebergement.title.rendered}
         </motion.h3>
-        <p className="text-white/80 text-sm mb-3 flex-1 line-clamp-3">{truncatedDescription}</p>
 
-        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-white/90 mb-4">
-          {hebergement.acf?.capacite_daccueil != null && (
-            <span>👥 {hebergement.acf.capacite_daccueil} pers.</span>
-          )}
-          {hebergement.acf?.repartition_des_chambres && (
-            <span>🛏️ {hebergement.acf.repartition_des_chambres}</span>
-          )}
-          {hebergement.acf?.disponibilite && (
-            <span>📅 {hebergement.acf.disponibilite}</span>
-          )}
-        </div>
-
-        {hebergement.acf?.commodites && (
-          <p className="text-white/70 text-xs mb-4 line-clamp-2">
-            {hebergement.acf.commodites}
-          </p>
+        {hebergement.acf?.capacite_daccueil != null && (
+          <span className="text-sm text-white/90 flex items-center gap-1">
+            <Users className="w-3.5 h-3.5" /> {hebergement.acf.capacite_daccueil} pers.
+          </span>
         )}
 
         <Button
           onClick={onExpand}
           size="sm"
-          className="rounded-full bg-white/20 text-white transition-colors hover:bg-white/30 shadow-sm text-xs h-8 px-4"
+          className="rounded-full bg-white text-brand-green font-semibold transition-colors hover:bg-white/90 shadow-md text-sm h-9 px-6"
         >
           Découvrir
         </Button>
@@ -92,8 +73,9 @@ const CollapsedCard: React.FC<{
             alt={imageAlt}
             width={600}
             height={400}
-            quality={100}
+            quality={80}
             sizes="(max-width: 768px) 100vw, 33vw"
+            loading="lazy"
             className="rounded-xl object-cover w-full h-48"
           />
         </motion.div>
@@ -114,9 +96,8 @@ const ExpandedCard: React.FC<{
   return (
     <motion.div
       layoutId={`card-${hebergement.id}`}
-      className="flex flex-col p-2 pt-6 shadow-lg rounded-xl overflow-hidden relative"
-      style={{ backgroundColor: color }}
-      transition={{ layout: { duration: 0.5, ease: [0.4, 0, 0.2, 1] } }}
+      className="flex flex-col p-2 pt-6 shadow-lg rounded-xl overflow-hidden relative bg-brand-green"
+      transition={{ layout: { duration: 0.25, ease: [0.4, 0, 0.2, 1] } }}
     >
       {/* Close button */}
       <motion.button
@@ -133,7 +114,7 @@ const ExpandedCard: React.FC<{
 
       <div className="flex flex-col lg:flex-row gap-6 px-2 pb-6">
         {/* Left: text content */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 flex flex-col justify-between">
           <motion.h3
             layoutId={`title-${hebergement.id}`}
             className="text-2xl font-bold mb-4 text-white"
@@ -141,69 +122,57 @@ const ExpandedCard: React.FC<{
             {hebergement.acf?.nom || hebergement.title.rendered}
           </motion.h3>
 
-          {/* Info badges */}
-          <motion.div
-            className="flex flex-wrap gap-3 mb-4"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ delay: 0.15, duration: 0.3 }}
-          >
-            {hebergement.acf?.capacite_daccueil != null && (
-              <span className="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm rounded-full px-3 py-1.5 text-sm text-white">
-                👥 {hebergement.acf.capacite_daccueil} personnes
-              </span>
-            )}
-            {hebergement.acf?.repartition_des_chambres && (
-              <span className="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm rounded-full px-3 py-1.5 text-sm text-white">
-                🛏️ {hebergement.acf.repartition_des_chambres}
-              </span>
-            )}
-            {hebergement.acf?.disponibilite && (
-              <span className="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm rounded-full px-3 py-1.5 text-sm text-white">
-                📅 {hebergement.acf.disponibilite}
-              </span>
-            )}
-          </motion.div>
-
-          {hebergement.acf?.commodites && (
-            <motion.p
-              className="text-white/80 text-sm mb-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ delay: 0.2, duration: 0.3 }}
-            >
-              {hebergement.acf.commodites}
-            </motion.p>
-          )}
-
-          {/* Full description */}
-          {hebergement.acf?.descriptif && (
+          <div className="bg-white rounded-xl p-5">
+            {/* Info badges */}
             <motion.div
-              className="prose prose-sm prose-invert max-w-none mb-6 [&_p]:text-white/85 [&_a]:text-white [&_a]:underline"
-              dangerouslySetInnerHTML={{ __html: sanitizeHtml(hebergement.acf.descriptif) }}
-              initial={{ opacity: 0, y: 15 }}
+              className="flex flex-wrap gap-3 mb-4"
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 15 }}
-              transition={{ delay: 0.25, duration: 0.35 }}
-            />
-          )}
-
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ delay: 0.3, duration: 0.3 }}
-          >
-            <Button
-              asChild
-              size="sm"
-              className="rounded-full bg-white text-stone-800 hover:bg-white/90 shadow-sm text-xs h-8 px-4"
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ delay: 0.15, duration: 0.3 }}
             >
-              <Link href={`/hebergement/${hebergement.slug}`}>Voir la fiche complète</Link>
-            </Button>
-          </motion.div>
+              {hebergement.acf?.capacite_daccueil != null && (
+                <span className="inline-flex items-center gap-1.5 bg-brand-green/10 rounded-full px-3 py-1.5 text-sm text-stone-700">
+                  <Users className="w-4 h-4" /> {hebergement.acf.capacite_daccueil} personnes
+                </span>
+              )}
+              {hebergement.acf?.repartition_des_chambres && (
+                <span className="inline-flex items-center gap-1.5 bg-brand-green/10 rounded-full px-3 py-1.5 text-sm text-stone-700">
+                  <BedDouble className="w-4 h-4" /> {hebergement.acf.repartition_des_chambres}
+                </span>
+              )}
+              {hebergement.acf?.disponibilite && (
+                <span className="inline-flex items-center gap-1.5 bg-brand-green/10 rounded-full px-3 py-1.5 text-sm text-stone-700">
+                  <CalendarDays className="w-4 h-4" /> {hebergement.acf.disponibilite}
+                </span>
+              )}
+            </motion.div>
+
+            {hebergement.acf?.commodites && (
+              <motion.p
+                className="text-stone-600 text-sm mb-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ delay: 0.2, duration: 0.3 }}
+              >
+                {hebergement.acf.commodites}
+              </motion.p>
+            )}
+
+            {/* Full description */}
+            {hebergement.acf?.descriptif && (
+              <motion.div
+                className="prose prose-sm max-w-none [&_p]:text-stone-700 [&_a]:text-brand-green [&_a]:underline"
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(hebergement.acf.descriptif) }}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 15 }}
+                transition={{ delay: 0.25, duration: 0.35 }}
+              />
+            )}
+          </div>
+
         </div>
 
         {/* Right: photos */}
@@ -236,6 +205,9 @@ const ExpandedCard: React.FC<{
                   alt={photo.alt || `Photo ${i + 2}`}
                   width={300}
                   height={200}
+                  sizes="(max-width: 1024px) 33vw, 16vw"
+                  quality={75}
+                  loading="lazy"
                   className="rounded-lg object-cover w-full h-24 lg:h-28"
                 />
               ))}
@@ -247,48 +219,78 @@ const ExpandedCard: React.FC<{
   )
 }
 
-/* ── Grid: render row by row ── */
-
-const COLS = { sm: 1, md: 2, lg: 3 }
-
-function useColumns() {
-  const [cols, setCols] = useState(COLS.lg)
-
-  useEffect(() => {
-    function update() {
-      const w = window.innerWidth
-      setCols(w >= 1024 ? COLS.lg : w >= 768 ? COLS.md : COLS.sm)
-    }
-    update()
-    window.addEventListener("resize", update)
-    return () => window.removeEventListener("resize", update)
-  }, [])
-
-  return cols
-}
-
-function chunkRows<T>(items: T[], cols: number): T[][] {
-  const rows: T[][] = []
-  for (let i = 0; i < items.length; i += cols) {
-    rows.push(items.slice(i, i + cols))
-  }
-  return rows
-}
+/* ── Grid ── */
 
 export function HebergementsGrid({ hebergements }: HebergementsGridProps) {
   const [expandedId, setExpandedId] = useState<number | null>(null)
-  const expandedRef = useRef<HTMLDivElement>(null)
-  const cols = useColumns()
+  const scrollYBeforeExpand = useRef<number>(0)
 
-  const handleToggle = useCallback((id: number) => {
-    setExpandedId((prev) => (prev === id ? null : id))
+  /** Smooth scroll with custom duration & easing via rAF */
+  const smoothScrollTo = useCallback((target: number, duration = 600) => {
+    const start = window.scrollY
+    const delta = target - start
+    if (Math.abs(delta) < 1) return
+    const startTime = performance.now()
+
+    function easeInOutCubic(t: number) {
+      return t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2
+    }
+
+    function step(now: number) {
+      const elapsed = now - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      window.scrollTo(0, start + delta * easeInOutCubic(progress))
+      if (progress < 1) requestAnimationFrame(step)
+    }
+
+    requestAnimationFrame(step)
   }, [])
 
+  const handleExpand = useCallback((id: number) => {
+    setExpandedId((prev) => {
+      if (prev === id) return prev
+      // Only save scroll position when opening from fully closed state
+      if (prev === null) {
+        scrollYBeforeExpand.current = window.scrollY
+      }
+      return id
+    })
+  }, [])
+
+  const handleCollapse = useCallback(() => {
+    const scrollTarget = scrollYBeforeExpand.current
+    setExpandedId(null)
+    setTimeout(() => {
+      smoothScrollTo(scrollTarget, 500)
+    }, 300)
+  }, [smoothScrollTo])
+
   useEffect(() => {
-    if (expandedId !== null && expandedRef.current) {
-      expandedRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" })
+    if (expandedId === null) return
+    const timer = setTimeout(() => {
+      const el = document.getElementById(`expanded-${expandedId}`)
+      if (el) {
+        const targetY = el.getBoundingClientRect().top + window.scrollY
+        smoothScrollTo(targetY, 250)
+      }
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [expandedId, smoothScrollTo])
+
+  useEffect(() => {
+    if (expandedId === null) return
+    function handleClickOutside(e: MouseEvent) {
+      const el = document.getElementById(`expanded-${expandedId}`)
+      const target = e.target as HTMLElement
+      // Don't close if clicking a "Découvrir" button on another card
+      if (target.closest("button")?.textContent?.includes("Découvrir")) return
+      if (el && !el.contains(target)) {
+        handleCollapse()
+      }
     }
-  }, [expandedId])
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [expandedId, handleCollapse])
 
   if (!hebergements || hebergements.length === 0) {
     return (
@@ -301,74 +303,44 @@ export function HebergementsGrid({ hebergements }: HebergementsGridProps) {
     )
   }
 
-  const rows = chunkRows(hebergements, cols)
-
   return (
     <LayoutGroup>
-      <div className="flex flex-col gap-2">
-        {rows.map((row, rowIndex) => {
-          const expandedInRow = row.find((h) => h.id === expandedId)
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+        {hebergements.map((hebergement) => {
+          const isExpanded = hebergement.id === expandedId
 
-          /* Row has an expanded card → full-width expanded + siblings fade out */
-          if (expandedInRow) {
+          if (isExpanded) {
             return (
-              <div key={`row-${rowIndex}`} ref={expandedRef}>
-                <div
-                  className="grid gap-2"
-                  style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
-                >
-                  {/* Siblings fade/shrink out */}
-                  <AnimatePresence>
-                    {row
-                      .filter((h) => h.id !== expandedId)
-                      .map((h) => (
-                        <motion.div
-                          key={h.id}
-                          initial={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.9 }}
-                          transition={{ duration: 0.25 }}
-                          className="pointer-events-none"
-                        />
-                      ))}
-                  </AnimatePresence>
-                </div>
-                {/* Expanded card takes full row */}
+              <motion.div
+                key={hebergement.id}
+                id={`expanded-${hebergement.id}`}
+                layout
+                className="col-span-1 md:col-span-2 lg:col-span-3"
+                transition={{ layout: { duration: 0.25, ease: [0.4, 0, 0.2, 1] } }}
+              >
                 <ExpandedCard
-                  hebergement={expandedInRow}
+                  hebergement={hebergement}
                   color={BRAND_COLORS.rose}
-                  onCollapse={() => setExpandedId(null)}
+                  onCollapse={handleCollapse}
                 />
-              </div>
+              </motion.div>
             )
           }
 
-          /* Normal row → grid of collapsed cards */
           return (
             <motion.div
-              key={`row-${rowIndex}`}
+              key={hebergement.id}
               layout
-              className="grid gap-2"
-              style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
-              transition={{ layout: { duration: 0.4, ease: [0.4, 0, 0.2, 1] } }}
+              animate={{
+                filter: expandedId !== null ? "opacity(0.7)" : "opacity(1)",
+              }}
+              transition={{ layout: { duration: 0.5, ease: [0.4, 0, 0.2, 1] }, duration: 0.3 }}
             >
-              <AnimatePresence mode="popLayout">
-                {row.map((hebergement) => (
-                  <motion.div
-                    key={hebergement.id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <CollapsedCard
-                      hebergement={hebergement}
-                      color={BRAND_COLORS.rose}
-                      onExpand={() => handleToggle(hebergement.id)}
-                    />
-                  </motion.div>
-                ))}
-              </AnimatePresence>
+              <CollapsedCard
+                hebergement={hebergement}
+                color={BRAND_COLORS.rose}
+                onExpand={() => handleExpand(hebergement.id)}
+              />
             </motion.div>
           )
         })}

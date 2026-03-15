@@ -255,7 +255,10 @@ export function LoadingCarousel({
                       alt={`Visual representation for tip: ${tip.text}`}
                       fill
                       className="object-cover"
-                      priority
+                      priority={index === 0}
+                      loading={index === 0 ? "eager" : "lazy"}
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1152px"
+                      quality={80}
                     />
                     {backgroundGradient && (
                       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
