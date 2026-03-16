@@ -8,6 +8,7 @@ import type {
   HebergementACF,
   SejourACF,
   ActiviteACF,
+  ServiceACF,
   StructureACF,
   EvenementACF,
   PartenaireACF,
@@ -27,6 +28,7 @@ import {
   transformTeamMemberAcf,
   transformEspaceDeTravailAcf,
   transformSejourAcf,
+  transformServiceAcf,
   transformSeminairesData,
   transformMenuItems,
   transformTerm,
@@ -48,6 +50,7 @@ import {
   GET_PARTENAIRES,
   GET_ESPACES_DE_TRAVAIL,
   GET_TEAM_MEMBERS,
+  GET_SERVICES,
 } from "./graphql/queries/posts"
 import { GET_SEJOURS, GET_SEJOUR_BY_SLUG } from "./graphql/queries/sejours"
 import { GET_PAGE_SEMINAIRES } from "./graphql/queries/seminaires"
@@ -175,6 +178,8 @@ export class WordPressAPI {
         return this.getSejours() as Promise<WPPost<T>[]>
       case "membre":
         return this.getTeamMembers() as Promise<WPPost<T>[]>
+      case "service":
+        return this.getServices() as Promise<WPPost<T>[]>
       default:
         logger.error(`Unknown post type for GraphQL: ${postType}`)
         return []
@@ -281,6 +286,38 @@ export class WordPressAPI {
     } catch (error) {
       logger.error("Failed to fetch activite by slug:", slug, error instanceof Error ? error.message : error)
       return null
+    }
+  }
+
+  async getServices(): Promise<WPPost<ServiceACF>[]> {
+    try {
+      const data = await gqlRequestList<{ services: { nodes: any[] } }>(GET_SERVICES)
+      const nodes = data.services?.nodes || []
+      return nodes.map((node) => {
+        const post = transformPost<ServiceACF>(node, transformServiceAcf(node), "service")
+        // Inject taxonomy terms into _embedded["wp:term"] for filter compatibility
+        const typeTerms = node.typesDeServices?.nodes
+        if (typeTerms?.length) {
+          if (!post._embedded) post._embedded = {}
+          post._embedded["wp:term"] = [
+            typeTerms.map((t: any) => ({
+              id: t.databaseId,
+              name: t.name,
+              slug: t.slug,
+              taxonomy: "type-de-service",
+              display_order: t.displayOrder ?? 0,
+              image: t.image ? {
+                url: t.image.sourceUrl,
+                alt: t.image.altText || "",
+              } : null,
+            })),
+          ]
+        }
+        return post
+      })
+    } catch (error) {
+      logger.error("Failed to fetch services:", error)
+      return []
     }
   }
 

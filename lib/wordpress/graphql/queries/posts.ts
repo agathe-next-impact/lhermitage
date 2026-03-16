@@ -424,6 +424,52 @@ export const GET_ESPACES_DE_TRAVAIL = gql`
   ${IMAGE_FIELDS}
 `
 
+// --- Services ---
+// WPGraphQL root query: services
+// ACF field group: "pageServices" (nom, descriptif, photos)
+// Taxonomy: typesDeServices (with displayOrder + image term meta)
+
+export const GET_SERVICES = gql`
+  query GetServices {
+    services(first: 100) {
+      nodes {
+        databaseId
+        slug
+        title
+        date
+        status
+        link
+        featuredImage {
+          node {
+            ...ImageFields
+          }
+        }
+        typesDeServices {
+          nodes {
+            databaseId
+            name
+            slug
+            displayOrder
+            image {
+              ...ImageFields
+            }
+          }
+        }
+        pageServices {
+          nom
+          descriptif
+          photos {
+            nodes {
+              ...ImageFields
+            }
+          }
+        }
+      }
+    }
+  }
+  ${IMAGE_FIELDS}
+`
+
 // --- Team Members ---
 // WPGraphQL root query: equipes (custom name for "membre" CPT)
 // ACF field group: "membreDEquipe" (member content)

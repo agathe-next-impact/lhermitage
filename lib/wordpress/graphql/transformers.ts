@@ -507,9 +507,11 @@ export function transformEspaceDeTravailAcf(gqlPost: Record<string, any>): Espac
 }
 
 export function transformServiceAcf(_gqlPost: Record<string, any>): ServiceACF {
-  // Service CPT has no dedicated ACF field group — title serves as nom
+  const acf = _gqlPost.pageServices || {}
   return {
-    nom: _gqlPost.title || undefined,
+    nom: acf.nom || _gqlPost.title || undefined,
+    descriptif: acf.descriptif || undefined,
+    photos: transformAcfMediaConnection(acf.photos),
   }
 }
 

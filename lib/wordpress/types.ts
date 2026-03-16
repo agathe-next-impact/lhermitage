@@ -122,6 +122,7 @@ export interface ActiviteACF {
 export interface ServiceACF {
   nom?: string
   descriptif?: string
+  photos?: WPImage[]
 }
 
 export interface EvenementACF {
@@ -394,6 +395,7 @@ export interface WPTerm {
   slug: string
   taxonomy: string
   display_order?: number
+  image?: { url: string; alt: string } | null
 }
 
 export interface FooterLink {

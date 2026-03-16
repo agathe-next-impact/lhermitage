@@ -13,9 +13,11 @@ interface Category {
 interface CategoryFilterProps {
   categories: Category[]
   onCategoryChange: (categorySlug: string | null) => void
+  allLabel?: string
+  allDescription?: string
 }
 
-export function CategoryFilter({ categories, onCategoryChange }: CategoryFilterProps) {
+export function CategoryFilter({ categories, onCategoryChange, allLabel, allDescription }: CategoryFilterProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
 
   const handleCategoryClick = (categorySlug: string) => {
@@ -26,9 +28,9 @@ export function CategoryFilter({ categories, onCategoryChange }: CategoryFilterP
   const allTabs = [
     {
       id: "all",
-      name: "Toutes les activités",
+      name: allLabel || "Toutes les activités",
       slug: "all",
-      description: "Découvrez toutes nos activités disponibles",
+      description: allDescription || "Découvrez toutes nos activités disponibles",
       color: "#2A4A51",
     },
     ...categories,

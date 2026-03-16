@@ -64,7 +64,9 @@
       "Bash(source c:/dev/lhermitage/.env.local)",
       "Bash(source c:/dev/lhermitage/.env)",
       "Bash(echo \"WP_API_URL=$WP_API_URL\")",
-      "Bash(echo \"WORDPRESS_GRAPHQL_URL=$WORDPRESS_GRAPHQL_URL\")"
+      "Bash(echo \"WORDPRESS_GRAPHQL_URL=$WORDPRESS_GRAPHQL_URL\")",
+      "Bash(taskkill //F //IM node.exe)",
+      "Read(//tmp/**)"
     ],
     "additionalDirectories": [
       "c:\\Users\\agath\\Downloads"
