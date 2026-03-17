@@ -10,6 +10,17 @@ import "maplibre-gl/dist/maplibre-gl.css"
 import { IGN_SATELLITE_STYLE, DEFAULT_CENTER, DEFAULT_ZOOM } from "@/lib/map/ign-style"
 import type { MapPinPointData, TourStop } from "@/lib/map/types"
 
+const TYPE_CONFIG: Record<string, { label: string; color: string }> = {
+  hebergement: { label: "Hébergement", color: "#56939F" },
+  structure: { label: "Structure", color: "#78AD7D" },
+  "espace-de-travail": { label: "Espace de travail", color: "#DC6F45" },
+  "vue-panoramique": { label: "Vue panoramique", color: "#C14C66" },
+}
+
+function getTypeConfig(type: string) {
+  return TYPE_CONFIG[type] ?? { label: type, color: "#535353" }
+}
+
 interface GuidedTourProps {
   mapPinPoints: MapPinPointData[]
 }
@@ -30,11 +41,11 @@ function buildTourStops(mapPinPoints: MapPinPointData[]): TourStop[] {
     pointId: 0,
   }
 
-  const dataStops: TourStop[] = mapPinPoints.map((point) => ({
+  const dataStops: TourStop[] = mapPinPoints.filter((point) => point.mapPinPoint?.position?.latitude && point.mapPinPoint?.position?.longitude).map((point) => ({
     name: point.mapPinPoint?.nom || point.title || "Point d'intérêt",
     description: point.mapPinPoint?.descriptif || "",
-    longitude: point.mapPinPoint?.position?.longitude || DEFAULT_CENTER.lng,
-    latitude: point.mapPinPoint?.position?.latitude || DEFAULT_CENTER.lat,
+    longitude: point.mapPinPoint!.position!.longitude,
+    latitude: point.mapPinPoint!.position!.latitude,
     zoom: 19,
     image: point.mapPinPoint?.images?.[0]?.url,
     link: `/${point.type}/${point.slug}`,
@@ -86,6 +97,12 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
   const markersRef = useRef<maplibregl.Marker[]>([])
   const tourStopsRef = useRef<TourStop[]>([])
   const currentStopRef = useRef(0)
+  const isTransitioningRef = useRef(false)
+  const prefersReducedMotionRef = useRef(
+    typeof window !== "undefined"
+      ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      : false
+  )
 
   const tourStops = useMemo(() => buildTourStops(mapPinPoints), [mapPinPoints])
 
@@ -93,11 +110,12 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
     tourStopsRef.current = tourStops
   }, [tourStops])
 
-  const handleMarkerClick = useCallback((index: number) => {
-    if (index === currentStopRef.current) return
+  const navigateToStop = useCallback((index: number) => {
+    if (index === currentStopRef.current || isTransitioningRef.current) return
 
     setShowInfoPanel(false)
     setIsTransitioning(true)
+    isTransitioningRef.current = true
     currentStopRef.current = index
     setCurrentStop(index)
   }, [])
@@ -105,6 +123,9 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
   // Initialize MapLibre GL map
   useEffect(() => {
     if (!mapContainerRef.current) return
+
+    const abortController = new AbortController()
+    const { signal } = abortController
 
     const map = new maplibregl.Map({
       container: mapContainerRef.current,
@@ -128,19 +149,22 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
         el.setAttribute("aria-label", `Point d'intérêt : ${stop.name}`)
         el.setAttribute("tabindex", "0")
 
-        el.addEventListener("click", () => handleMarkerClick(index))
+        el.addEventListener("click", () => navigateToStop(index), { signal })
         el.addEventListener("keydown", (e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault()
-            handleMarkerClick(index)
+            navigateToStop(index)
           }
-        })
+        }, { signal })
         el.addEventListener("mouseenter", () => {
-          el.style.transform = "scale(1.3)"
-        })
+          el.style.width = "20px"
+          el.style.height = "20px"
+          el.style.boxShadow = "0 0 0 4px rgba(231, 87, 84, 0.4), 0 2px 8px rgba(0,0,0,0.3)"
+        }, { signal })
         el.addEventListener("mouseleave", () => {
-          el.style.transform = "scale(1)"
-        })
+          const isActive = currentStopRef.current === index
+          updateMarkerStyle(el, isActive)
+        }, { signal })
 
         const marker = new maplibregl.Marker({ element: el })
           .setLngLat([stop.longitude, stop.latitude])
@@ -151,12 +175,13 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
     })
 
     return () => {
+      abortController.abort()
       markersRef.current.forEach((m) => m.remove())
       markersRef.current = []
       map.remove()
       mapRef.current = null
     }
-  }, [handleMarkerClick])
+  }, [navigateToStop])
 
   // Fly to current stop when it changes
   useEffect(() => {
@@ -164,12 +189,18 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
     if (!map || !mapLoaded) return
 
     const stop = tourStops[currentStop]
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+
+    // Cancel any previous moveend listener to avoid race conditions
+    const onMoveEnd = () => {
+      setIsTransitioning(false)
+      isTransitioningRef.current = false
+      setShowInfoPanel(true)
+    }
 
     map.flyTo({
       center: [stop.longitude, stop.latitude],
       zoom: stop.zoom,
-      duration: prefersReducedMotion ? 0 : 3000,
+      duration: prefersReducedMotionRef.current ? 0 : 3000,
       essential: true,
     })
 
@@ -179,11 +210,7 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
       updateMarkerStyle(marker.getElement(), markerStopIndex === currentStop)
     })
 
-    // Show info panel after flyTo completes
-    map.once("moveend", () => {
-      setIsTransitioning(false)
-      setShowInfoPanel(true)
-    })
+    map.once("moveend", onMoveEnd)
 
     // Scroll map into view
     if (mapContainerRef.current && currentStop > 0) {
@@ -194,19 +221,11 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
         behavior: "smooth",
       })
     }
+
+    return () => {
+      map.off("moveend", onMoveEnd)
+    }
   }, [currentStop, mapLoaded, tourStops])
-
-  const handleStopClick = useCallback(
-    (index: number) => {
-      if (index === currentStop || isTransitioning) return
-
-      setShowInfoPanel(false)
-      setIsTransitioning(true)
-      currentStopRef.current = index
-      setCurrentStop(index)
-    },
-    [currentStop, isTransitioning]
-  )
 
   const currentStopData = tourStops[currentStop]
 
@@ -268,18 +287,20 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
                   <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden rounded-l-2xl bg-white p-2">
                     <div className="relative h-full w-full rounded-lg overflow-hidden">
                       <Image
-                        src={currentStopData.image || "/placeholder.jpg"}
+                        src={currentStopData.image}
                         alt={currentStopData.name}
                         fill
                         className="object-cover rounded-lg"
                         sizes="128px"
-                        loading="lazy"
                       />
                     </div>
 
                     {currentStopData.type && (
-                      <span className="absolute top-2 left-2 bg-primary text-white text-xs font-semibold px-2 py-0.5 rounded-full shadow-md z-10 capitalize">
-                        {currentStopData.type}
+                      <span
+                        className="absolute top-2 left-2 text-white text-xs font-semibold px-2 py-0.5 rounded-full shadow-md z-10"
+                        style={{ backgroundColor: getTypeConfig(currentStopData.type).color }}
+                      >
+                        {getTypeConfig(currentStopData.type).label}
                       </span>
                     )}
                   </div>
@@ -331,15 +352,15 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
 
       {/* Sidebar — vignettes des points d'intérêt */}
       <div className="lg:w-1/4 lg:max-w-sm">
-        <div className="sticky top-4 space-y-3">
+        <div className="sticky top-24 space-y-3">
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-1">
             Points d&apos;intérêt ({tourStops.length})
           </h3>
-          <div className="grid grid-cols-2 gap-3 max-h-[80vh] overflow-y-scroll pr-2">
+          <div className="grid grid-cols-2 gap-3 max-h-[80vh] overflow-y-auto pr-2">
             {tourStops.map((stop, index) => (
               <button
                 key={stop.pointId}
-                onClick={() => handleStopClick(index)}
+                onClick={() => navigateToStop(index)}
                 aria-label={`Voir ${stop.name}`}
                 aria-current={index === currentStop ? "true" : undefined}
                 className={`group relative aspect-video overflow-hidden rounded-lg border-2 transition-all ${
@@ -350,7 +371,7 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
               >
                 {stop.image ? (
                   <Image
-                    src={stop.image || "/placeholder.jpg"}
+                    src={stop.image}
                     alt={stop.name}
                     fill
                     className="object-cover transition-transform group-hover:scale-110 rounded-lg"
@@ -371,9 +392,12 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
                 {index === currentStop && (
                   <div className="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary animate-pulse" />
                 )}
-                <div className="absolute top-2 left-2 rounded-full bg-primary/90 px-2 py-0.5">
-                  <span className="text-xs font-medium text-white flex items-center gap-1">
-                    <Camera className="h-3 w-3" />
+                <div
+                  className="absolute top-2 left-2 rounded-full px-2 py-0.5"
+                  style={{ backgroundColor: getTypeConfig(stop.type).color }}
+                >
+                  <span className="text-[10px] font-medium text-white">
+                    {getTypeConfig(stop.type).label}
                   </span>
                 </div>
               </button>

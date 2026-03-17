@@ -1,17 +1,17 @@
 "use client"
 
 import type React from "react"
+import { useState, useRef, useCallback, useEffect } from "react"
+import { motion, LayoutGroup } from "framer-motion"
 
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import type { WPPost, WPImage, StructureACF } from "@/lib/wordpress/types"
-import { getCategoryColor } from "@/lib/wordpress/category-colors"
-import { truncateText } from "@/lib/utils"
-import { sanitizeUrl } from "@/lib/wordpress/sanitize"
-import { MinimalCard } from "@/components/ui/minimal-card"
-import { BRAND_COLORS } from "@/lib/theme/colors"
-import { BentoHeaderContent } from "@/components/layout/bento-header-content"
 import Image from "next/image"
+import type { WPPost, WPImage, StructureACF } from "@/lib/wordpress/types"
+import { BRAND_COLORS } from "@/lib/theme/colors"
+import { sanitizeHtml, sanitizeUrl } from "@/lib/wordpress/sanitize"
+import { BentoHeaderContent } from "@/components/layout/bento-header-content"
+import { X } from "lucide-react"
 
 interface SectionData {
   titre_de_section?: string
@@ -24,90 +24,351 @@ interface StructuresGridProps {
   sectionHebergees?: SectionData
 }
 
-const StructureCard: React.FC<{
+/* ── Shared helpers ── */
+
+function getImage(s: WPPost<StructureACF>) {
+  return {
+    url:
+      s.acf?.photos?.[0]?.url ||
+      s._embedded?.["wp:featuredmedia"]?.[0]?.source_url,
+    alt:
+      s.acf?.photos?.[0]?.alt ||
+      s._embedded?.["wp:featuredmedia"]?.[0]?.alt_text ||
+      s.title.rendered,
+  }
+}
+
+/* ── Collapsed card ── */
+
+const CollapsedCard: React.FC<{
   structure: WPPost<StructureACF>
-  categoryColor: string
-}> = ({ structure, categoryColor }) => {
-  const truncatedDescription = structure.acf?.descriptif
-    ? truncateText(structure.acf.descriptif, 120)
-    : ""
+  color: string
+  onExpand: () => void
+}> = ({ structure, color, onExpand }) => {
+  const { url: imageUrl, alt: imageAlt } = getImage(structure)
 
   return (
-    <MinimalCard
-      className="h-full flex flex-col justify-between p-2 pt-6 shadow-sm hover:shadow-md transition-shadow relative"
-      style={{ backgroundColor: categoryColor }}
+    <motion.div
+      layoutId={`structure-card-${structure.id}`}
+      className="h-full flex flex-col justify-between p-2 pt-6 shadow-sm hover:shadow-md rounded-xl overflow-hidden relative cursor-pointer"
+      style={{ backgroundColor: color }}
+      transition={{ layout: { duration: 0.25, ease: [0.4, 0, 0.2, 1] } }}
+      data-structure-card
+      onClick={onExpand}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onExpand() }}
     >
-      <div className="px-2 pb-6">
-        <h3 className="text-xl font-bold mb-3 text-white">
+      <div className="px-2 pb-6 flex flex-col items-start gap-3">
+        <motion.h3
+          layoutId={`structure-title-${structure.id}`}
+          className="text-2xl font-bold text-white"
+        >
           {structure.acf?.nom || structure.title.rendered}
-        </h3>
-        <p className="text-white/80 text-sm mb-4 flex-1 line-clamp-4">{truncatedDescription}</p>
+        </motion.h3>
 
-        <div className="flex gap-2">
-          <Button
-            asChild
-            size="sm"
-            className="rounded-full bg-white/20 text-white transition-colors hover:bg-white/30 shadow-sm text-xs h-8 px-4"
+        <Button
+          onClick={onExpand}
+          size="sm"
+          className="rounded-full bg-white text-stone-700 font-semibold transition-colors hover:bg-white/90 shadow-md text-sm h-9 px-6"
+        >
+          Découvrir
+        </Button>
+      </div>
+      {imageUrl && (
+        <motion.div layoutId={`structure-image-${structure.id}`}>
+          <Image
+            src={imageUrl}
+            alt={imageAlt}
+            width={600}
+            height={400}
+            quality={80}
+            sizes="(max-width: 768px) 100vw, 33vw"
+            loading="lazy"
+            className="rounded-xl object-cover w-full h-48"
+          />
+        </motion.div>
+      )}
+    </motion.div>
+  )
+}
+
+/* ── Expanded card (full row width) ── */
+
+const ExpandedCard: React.FC<{
+  structure: WPPost<StructureACF>
+  color: string
+  onCollapse: () => void
+}> = ({ structure, color, onCollapse }) => {
+  const { url: imageUrl, alt: imageAlt } = getImage(structure)
+
+  return (
+    <motion.div
+      layoutId={`structure-card-${structure.id}`}
+      className="flex flex-col p-2 pt-6 shadow-lg rounded-xl overflow-hidden relative"
+      style={{ backgroundColor: color }}
+      transition={{ layout: { duration: 0.25, ease: [0.4, 0, 0.2, 1] } }}
+    >
+      {/* Close button */}
+      <motion.button
+        onClick={onCollapse}
+        className="absolute top-3 right-3 z-10 rounded-full bg-white/20 hover:bg-white/30 transition-colors p-1.5"
+        aria-label="Fermer"
+        initial={{ opacity: 0, scale: 0.5 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.5 }}
+        transition={{ delay: 0.2, duration: 0.2 }}
+      >
+        <X className="w-5 h-5 text-white" />
+      </motion.button>
+
+      <div className="flex flex-col lg:flex-row gap-6 px-2 pb-6">
+        {/* Left: text content */}
+        <div className="flex-1 min-w-0 flex flex-col justify-between">
+          <motion.h3
+            layoutId={`structure-title-${structure.id}`}
+            className="text-2xl font-bold mb-4 text-white"
           >
-            <Link href={`/structure/${structure.slug}`}>Voir</Link>
-          </Button>
+            {structure.acf?.nom || structure.title.rendered}
+          </motion.h3>
 
-          {structure.acf?.lien?.url && (
-            <Button
-              asChild
-              variant="outline"
-              size="sm"
-              className="rounded-full transition-colors hover:bg-white/10 bg-transparent border-white/40 text-white text-xs h-8 px-4"
+          <div className="bg-white rounded-xl p-5">
+            {/* Full description */}
+            {structure.acf?.descriptif && (
+              <motion.div
+                className="prose prose-sm max-w-none [&_p]:text-stone-700 [&_a]:underline"
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(structure.acf.descriptif) }}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 15 }}
+                transition={{ delay: 0.25, duration: 0.35 }}
+              />
+            )}
+
+            {/* Action buttons */}
+            <motion.div
+              className="flex flex-wrap gap-3 mt-4"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ delay: 0.3, duration: 0.3 }}
             >
-              <a
-                href={sanitizeUrl(structure.acf.lien.url)}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Button
+                asChild
+                size="sm"
+                className="rounded-full font-semibold text-sm h-9 px-6"
+                style={{ backgroundColor: color, color: "white" }}
               >
-                {structure.acf.lien.title || "Site web"}
-              </a>
-            </Button>
+                <Link href={`/structure/${structure.slug}`}>Voir la fiche</Link>
+              </Button>
+
+              {structure.acf?.lien?.url && (
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full text-sm h-9 px-6"
+                >
+                  <a
+                    href={sanitizeUrl(structure.acf.lien.url)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {structure.acf.lien.title || "Site web"}
+                  </a>
+                </Button>
+              )}
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Right: photos */}
+        <div className="lg:w-1/2 flex flex-col gap-2">
+          {imageUrl && (
+            <motion.div layoutId={`structure-image-${structure.id}`}>
+              <Image
+                src={imageUrl}
+                alt={imageAlt}
+                width={800}
+                height={500}
+                quality={90}
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="rounded-xl object-cover w-full h-64 lg:h-72"
+              />
+            </motion.div>
+          )}
+          {structure.acf?.photos && structure.acf.photos.length > 1 && (
+            <motion.div
+              className="grid grid-cols-3 gap-2"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ delay: 0.2, duration: 0.35 }}
+            >
+              {structure.acf.photos.slice(1, 4).map((photo, i) => (
+                <Image
+                  key={photo.id ?? i}
+                  src={photo.url}
+                  alt={photo.alt || `Photo ${i + 2}`}
+                  width={300}
+                  height={200}
+                  sizes="(max-width: 1024px) 33vw, 16vw"
+                  quality={75}
+                  loading="lazy"
+                  className="rounded-lg object-cover w-full h-24 lg:h-28"
+                />
+              ))}
+            </motion.div>
           )}
         </div>
       </div>
-      <div>
-        <Image
-          src={
-            structure._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
-            "/images/default-structure-logo.png"
-          }
-          alt={structure._embedded?.["wp:featuredmedia"]?.[0]?.alt_text || structure.title.rendered}
-          width={600}
-          height={400}
-          quality={80}
-          sizes="(max-width: 768px) 100vw, 33vw"
-          loading="lazy"
-          className="rounded-xl object-cover w-full h-48"
-        />
-      </div>
-    </MinimalCard>
+    </motion.div>
   )
 }
 
-function FillerCard({ count, color, image }: { count: number; color: string; image?: string }) {
-  const remainder = count % 3
-  if (remainder === 0) return null
-  const span = 3 - remainder
+/* ── Section grid with expand/collapse logic ── */
+
+function StructuresSectionGrid({
+  structures,
+  color,
+}: {
+  structures: WPPost<StructureACF>[]
+  color: string
+}) {
+  const [expandedId, setExpandedId] = useState<number | null>(null)
+  const scrollYBeforeExpand = useRef<number>(0)
+  const scrollRafId = useRef<number>(0)
+
+  const cancelScroll = useCallback(() => {
+    if (scrollRafId.current) {
+      cancelAnimationFrame(scrollRafId.current)
+      scrollRafId.current = 0
+    }
+  }, [])
+
+  const smoothScrollTo = useCallback((target: number, duration = 600) => {
+    cancelScroll()
+    const start = window.scrollY
+    const delta = target - start
+    if (Math.abs(delta) < 1) return
+    const startTime = performance.now()
+
+    function easeInOutCubic(t: number) {
+      return t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2
+    }
+
+    function step(now: number) {
+      const elapsed = now - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      window.scrollTo(0, start + delta * easeInOutCubic(progress))
+      if (progress < 1) {
+        scrollRafId.current = requestAnimationFrame(step)
+      } else {
+        scrollRafId.current = 0
+      }
+    }
+
+    scrollRafId.current = requestAnimationFrame(step)
+  }, [cancelScroll])
+
+  const handleExpand = useCallback((id: number) => {
+    cancelScroll()
+    setExpandedId((prev) => {
+      if (prev === id) return prev
+      if (prev === null) {
+        scrollYBeforeExpand.current = window.scrollY
+      }
+      return id
+    })
+  }, [cancelScroll])
+
+  const handleCollapse = useCallback(() => {
+    cancelScroll()
+    const scrollTarget = scrollYBeforeExpand.current
+    setExpandedId(null)
+    setTimeout(() => {
+      smoothScrollTo(scrollTarget, 500)
+    }, 300)
+  }, [cancelScroll, smoothScrollTo])
+
+  useEffect(() => {
+    if (expandedId === null) return
+    const timer = setTimeout(() => {
+      requestAnimationFrame(() => {
+        const el = document.getElementById(`structure-expanded-${expandedId}`)
+        if (el) {
+          const offset = 50
+          const targetY = el.getBoundingClientRect().top + window.scrollY - offset
+          smoothScrollTo(targetY, 350)
+        }
+      })
+    }, 280)
+    return () => clearTimeout(timer)
+  }, [expandedId, smoothScrollTo])
+
+  useEffect(() => cancelScroll, [cancelScroll])
+
+  useEffect(() => {
+    if (expandedId === null) return
+    function handleClickOutside(e: MouseEvent) {
+      const el = document.getElementById(`structure-expanded-${expandedId}`)
+      const target = e.target as HTMLElement
+      if (target.closest("[data-structure-card]")) return
+      if (el && !el.contains(target)) {
+        handleCollapse()
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [expandedId, handleCollapse])
+
   return (
-    <div
-      className={`hidden lg:flex items-end justify-end rounded-[15px] overflow-hidden ${span === 2 ? "lg:col-span-2" : ""}`}
-      style={{ backgroundColor: color }}
-    >
-      <Image
-        src={image || "/logo-hermitage-new.png"}
-        alt=""
-        width={340}
-        height={120}
-        className="object-contain opacity-30 brightness-0 invert pr-4 pb-4"
-      />
-    </div>
+    <LayoutGroup>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 pt-2 pl-2">
+        {structures.map((structure) => {
+          const isExpanded = structure.id === expandedId
+
+          if (isExpanded) {
+            return (
+              <motion.div
+                key={structure.id}
+                id={`structure-expanded-${structure.id}`}
+                layout
+                className="col-span-1 md:col-span-2 lg:col-span-3"
+                transition={{ layout: { duration: 0.25, ease: [0.4, 0, 0.2, 1] } }}
+              >
+                <ExpandedCard
+                  structure={structure}
+                  color={color}
+                  onCollapse={handleCollapse}
+                />
+              </motion.div>
+            )
+          }
+
+          return (
+            <motion.div
+              key={structure.id}
+              layout
+              animate={{
+                filter: expandedId !== null ? "opacity(0.7)" : "opacity(1)",
+              }}
+              transition={{ layout: { duration: 0.5, ease: [0.4, 0, 0.2, 1] }, duration: 0.3 }}
+            >
+              <CollapsedCard
+                structure={structure}
+                color={color}
+                onExpand={() => handleExpand(structure.id)}
+              />
+            </motion.div>
+          )
+        })}
+      </div>
+    </LayoutGroup>
   )
 }
+
+/* ── Main export ── */
 
 export function StructuresGrid({
   structures,
@@ -119,53 +380,29 @@ export function StructuresGrid({
 
   return (
     <div className="space-y-8">
-      {/* Internal Structures Section */}
       {internalStructures.length > 0 && (
         <BentoHeaderContent
           title={sectionInternes?.titre_de_section || "Structures internes"}
           color={BRAND_COLORS.rose}
           columnImage={sectionInternes?.image_de_section?.url}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 pt-2 pl-2">
-            {internalStructures.map((structure) => {
-              const categorySlug = structure._embedded?.["wp:term"]?.[0]?.[0]?.slug
-              const categoryColor = BRAND_COLORS.rose
-
-              return (
-                <StructureCard
-                  key={structure.id}
-                  structure={structure}
-                  categoryColor={categoryColor}
-                />
-              )
-            })}
-            <FillerCard count={internalStructures.length} color={BRAND_COLORS.green} />
-          </div>
+          <StructuresSectionGrid
+            structures={internalStructures}
+            color={BRAND_COLORS.rose}
+          />
         </BentoHeaderContent>
       )}
 
-      {/* Hosted Structures Section */}
       {hostedStructures.length > 0 && (
         <BentoHeaderContent
           title={sectionHebergees?.titre_de_section || "Structures hébergées"}
           color={BRAND_COLORS.teal}
           columnImage={sectionHebergees?.image_de_section?.url}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 pt-2 pl-2">
-            {hostedStructures.map((structure) => {
-              const categorySlug = structure._embedded?.["wp:term"]?.[0]?.[0]?.slug
-              const categoryColor = categorySlug ? getCategoryColor(categorySlug) : "#e75754"
-
-              return (
-                <StructureCard
-                  key={structure.id}
-                  structure={structure}
-                  categoryColor={BRAND_COLORS.teal}
-                />
-              )
-            })}
-            <FillerCard count={hostedStructures.length} color={BRAND_COLORS.teal} />
-          </div>
+          <StructuresSectionGrid
+            structures={hostedStructures}
+            color={BRAND_COLORS.teal}
+          />
         </BentoHeaderContent>
       )}
     </div>
