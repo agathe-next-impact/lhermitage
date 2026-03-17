@@ -1,5 +1,4 @@
 import type { ReactNode } from "react"
-import Link from "next/link"
 import CardNav from "@/components/layout/card-nav"
 import { wpApi } from "@/lib/wordpress/api"
 import type { WPMenuItem } from "@/lib/wordpress/types"
@@ -119,21 +118,12 @@ export async function SiteHeader({ children }: { children?: ReactNode }) {
   return (
     <MenuColorsProvider colorMap={colorMap}>
       <header className="fixed top-0 z-40 w-full bg-transparent">
-        <div className="flex items-center justify-between gap-4 bg-[#E75754] text-sm uppercase font-extrabold px-4 py-1.5 text-white">
-          <Link href="/visite-virtuelle" className="hover:underline">
-            Visiter
-          </Link>
-          <div>
-            <Link href="/soutenir" className="hover:underline">
-              Soutenir
-            </Link>
-            &nbsp;|&nbsp;
-            <Link href="/reserver" className="hover:underline">
-              Réserver
-            </Link>
-          </div>
-        </div>
         <CardNav
+          topBarLinks={[
+            { label: "Visiter", href: "/visite-virtuelle", bgColor: "#56939F" },
+            { label: "Soutenir", href: "/soutenir", bgColor: "#78AD7D" },
+            { label: "Réserver", href: "/reserver", bgColor: "#E75754" },
+          ]}
           centerLogo="/logo-arcs-coral.png"
           centerLogoAlt="Logo ARCS"
           items={navItems}

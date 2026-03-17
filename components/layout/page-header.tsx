@@ -38,7 +38,7 @@ export function PageHeader({
   const mainBlobColor = color || menuColor || getColorForPath(pathname) || getHashColor(title)
 
   return (
-    <div className={`w-[calc(100%-1rem)] mt-3 mx-auto relative pt-16 ${className}`}>
+    <div className={`w-[calc(100%-1rem)] mt-3 mx-auto relative pt-8 ${className}`}>
       {/* Container principal */}
       <div className="relative" style={{ height: "clamp(160px, 35vh, 480px)" }}>
         {/* Fond image – pleine largeur */}

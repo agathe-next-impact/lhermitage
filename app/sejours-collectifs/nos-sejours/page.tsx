@@ -6,6 +6,7 @@ import { BentoHeaderContent } from "@/components/layout/bento-header-content"
 import { SejoursHeader } from "@/components/layout/sejours-header"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 import { REVALIDATION } from "@/lib/constants"
+import { BRAND_COLORS } from "@/lib/theme/colors"
 
 const SeminairesPage = dynamic(() =>
   import("@/components/seminaires-page").then((m) => m.SeminairesPage)
@@ -13,11 +14,39 @@ const SeminairesPage = dynamic(() =>
 
 export const revalidate = REVALIDATION.listing
 
+const PALETTE = [
+  BRAND_COLORS.coral,
+  BRAND_COLORS.teal,
+  BRAND_COLORS.green,
+  BRAND_COLORS.rose,
+  BRAND_COLORS.orange,
+  BRAND_COLORS.darkBlue,
+]
+
 export default async function NosSejoursPage() {
-  const [page, seminairesData] = await Promise.all([
+  const [page, seminairesData, services] = await Promise.all([
     wpApi.getPageByPath("sejours-collectifs/nos-sejours"),
     wpApi.getSeminairesData("sejours-collectifs/nos-sejours"),
+    wpApi.getServices(),
   ])
+
+  // Extract unique service types from services taxonomy
+  const serviceTypesMap = new Map<string, { id: string; name: string; slug: string; image?: { url: string; alt: string } | null; color: string }>()
+  let colorIdx = 0
+  services.forEach((service) => {
+    const term = service._embedded?.["wp:term"]?.[0]?.[0]
+    if (term && !serviceTypesMap.has(term.slug)) {
+      serviceTypesMap.set(term.slug, {
+        id: term.id.toString(),
+        name: term.name,
+        slug: term.slug,
+        image: term.image || null,
+        color: PALETTE[colorIdx % PALETTE.length],
+      })
+      colorIdx++
+    }
+  })
+  const serviceTypes = Array.from(serviceTypesMap.values())
 
   if (!page && !seminairesData) {
     notFound()
@@ -41,7 +70,7 @@ export default async function NosSejoursPage() {
         />
         <BentoHeaderContent title={seminairesData.promesse?.titre || bentoTitle}>
           <div className="relative z-10">
-            <SeminairesPage acf={seminairesData} />
+            <SeminairesPage acf={seminairesData} serviceTypes={serviceTypes} />
           </div>
         </BentoHeaderContent>
       </div>

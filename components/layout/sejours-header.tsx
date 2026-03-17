@@ -66,7 +66,7 @@ export function SejoursHeader({
   )
 
   return (
-    <div className="w-[calc(100%-1rem)] mt-3 mx-auto relative pt-16">
+    <div className="w-[calc(100%-1rem)] mt-3 mx-auto relative pt-10">
       {/* ====== MOBILE / TABLET ====== */}
       <section className="lg:hidden flex flex-col gap-2">
         {/* Ligne 1 : Logo + Titre côte à côte */}

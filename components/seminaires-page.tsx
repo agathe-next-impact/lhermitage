@@ -16,11 +16,20 @@ import type {
   WPPost,
   EspaceDeTravailACF,
   HebergementACF,
-  ServiceACF,
 } from "@/lib/wordpress/types"
+import { BRAND } from "zod"
+
+interface ServiceType {
+  id: string
+  name: string
+  slug: string
+  image?: { url: string; alt: string } | null
+  color: string
+}
 
 interface SeminairesPageProps {
   acf: SeminairesACF
+  serviceTypes?: ServiceType[]
 }
 
 const SECTION_COLORS = [
@@ -99,17 +108,16 @@ function EspacesCarousel({
   return (
     <div className="space-y-4">
       {/* Navigation tabs */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-1">
         {items.map((espace, idx) => (
           <button
             key={espace.id}
             onClick={() => setActive(idx)}
-            className="px-4 py-2 rounded-full text-sm font-medium transition-all"
+            className={`text-white text-sm font-semibold px-4 py-2 rounded-lg shadow-md transition-all hover:shadow-lg ${
+              active === idx ? "shadow-lg" : "opacity-80 hover:opacity-100"
+            }`}
             style={{
-              backgroundColor:
-                active === idx ? SECTION_COLORS[idx % SECTION_COLORS.length] : "transparent",
-              color: active === idx ? "white" : SECTION_COLORS[idx % SECTION_COLORS.length],
-              border: `2px solid ${SECTION_COLORS[idx % SECTION_COLORS.length]}`,
+              backgroundColor: SECTION_COLORS[idx % SECTION_COLORS.length],
             }}
           >
             {espace.acf?.nom || espace.title.rendered || `Espace ${idx + 1}`}
@@ -159,14 +167,97 @@ function EspacesCarousel({
   )
 }
 
+/* ───────────────────────── Carrousel Hébergements ───────────────────────── */
+
+function HebergementsCarousel({
+  hebergements,
+}: {
+  hebergements: WPPost<HebergementACF>[] | undefined
+}) {
+  const [active, setActive] = useState(0)
+  const items = hebergements || []
+
+  if (items.length === 0) return null
+
+  const current = items[active]
+  const acf = current?.acf
+  const featuredImage = current?._embedded?.["wp:featuredmedia"]?.[0]
+  const photos = acf?.photos || acf?.images || []
+  const mainImage = featuredImage
+    ? { url: featuredImage.source_url, alt: featuredImage.alt_text }
+    : photos[0]
+      ? { url: photos[0].url, alt: photos[0].alt }
+      : null
+
+  return (
+    <div className="space-y-4">
+      {/* Navigation tabs */}
+      <div className="flex flex-wrap gap-1">
+        {items.map((heb, idx) => (
+          <button
+            key={heb.id}
+            onClick={() => setActive(idx)}
+            className={`text-white text-sm font-semibold px-4 py-2 rounded-lg shadow-md transition-all hover:shadow-lg ${
+              active === idx ? "shadow-lg" : "opacity-80 hover:opacity-100"
+            }`}
+            style={{
+              backgroundColor: SECTION_COLORS[idx % SECTION_COLORS.length],
+            }}
+          >
+            {heb.acf?.nom || heb.title.rendered || `Hébergement ${idx + 1}`}
+          </button>
+        ))}
+      </div>
+
+      {/* Active card */}
+      {current && (
+        <motion.div
+          key={current.id}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="flex flex-col md:flex-row rounded-2xl overflow-hidden shadow-lg"
+        >
+          {mainImage && (
+            <div className="relative w-full md:w-1/2 min-h-[30vh] md:min-h-[40vh]">
+              <Image
+                src={mainImage.url || "/placeholder.svg"}
+                alt={mainImage.alt || acf?.nom || ""}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+                quality={85}
+              />
+            </div>
+          )}
+          <div
+            className="w-full md:w-1/2 p-6 md:p-10 flex flex-col justify-center text-white"
+            style={{ backgroundColor: SECTION_COLORS[active % SECTION_COLORS.length] }}
+          >
+            <h4 className="text-2xl md:text-3xl font-bold mb-3">
+              {acf?.nom || current.title.rendered}
+            </h4>
+
+            {acf?.descriptif && (
+              <div
+                className="text-white/90 text-sm md:text-base mb-4 leading-relaxed prose prose-invert prose-sm max-w-none"
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(acf.descriptif) }}
+              />
+            )}
+          </div>
+        </motion.div>
+      )}
+    </div>
+  )
+}
+
 /* ───────────────────────── Page complète ───────────────────────── */
 
-export function SeminairesPage({ acf }: SeminairesPageProps) {
+export function SeminairesPage({ acf, serviceTypes = [] }: SeminairesPageProps) {
   const {
     promesse,
     espaces_travail,
     activites_teambuilding,
-    restauration,
     hebergements_seminaires,
     temoignages,
     contact,
@@ -179,67 +270,118 @@ export function SeminairesPage({ acf }: SeminairesPageProps) {
   return (
     <div className="pt-4 pl-4">
       <div className="max-w-7xl space-y-16">
-        {/* ─── 3. ESPACES DE TRAVAIL ─── */}
-        {espaces_travail && (
+        {/* ─── 1. LA PROMESSE ─── */}
+        {promesse && (
+          <section className="space-y-8">
+            <div className="flex flex-col md:flex-row gap-8 items-stretch">
+              {promesse.storytelling && (
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  className="md:w-1/2 prose prose-stone prose-lg max-w-none text-brand-gray/80"
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(promesse.storytelling) }}
+                />
+              )}
+              {promesse.image && (
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  className="md:w-1/2 relative rounded-2xl overflow-hidden min-h-[300px]"
+                >
+                  <Image
+                    src={promesse.image.url || "/placeholder.svg"}
+                    alt={promesse.image.alt || ""}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                </motion.div>
+              )}
+            </div>
+
+            {/* Chiffres clés animés */}
+            {promesse.chiffres_cles && promesse.chiffres_cles.length > 0 && (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-6 pt-4">
+                {promesse.chiffres_cles.map((chiffre, idx) => (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: idx * 0.15 }}
+                    viewport={{ once: true }}
+                    className="text-center p-6 rounded-2xl bg-muted/30"
+                  >
+                    <AnimatedCounter
+                      value={chiffre.valeur || "0"}
+                      color={SECTION_COLORS[idx % SECTION_COLORS.length]}
+                    />
+                    {chiffre.unite && (
+                      <p
+                        className="text-lg font-semibold mt-1"
+                        style={{ color: SECTION_COLORS[idx % SECTION_COLORS.length] }}
+                      >
+                        {chiffre.unite}
+                      </p>
+                    )}
+                    {chiffre.label && (
+                      <p className="text-sm text-brand-gray/60 mt-1">{chiffre.label}</p>
+                    )}
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* ─── 2. HÉBERGEMENTS ─── */}
+        {hebergements_seminaires && (
           <section className="space-y-6">
-            {espaces_travail.titre && (
+            {hebergements_seminaires.titre && (
               <motion.h2
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 className="text-2xl md:text-3xl text-brand-dark"
               >
-                {decodeHtmlEntities(espaces_travail.titre)}
+                {decodeHtmlEntities(hebergements_seminaires.titre)}
               </motion.h2>
             )}
 
-            {espaces_travail.introduction && (
+            {hebergements_seminaires.sous_titre && (
               <div
                 className="text-lg text-brand-gray/80 prose prose-stone prose-lg max-w-3xl [&_p]:m-0"
-                dangerouslySetInnerHTML={{ __html: sanitizeHtml(espaces_travail.introduction) }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(hebergements_seminaires.sous_titre) }}
               />
             )}
 
-            <EspacesCarousel espaces={espaces_travail.espaces} sectionColor={sectionColor} />
+            <HebergementsCarousel hebergements={hebergements_seminaires.hebergements} />
 
-            {/* Facilitation stratégique */}
-            {espaces_travail.facilitation && (
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="relative p-6 md:p-8 rounded-2xl overflow-hidden"
-                style={{ backgroundColor: BRAND_COLORS.darkBlue }}
+            <Link
+              href="/hebergements"
+              className="w-max inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all hover:scale-105 hover:brightness-110 shadow-sm"
+              style={{ backgroundColor: BRAND_COLORS.darkBlue, color: "white" }}
+            >
+              Voir tous les hébergements
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
-                <div className="text-white">
-                  {espaces_travail.facilitation.titre && (
-                    <h3 className="text-2xl font-bold mb-4">
-                      {espaces_travail.facilitation.titre}
-                    </h3>
-                  )}
-                  {espaces_travail.facilitation.contenu && (
-                    <div
-                      className="prose prose-invert prose-sm md:prose-base max-w-none mb-4"
-                      dangerouslySetInnerHTML={{
-                        __html: sanitizeHtml(espaces_travail.facilitation.contenu),
-                      }}
-                    />
-                  )}
-                  {espaces_travail.facilitation.badge && (
-                    <span
-                      className="inline-block px-4 py-2 rounded-full text-sm font-bold"
-                      style={{ backgroundColor: "white", color: BRAND_COLORS.darkBlue }}
-                    >
-                      {espaces_travail.facilitation.badge}
-                    </span>
-                  )}
-                </div>
-              </motion.div>
-            )}
+                <path d="M5 12h14" />
+                <path d="m12 5 7 7-7 7" />
+              </svg>
+            </Link>
           </section>
         )}
 
-        {/* ─── 4. ACTIVITÉS TEAM BUILDING ─── */}
+        {/* ─── 3. ACTIVITÉS TEAM BUILDING ─── */}
         {activites_teambuilding && (
           <section>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -335,11 +477,71 @@ export function SeminairesPage({ acf }: SeminairesPageProps) {
           </section>
         )}
 
-        {/* ─── 5. RESTAURATION ─── */}
-        {restauration && restauration.services && restauration.services.length > 0 && (
+        {/* ─── 4. ESPACES DE TRAVAIL ─── */}
+        {espaces_travail && (
+          <section className="space-y-6">
+            {espaces_travail.titre && (
+              <motion.h2
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="text-2xl md:text-3xl text-brand-dark"
+              >
+                {decodeHtmlEntities(espaces_travail.titre)}
+              </motion.h2>
+            )}
+
+            {espaces_travail.introduction && (
+              <div
+                className="text-lg text-brand-gray/80 prose prose-stone prose-lg max-w-3xl [&_p]:m-0"
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(espaces_travail.introduction) }}
+              />
+            )}
+
+            <EspacesCarousel espaces={espaces_travail.espaces} sectionColor={sectionColor} />
+
+            {/* Facilitation stratégique */}
+            {espaces_travail.facilitation && (
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="relative p-6 md:p-8 rounded-2xl overflow-hidden"
+                style={{ backgroundColor: BRAND_COLORS.darkBlue }}
+              >
+                <div className="text-white">
+                  {espaces_travail.facilitation.titre && (
+                    <h3 className="text-2xl font-bold mb-4">
+                      {espaces_travail.facilitation.titre}
+                    </h3>
+                  )}
+                  {espaces_travail.facilitation.contenu && (
+                    <div
+                      className="prose prose-invert prose-sm md:prose-base max-w-none mb-4"
+                      dangerouslySetInnerHTML={{
+                        __html: sanitizeHtml(espaces_travail.facilitation.contenu),
+                      }}
+                    />
+                  )}
+                  {espaces_travail.facilitation.badge && (
+                    <span
+                      className="inline-block px-4 py-2 rounded-full text-sm font-bold"
+                      style={{ backgroundColor: "white", color: BRAND_COLORS.darkBlue }}
+                    >
+                      {espaces_travail.facilitation.badge}
+                    </span>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </section>
+        )}
+
+        {/* ─── 5. SERVICES (Types de services) ─── */}
+        {serviceTypes.length > 0 && (
           <section>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {/* Titre + description */}
+              {/* Titre + CTA */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -347,13 +549,13 @@ export function SeminairesPage({ acf }: SeminairesPageProps) {
                 className="rounded-2xl p-6 md:p-8 flex flex-col justify-end"
                 style={{ backgroundColor: BRAND_COLORS.orange }}
               >
-                <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">Se Restaurer</h2>
+                <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">Nos Prestations</h2>
                 <Link
-                  href="/services"
+                  href="/sejours-collectifs/services"
                   className="w-max inline-flex items-end gap-2 mt-4 px-5 py-2.5 rounded-full text-sm font-semibold transition-all hover:scale-105 hover:brightness-110 shadow-sm"
                   style={{ backgroundColor: "white", color: BRAND_COLORS.orange }}
                 >
-                  Voir tous les services
+                  Voir toutes les prestations
                   <svg
                     width="16"
                     height="16"
@@ -370,41 +572,32 @@ export function SeminairesPage({ acf }: SeminairesPageProps) {
                 </Link>
               </motion.div>
 
-              {/* Cartes services */}
-              {restauration.services.slice(0, 3).map((service, idx) => {
-                const featuredImage = service._embedded?.["wp:featuredmedia"]?.[0]
-                return (
-                  <motion.div
-                    key={service.id}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3, delay: idx * 0.05 }}
-                    viewport={{ once: true }}
-                  >
+              {/* Cartes types de services */}
+              {serviceTypes.map((type, idx) => (
+                <motion.div
+                  key={type.id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3, delay: idx * 0.05 }}
+                  viewport={{ once: true }}
+                >
+                  <Link href={`/sejours-collectifs/services?type=${type.slug}`}>
                     <MinimalCard
-                      className="h-full flex flex-col justify-between p-2 pt-6 shadow-sm hover:shadow-md transition-shadow"
-                      style={{ backgroundColor: `${BRAND_COLORS.orange}15` }}
+                      className="h-full flex flex-col justify-between p-2 pt-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                      style={{ backgroundColor: BRAND_COLORS.orange + "15" }}
                     >
                       <div className="px-2 pb-4">
                         <h5
                           className="text-base font-bold mb-1"
                           style={{ color: BRAND_COLORS.orange }}
                         >
-                          {service.acf?.nom || service.title.rendered}
+                          {type.name}
                         </h5>
-                        {service.acf?.descriptif && (
-                          <div
-                            className="text-brand-gray/70 text-xs line-clamp-3 [&_p]:m-0"
-                            dangerouslySetInnerHTML={{
-                              __html: sanitizeHtml(service.acf.descriptif),
-                            }}
-                          />
-                        )}
                       </div>
-                      {featuredImage && (
+                      {type.image && (
                         <Image
-                          src={featuredImage.source_url || "/placeholder.svg"}
-                          alt={featuredImage.alt_text || service.acf?.nom || ""}
+                          src={type.image.url || "/placeholder.svg"}
+                          alt={type.image.alt || type.name}
                           width={600}
                           height={400}
                           className="rounded-xl object-cover w-full h-36"
@@ -412,176 +605,10 @@ export function SeminairesPage({ acf }: SeminairesPageProps) {
                         />
                       )}
                     </MinimalCard>
-                  </motion.div>
-                )
-              })}
-            </div>
-          </section>
-        )}
-
-        {/* ─── 6. HÉBERGEMENTS ─── */}
-        {hebergements_seminaires && (
-          <section>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {/* Titre + description */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="rounded-2xl p-6 md:p-8 flex flex-col justify-end"
-                style={{ backgroundColor: BRAND_COLORS.rose }}
-              >
-                {hebergements_seminaires.titre && (
-                  <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
-                    {decodeHtmlEntities(hebergements_seminaires.titre)}
-                  </h2>
-                )}
-                {hebergements_seminaires.sous_titre && (
-                  <div
-                    className="text-base text-white/80 [&_p]:m-0"
-                    dangerouslySetInnerHTML={{
-                      __html: sanitizeHtml(hebergements_seminaires.sous_titre),
-                    }}
-                  />
-                )}
-                <Link
-                  href="/hebergements"
-                  className="w-max inline-flex items-end gap-2 mt-4 px-5 py-2.5 rounded-full text-sm font-semibold transition-all hover:scale-105 hover:brightness-110 shadow-sm"
-                  style={{ backgroundColor: "white", color: BRAND_COLORS.rose }}
-                >
-                  Voir tous les hébergements
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M5 12h14" />
-                    <path d="m12 5 7 7-7 7" />
-                  </svg>
-                </Link>
-              </motion.div>
-
-              {/* Cartes hébergements */}
-              {(hebergements_seminaires.hebergements || []).slice(0, 3).map((heb, idx) => {
-                const featuredImage = heb._embedded?.["wp:featuredmedia"]?.[0]
-                const photos = heb.acf?.photos || heb.acf?.images || []
-                const mainImage = featuredImage
-                  ? { url: featuredImage.source_url, alt: featuredImage.alt_text }
-                  : photos[0]
-                    ? { url: photos[0].url, alt: photos[0].alt }
-                    : null
-
-                return (
-                  <motion.div
-                    key={heb.id}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3, delay: idx * 0.05 }}
-                    viewport={{ once: true }}
-                  >
-                    <MinimalCard
-                      className="h-full flex flex-col justify-between p-2 pt-6 shadow-sm hover:shadow-md transition-shadow"
-                      style={{ backgroundColor: `${BRAND_COLORS.rose}15` }}
-                    >
-                      <div className="px-2 pb-4">
-                        <h5
-                          className="text-base font-bold mb-1"
-                          style={{ color: BRAND_COLORS.rose }}
-                        >
-                          {heb.acf?.nom || heb.title.rendered}
-                        </h5>
-                        {heb.acf?.descriptif && (
-                          <div
-                            className="text-brand-gray/70 text-xs line-clamp-3 [&_p]:m-0"
-                            dangerouslySetInnerHTML={{ __html: sanitizeHtml(heb.acf.descriptif) }}
-                          />
-                        )}
-                      </div>
-                      {mainImage && (
-                        <Image
-                          src={mainImage.url || "/placeholder.svg"}
-                          alt={mainImage.alt || heb.acf?.nom || ""}
-                          width={600}
-                          height={400}
-                          className="rounded-xl object-cover w-full h-36"
-                          sizes="(max-width: 768px) 100vw, 50vw"
-                        />
-                      )}
-                    </MinimalCard>
-                  </motion.div>
-                )
-              })}
-            </div>
-          </section>
-        )}
-
-        {/* ─── LA PROMESSE ─── */}
-        {promesse && (
-          <section className="space-y-8">
-            <div className="flex flex-col md:flex-row gap-8 items-stretch">
-              {promesse.storytelling && (
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  className="md:w-1/2 prose prose-stone prose-lg max-w-none text-brand-gray/80"
-                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(promesse.storytelling) }}
-                />
-              )}
-              {promesse.image && (
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  className="md:w-1/2 relative rounded-2xl overflow-hidden min-h-[300px]"
-                >
-                  <Image
-                    src={promesse.image.url || "/placeholder.svg"}
-                    alt={promesse.image.alt || ""}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                  />
+                  </Link>
                 </motion.div>
-              )}
+              ))}
             </div>
-
-            {/* Chiffres clés animés */}
-            {promesse.chiffres_cles && promesse.chiffres_cles.length > 0 && (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-6 pt-4">
-                {promesse.chiffres_cles.map((chiffre, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: idx * 0.15 }}
-                    viewport={{ once: true }}
-                    className="text-center p-6 rounded-2xl bg-muted/30"
-                  >
-                    <AnimatedCounter
-                      value={chiffre.valeur || "0"}
-                      color={SECTION_COLORS[idx % SECTION_COLORS.length]}
-                    />
-                    {chiffre.unite && (
-                      <p
-                        className="text-lg font-semibold mt-1"
-                        style={{ color: SECTION_COLORS[idx % SECTION_COLORS.length] }}
-                      >
-                        {chiffre.unite}
-                      </p>
-                    )}
-                    {chiffre.label && (
-                      <p className="text-sm text-brand-gray/60 mt-1">{chiffre.label}</p>
-                    )}
-                  </motion.div>
-                ))}
-              </div>
-            )}
           </section>
         )}
 

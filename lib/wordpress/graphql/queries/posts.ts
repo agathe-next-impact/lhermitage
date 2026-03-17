@@ -396,12 +396,6 @@ export const GET_ESPACES_DE_TRAVAIL = gql`
             }
           }
           video
-          localisation {
-            latitude
-            longitude
-            zoom
-            streetAddress
-          }
         }
         mapPinPoints {
           nom

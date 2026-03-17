@@ -31,6 +31,12 @@ export type CardNavItem = {
   cta2Target?: string
 }
 
+type TopBarLink = {
+  label: string
+  href: string
+  bgColor: string
+}
+
 export interface CardNavProps {
   centerLogo?: string
   centerLogoAlt?: string
@@ -44,6 +50,7 @@ export interface CardNavProps {
   ctaLabel?: string
   ctaHref?: string
   ctaTarget?: string
+  topBarLinks?: TopBarLink[]
 }
 
 const CardNav: React.FC<CardNavProps> = ({
@@ -59,6 +66,7 @@ const CardNav: React.FC<CardNavProps> = ({
   ctaLabel = "Réserver",
   ctaHref = "/reserver",
   ctaTarget,
+  topBarLinks = [],
 }) => {
   const [isHamburgerOpen, setIsHamburgerOpen] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
@@ -94,7 +102,7 @@ const CardNav: React.FC<CardNavProps> = ({
 
       contentEl.offsetHeight
 
-      const topBar = 40
+      const topBar = 48
       const padding = isMobile ? 96 : 24
       const contentHeight = contentEl.scrollHeight
 
@@ -131,7 +139,7 @@ const CardNav: React.FC<CardNavProps> = ({
 
     console.log(`createTimeline: Found ${validCards.length} cards`)
 
-    gsap.set(navEl, { height: 40, overflow: "hidden" })
+    gsap.set(navEl, { height: 48, overflow: "hidden" })
     gsap.set(validCards, { y: 50, opacity: 0 })
 
     const tl = gsap.timeline({ paused: true })
@@ -200,7 +208,7 @@ const CardNav: React.FC<CardNavProps> = ({
     closeTl.to(
       navEl,
       {
-        height: 40,
+        height: 48,
         duration: 0.2,
         ease: "power3.inOut",
         overwrite: true,
@@ -400,7 +408,7 @@ const CardNav: React.FC<CardNavProps> = ({
         style={{ backgroundColor: baseColor }}
       >
         <div className="card-nav-top">
-          <div className="flex">
+          <div className="flex items-center">
             <div
               className={`hamburger-menu ${isHamburgerOpen ? "open" : ""}`}
               onClick={toggleMenu}
@@ -414,18 +422,18 @@ const CardNav: React.FC<CardNavProps> = ({
             </div>
             <span className="hamburger-label">{isExpanded ? "Fermer" : "Menu"}</span>
           </div>
-          {centerLogo && (
-            <Link href="/" className="card-nav-center-logo" aria-label="Retour à l'accueil">
-              <Image
-                src={centerLogo || "/placeholder.svg"}
-                alt={centerLogoAlt}
-                width={120}
-                height={40}
-                className="center-logo-image"
-                priority
-              />
-            </Link>
-          )}
+          <div className="flex items-center gap-1">
+            {topBarLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="topbar-action-link"
+                style={{ backgroundColor: link.bgColor }}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
         </div>
 
         <div className="card-nav-content" aria-hidden={!isExpanded}>
