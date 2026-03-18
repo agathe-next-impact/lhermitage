@@ -167,6 +167,55 @@ export const PAGE_FIELDS = gql`
         }
       }
     }
+    pageHoraires {
+      horairesPage {
+        imageAmbiance {
+          node {
+            ...ImageFields
+          }
+        }
+        accroche
+        bonASavoir
+        cafe {
+          titre
+          sousTitre
+          horaires {
+            jour
+            heures
+            ferme
+            note
+            evenement
+          }
+          encarts {
+            titre
+            texte
+            icone
+            couleur
+          }
+        }
+        domaine {
+          titre
+          sousTitre
+          texte
+          image {
+            node {
+              ...ImageFields
+            }
+          }
+          badges {
+            label
+            description
+          }
+          note
+        }
+        sejours {
+          titre
+          sousTitre
+          accroche
+          texte
+        }
+      }
+    }
     pagePatrimoine {
       introduction {
         citation

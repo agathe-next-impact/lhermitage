@@ -21,7 +21,7 @@ export function LocalisationMap() {
       style: IGN_PLAN_STYLE,
       center: [HERMITAGE_COORDS.lng, HERMITAGE_COORDS.lat],
       zoom: 15,
-      attributionControl: true,
+      attributionControl: {},
     })
 
     map.addControl(new maplibregl.NavigationControl(), "top-right")

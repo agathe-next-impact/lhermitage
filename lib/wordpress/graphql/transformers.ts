@@ -351,6 +351,67 @@ export function transformPage(
     }
   }
 
+  // "pageHoraires" — horaires page: café, domaine, séjours
+  // ACF wraps fields in a "horairesPage" group inside the field group
+  const horData = gqlPage.pageHoraires?.horairesPage
+  if (horData) {
+    const hasContent =
+      horData.cafe?.titre ||
+      horData.domaine?.titre ||
+      horData.sejours?.titre ||
+      horData.accroche ||
+      horData.bonASavoir
+    if (hasContent) {
+      pageAcf.horaires_page = {
+        image_ambiance: horData.imageAmbiance
+          ? transformAcfMediaEdge(horData.imageAmbiance)
+          : undefined,
+        accroche: horData.accroche,
+        bon_a_savoir: horData.bonASavoir,
+        cafe: horData.cafe
+          ? {
+              titre: horData.cafe.titre,
+              sous_titre: horData.cafe.sousTitre,
+              // ACF select fields return arrays — unwrap to single strings
+              horaires: horData.cafe.horaires?.map((h: any) => ({
+                jour: Array.isArray(h.jour) ? h.jour[0] : h.jour,
+                heures: h.heures,
+                ferme: h.ferme,
+                note: h.note,
+                evenement: h.evenement,
+              })),
+              encarts: horData.cafe.encarts?.map((e: any) => ({
+                titre: e.titre,
+                texte: e.texte,
+                icone: Array.isArray(e.icone) ? e.icone[0] : e.icone,
+                couleur: e.couleur,
+              })),
+            }
+          : undefined,
+        domaine: horData.domaine
+          ? {
+              titre: horData.domaine.titre,
+              sous_titre: horData.domaine.sousTitre,
+              texte: horData.domaine.texte,
+              image: horData.domaine.image
+                ? transformAcfMediaEdge(horData.domaine.image)
+                : undefined,
+              badges: horData.domaine.badges,
+              note: horData.domaine.note,
+            }
+          : undefined,
+        sejours: horData.sejours
+          ? {
+              titre: horData.sejours.titre,
+              sous_titre: horData.sejours.sousTitre,
+              accroche: horData.sejours.accroche,
+              texte: horData.sejours.texte,
+            }
+          : undefined,
+      }
+    }
+  }
+
   // "pagePatrimoine" — patrimoine page sections, valeurs, publics
   const patData = gqlPage.pagePatrimoine
   if (patData?.sections && Array.isArray(patData.sections) && patData.sections.length > 0) {

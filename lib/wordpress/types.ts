@@ -131,6 +131,43 @@ export interface PageACF {
       image?: WPImage
     }
   }
+  // Page Horaires fields
+  horaires_page?: {
+    image_ambiance?: WPImage
+    accroche?: string
+    bon_a_savoir?: string
+    cafe?: {
+      titre?: string
+      sous_titre?: string
+      horaires?: Array<{
+        jour?: string
+        heures?: string
+        ferme?: boolean
+        note?: string
+        evenement?: boolean
+      }>
+      encarts?: Array<{
+        titre?: string
+        texte?: string
+        icone?: string
+        couleur?: string
+      }>
+    }
+    domaine?: {
+      titre?: string
+      sous_titre?: string
+      texte?: string
+      image?: WPImage
+      badges?: Array<{ label?: string; description?: string }>
+      note?: string
+    }
+    sejours?: {
+      titre?: string
+      sous_titre?: string
+      accroche?: string
+      texte?: string
+    }
+  }
   // Page Patrimoine fields
   patrimoine?: PatrimoineACF
   // Page Séminaires fields
