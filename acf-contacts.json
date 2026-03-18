@@ -1,0 +1,192 @@
+[
+    {
+        "key": "group_contacts_page",
+        "title": "Page Contacts — Équipe",
+        "fields": [
+            {
+                "key": "field_contacts_root",
+                "label": "Équipe de contact",
+                "name": "contacts_equipe",
+                "type": "repeater",
+                "instructions": "Liste des personnes à contacter, affichées en grille sur la page Contacts.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": { "width": "", "class": "", "id": "" },
+                "layout": "block",
+                "button_label": "Ajouter un contact",
+                "min": 0,
+                "max": 12,
+                "sub_fields": [
+                    {
+                        "key": "field_contacts_nom",
+                        "label": "Nom complet",
+                        "name": "nom",
+                        "type": "text",
+                        "instructions": "Prénom et nom de la personne. Ex : Laëtitia LAFRANCE",
+                        "required": 1,
+                        "conditional_logic": 0,
+                        "wrapper": { "width": "50", "class": "", "id": "" },
+                        "default_value": "",
+                        "maxlength": 80,
+                        "placeholder": "Prénom NOM",
+                        "prepend": "",
+                        "append": ""
+                    },
+                    {
+                        "key": "field_contacts_role",
+                        "label": "Fonction / Rôle",
+                        "name": "role",
+                        "type": "text",
+                        "instructions": "Intitulé du poste ou de la fonction. Ex : Directrice opérationnelle Séjours Inspirants",
+                        "required": 1,
+                        "conditional_logic": 0,
+                        "wrapper": { "width": "50", "class": "", "id": "" },
+                        "default_value": "",
+                        "maxlength": 200,
+                        "placeholder": "Directrice opérationnelle…",
+                        "prepend": "",
+                        "append": ""
+                    },
+                    {
+                        "key": "field_contacts_organisation",
+                        "label": "Organisation / Structure",
+                        "name": "organisation",
+                        "type": "text",
+                        "instructions": "Nom de la structure ou de l'entité. Ex : L'Hermitage Impact & Transitions — Tiers Lieu Hermitage",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": { "width": "50", "class": "", "id": "" },
+                        "default_value": "",
+                        "maxlength": 200,
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": ""
+                    },
+                    {
+                        "key": "field_contacts_photo",
+                        "label": "Photo",
+                        "name": "photo",
+                        "type": "image",
+                        "instructions": "Photo de profil (optionnelle). Format carré recommandé.",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": { "width": "50", "class": "", "id": "" },
+                        "return_format": "array",
+                        "library": "all",
+                        "min_width": 100,
+                        "min_height": 100,
+                        "min_size": "",
+                        "max_width": "",
+                        "max_height": "",
+                        "max_size": 2,
+                        "mime_types": "jpg,jpeg,png,webp",
+                        "preview_size": "thumbnail"
+                    },
+                    {
+                        "key": "field_contacts_email",
+                        "label": "Email",
+                        "name": "email",
+                        "type": "email",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": { "width": "50", "class": "", "id": "" },
+                        "default_value": "",
+                        "placeholder": "prenom@hermitagelelab.com",
+                        "prepend": "",
+                        "append": ""
+                    },
+                    {
+                        "key": "field_contacts_telephones",
+                        "label": "Téléphones",
+                        "name": "telephones",
+                        "type": "repeater",
+                        "instructions": "Un ou plusieurs numéros de téléphone.",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": { "width": "50", "class": "", "id": "" },
+                        "layout": "table",
+                        "button_label": "Ajouter un numéro",
+                        "min": 0,
+                        "max": 4,
+                        "sub_fields": [
+                            {
+                                "key": "field_contacts_tel_numero",
+                                "label": "Numéro",
+                                "name": "numero",
+                                "type": "text",
+                                "instructions": "",
+                                "required": 1,
+                                "conditional_logic": 0,
+                                "wrapper": { "width": "50", "class": "", "id": "" },
+                                "default_value": "",
+                                "maxlength": 20,
+                                "placeholder": "06 XX XX XX XX",
+                                "prepend": "",
+                                "append": ""
+                            },
+                            {
+                                "key": "field_contacts_tel_label",
+                                "label": "Libellé",
+                                "name": "label",
+                                "type": "text",
+                                "instructions": "Ex : Association, Personnel. Laisser vide si un seul numéro.",
+                                "required": 0,
+                                "conditional_logic": 0,
+                                "wrapper": { "width": "50", "class": "", "id": "" },
+                                "default_value": "",
+                                "maxlength": 30,
+                                "placeholder": "Association",
+                                "prepend": "",
+                                "append": ""
+                            }
+                        ]
+                    },
+                    {
+                        "key": "field_contacts_adresse",
+                        "label": "Adresse",
+                        "name": "adresse",
+                        "type": "text",
+                        "instructions": "Adresse postale (optionnelle). Ex : 17 rue de l'Hermitage, 60350 Autrêches",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": { "width": "", "class": "", "id": "" },
+                        "default_value": "",
+                        "maxlength": 200,
+                        "placeholder": "17 rue de l'Hermitage, 60350 Autrêches",
+                        "prepend": "",
+                        "append": ""
+                    }
+                ]
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "page"
+                },
+                {
+                    "param": "page_template",
+                    "operator": "==",
+                    "value": "default"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": "Grille des contacts de l'équipe affichée sur la page Contacts. Permet d'ajouter/modifier les membres via l'admin WordPress.",
+        "show_in_rest": 0,
+        "display_title": "",
+        "show_in_graphql": 1,
+        "graphql_field_name": "pageContacts",
+        "map_graphql_types_from_location_rules": 0,
+        "graphql_types": ""
+    }
+]
