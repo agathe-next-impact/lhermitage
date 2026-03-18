@@ -1,8 +1,7 @@
 "use client"
 
 import { useEffect, useState, useRef, useCallback, useMemo } from "react"
-import { Button } from "@/components/ui/button"
-import { ExternalLink, Camera } from "lucide-react"
+import { Camera } from "lucide-react"
 import Image from "next/image"
 import { sanitizeUrl } from "@/lib/wordpress/sanitize"
 import maplibregl from "maplibre-gl"
@@ -41,23 +40,27 @@ function buildTourStops(mapPinPoints: MapPinPointData[]): TourStop[] {
     pointId: 0,
   }
 
-  const dataStops: TourStop[] = mapPinPoints.filter((point) => point.mapPinPoint?.position?.latitude && point.mapPinPoint?.position?.longitude).map((point) => ({
-    name: point.mapPinPoint?.nom || point.title || "Point d'intérêt",
-    description: point.mapPinPoint?.descriptif || "",
-    longitude: point.mapPinPoint!.position!.longitude,
-    latitude: point.mapPinPoint!.position!.latitude,
-    zoom: 19,
-    image: point.mapPinPoint?.images?.[0]?.url,
-    link: `/${point.type}/${point.slug}`,
-    externalLink: sanitizeUrl(
-      typeof point.mapPinPoint?.lien === "string"
-        ? point.mapPinPoint?.lien
-        : point.mapPinPoint?.lien?.url || ""
-    ),
-    type: point.type,
-    slug: point.slug,
-    pointId: point.id,
-  }))
+  const dataStops: TourStop[] = mapPinPoints
+    .filter(
+      (point) => point.mapPinPoint?.position?.latitude && point.mapPinPoint?.position?.longitude
+    )
+    .map((point) => ({
+      name: point.mapPinPoint?.nom || point.title || "Point d'intérêt",
+      description: point.mapPinPoint?.descriptif || "",
+      longitude: point.mapPinPoint!.position!.longitude,
+      latitude: point.mapPinPoint!.position!.latitude,
+      zoom: 19,
+      image: point.mapPinPoint?.images?.[0]?.url,
+      link: `/${point.type}/${point.slug}`,
+      externalLink: sanitizeUrl(
+        typeof point.mapPinPoint?.lien === "string"
+          ? point.mapPinPoint?.lien
+          : point.mapPinPoint?.lien?.url || ""
+      ),
+      type: point.type,
+      slug: point.slug,
+      pointId: point.id,
+    }))
 
   return [overviewStop, ...dataStops]
 }
@@ -150,21 +153,33 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
         el.setAttribute("tabindex", "0")
 
         el.addEventListener("click", () => navigateToStop(index), { signal })
-        el.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault()
-            navigateToStop(index)
-          }
-        }, { signal })
-        el.addEventListener("mouseenter", () => {
-          el.style.width = "20px"
-          el.style.height = "20px"
-          el.style.boxShadow = "0 0 0 4px rgba(231, 87, 84, 0.4), 0 2px 8px rgba(0,0,0,0.3)"
-        }, { signal })
-        el.addEventListener("mouseleave", () => {
-          const isActive = currentStopRef.current === index
-          updateMarkerStyle(el, isActive)
-        }, { signal })
+        el.addEventListener(
+          "keydown",
+          (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault()
+              navigateToStop(index)
+            }
+          },
+          { signal }
+        )
+        el.addEventListener(
+          "mouseenter",
+          () => {
+            el.style.width = "20px"
+            el.style.height = "20px"
+            el.style.boxShadow = "0 0 0 4px rgba(231, 87, 84, 0.4), 0 2px 8px rgba(0,0,0,0.3)"
+          },
+          { signal }
+        )
+        el.addEventListener(
+          "mouseleave",
+          () => {
+            const isActive = currentStopRef.current === index
+            updateMarkerStyle(el, isActive)
+          },
+          { signal }
+        )
 
         const marker = new maplibregl.Marker({ element: el })
           .setLngLat([stop.longitude, stop.latitude])
@@ -190,17 +205,22 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
 
     const stop = tourStops[currentStop]
 
-    // Cancel any previous moveend listener to avoid race conditions
+    const duration = prefersReducedMotionRef.current ? 0 : 3000
+
+    // Show info panel early (after 40% of flight) instead of waiting for moveend
+    const panelTimer = setTimeout(() => {
+      setShowInfoPanel(true)
+    }, duration * 0.4)
+
     const onMoveEnd = () => {
       setIsTransitioning(false)
       isTransitioningRef.current = false
-      setShowInfoPanel(true)
     }
 
     map.flyTo({
       center: [stop.longitude, stop.latitude],
       zoom: stop.zoom,
-      duration: prefersReducedMotionRef.current ? 0 : 3000,
+      duration,
       essential: true,
     })
 
@@ -223,6 +243,7 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
     }
 
     return () => {
+      clearTimeout(panelTimer)
       map.off("moveend", onMoveEnd)
     }
   }, [currentStop, mapLoaded, tourStops])
@@ -294,15 +315,6 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
                         sizes="128px"
                       />
                     </div>
-
-                    {currentStopData.type && (
-                      <span
-                        className="absolute top-2 left-2 text-white text-xs font-semibold px-2 py-0.5 rounded-full shadow-md z-10"
-                        style={{ backgroundColor: getTypeConfig(currentStopData.type).color }}
-                      >
-                        {getTypeConfig(currentStopData.type).label}
-                      </span>
-                    )}
                   </div>
                 )}
 
@@ -319,14 +331,14 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
                     </p>
                   )}
 
-                  {currentStopData.link && (
+                  {currentStopData.type && (
                     <div className="pt-0.5">
-                      <Button variant="default" size="sm" asChild>
-                        <a href={currentStopData.link} className="flex items-center gap-2">
-                          Voir les détails
-                          <ExternalLink className="h-3.5 w-3.5" />
-                        </a>
-                      </Button>
+                      <span
+                        className="inline-block text-white text-xs font-semibold px-2.5 py-0.5 rounded-full"
+                        style={{ backgroundColor: getTypeConfig(currentStopData.type).color }}
+                      >
+                        {getTypeConfig(currentStopData.type).label}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -393,13 +405,9 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
                   <div className="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary animate-pulse" />
                 )}
                 <div
-                  className="absolute top-2 left-2 rounded-full px-2 py-0.5"
+                  className="absolute top-2 left-2 h-3 w-3 rounded-full border border-white/50 shadow-sm"
                   style={{ backgroundColor: getTypeConfig(stop.type).color }}
-                >
-                  <span className="text-[10px] font-medium text-white">
-                    {getTypeConfig(stop.type).label}
-                  </span>
-                </div>
+                />
               </button>
             ))}
           </div>

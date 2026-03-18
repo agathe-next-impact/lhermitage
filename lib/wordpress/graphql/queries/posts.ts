@@ -36,7 +36,7 @@ export const GET_HEBERGEMENTS = gql`
           video
         }
         mapPinPoints {
-          nom
+          nomPin: nom
           descriptif
           visibilite
           position {
@@ -85,7 +85,7 @@ export const GET_HEBERGEMENT_BY_SLUG = gql`
         video
       }
       mapPinPoints {
-        nom
+        nomPin: nom
         descriptif
         visibilite
         position {
@@ -214,7 +214,7 @@ export const GET_STRUCTURES = gql`
           }
         }
         mapPinPoints {
-          nom
+          nomPin: nom
           descriptif
           visibilite
           position {
@@ -271,7 +271,7 @@ export const GET_STRUCTURE_BY_SLUG = gql`
         }
       }
       mapPinPoints {
-        nom
+        nomPin: nom
         descriptif
         visibilite
         position {
@@ -398,7 +398,7 @@ export const GET_ESPACES_DE_TRAVAIL = gql`
           video
         }
         mapPinPoints {
-          nom
+          nomPin: nom
           descriptif
           visibilite
           position {

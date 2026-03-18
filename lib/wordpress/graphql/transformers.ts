@@ -362,7 +362,7 @@ function mergeMainAndMapPinPoints(
 
   // MapPinPoints fields (visibilite, position, images override)
   if (mapPinPoints) {
-    if (result.nom === undefined && mapPinPoints.nom) result.nom = mapPinPoints.nom
+    if (result.nom === undefined && mapPinPoints.nomPin) result.nom = mapPinPoints.nomPin
     if (result.descriptif === undefined && mapPinPoints.descriptif)
       result.descriptif = mapPinPoints.descriptif
     if (mapPinPoints.visibilite !== undefined) result.visibilite = mapPinPoints.visibilite
@@ -385,7 +385,8 @@ export function transformHebergementAcf(gqlPost: Record<string, any>): Hebergeme
     nom: merged.nom,
     descriptif: transformContentLinks(merged.descriptif || ""),
     disponibilite: mainAcf?.disponibilite,
-    capacite_daccueil: mainAcf?.capaciteDaccueil != null ? Number(mainAcf.capaciteDaccueil) : undefined,
+    capacite_daccueil:
+      mainAcf?.capaciteDaccueil != null ? Number(mainAcf.capaciteDaccueil) : undefined,
     repartition_des_chambres: mainAcf?.repartitionDesChambres,
     commodites: mainAcf?.commodites,
     photos: transformAcfMediaConnection(merged.photos),
@@ -653,11 +654,7 @@ export function transformSejourAcf(gqlPost: Record<string, any>): SejourACF {
   if (actNodes?.length) {
     result.activites = {
       activite: actNodes.map((node: any) => ({
-        activite: transformPost<ActiviteACF>(
-          node,
-          transformActiviteAcf(node),
-          "activite"
-        ),
+        activite: transformPost<ActiviteACF>(node, transformActiviteAcf(node), "activite"),
       })),
     }
   }
