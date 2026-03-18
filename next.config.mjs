@@ -71,7 +71,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob: https://admin.hermitagelelab.com https://wp-asso.com https://*.wp.com https://secure.gravatar.com https://data.geopf.fr https://i.ytimg.com",
               "font-src 'self' data:",
-              "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com",
+              "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://www.google.com https://maps.google.com https://consent.google.com https://maps.googleapis.com",
               "connect-src 'self' https://admin.hermitagelelab.com https://wp-asso.com https://api.panoramax.ign.fr https://data.geopf.fr",
               "worker-src 'self' blob:",
               "media-src 'self' https: blob:",

@@ -33,10 +33,22 @@ const FALLBACK_NAV_ITEMS: CardNavItem[] = [
     bgColor: MENU_COLOR_SEQUENCE[0],
     textColor: "#ffffff",
     links: [
-      { label: "Séjours Collectifs", href: "/sejours-collectifs", ariaLabel: "Voir les séjours collectifs" },
-      { label: "Séjours Individuels", href: "/sejours-individuels", ariaLabel: "Voir les séjours individuels" },
+      {
+        label: "Séjours Collectifs",
+        href: "/sejours-collectifs",
+        ariaLabel: "Voir les séjours collectifs",
+      },
+      {
+        label: "Séjours Individuels",
+        href: "/sejours-individuels",
+        ariaLabel: "Voir les séjours individuels",
+      },
       { label: "Hébergements", href: "/hebergements", ariaLabel: "Voir les hébergements" },
-      { label: "Activités", href: "/sejours-collectifs/activites", ariaLabel: "Voir les activités" },
+      {
+        label: "Activités",
+        href: "/sejours-collectifs/activites",
+        ariaLabel: "Voir les activités",
+      },
     ],
   },
   {
@@ -44,9 +56,21 @@ const FALLBACK_NAV_ITEMS: CardNavItem[] = [
     bgColor: MENU_COLOR_SEQUENCE[1],
     textColor: "#ffffff",
     links: [
-      { label: "Structures Hébergées", href: "/ecosysteme-innovant/structures-hebergees", ariaLabel: "Voir les structures hébergées" },
-      { label: "Partenaires", href: "/ecosysteme-innovant/partenaires", ariaLabel: "Voir les partenaires" },
-      { label: "Événements", href: "/ecosysteme-innovant/evenements", ariaLabel: "Voir les événements" },
+      {
+        label: "Structures Hébergées",
+        href: "/ecosysteme-innovant/structures-hebergees",
+        ariaLabel: "Voir les structures hébergées",
+      },
+      {
+        label: "Partenaires",
+        href: "/ecosysteme-innovant/partenaires",
+        ariaLabel: "Voir les partenaires",
+      },
+      {
+        label: "Événements",
+        href: "/ecosysteme-innovant/evenements",
+        ariaLabel: "Voir les événements",
+      },
     ],
   },
   {
@@ -65,9 +89,17 @@ const FALLBACK_NAV_ITEMS: CardNavItem[] = [
     bgColor: MENU_COLOR_SEQUENCE[3],
     textColor: "#ffffff",
     links: [
-      { label: "Localisation", href: "/infos-pratiques/localisation", ariaLabel: "Voir la localisation" },
+      {
+        label: "Localisation",
+        href: "/infos-pratiques/localisation",
+        ariaLabel: "Voir la localisation",
+      },
       { label: "Contacts", href: "/infos-pratiques/contacts", ariaLabel: "Nous contacter" },
-      { label: "Jours et Horaires", href: "/infos-pratiques/jours-et-horaires-douverture", ariaLabel: "Voir les horaires" },
+      {
+        label: "Jours et Horaires",
+        href: "/infos-pratiques/jours-et-horaires-douverture",
+        ariaLabel: "Voir les horaires",
+      },
       { label: "Services", href: "/services", ariaLabel: "Découvrir nos services" },
     ],
   },
@@ -108,9 +140,7 @@ export async function SiteHeader({ children }: { children?: ReactNode }) {
     }
   }
 
-  const navItems = menuItems.length > 0
-    ? transformMenuToNavItems(menuItems)
-    : FALLBACK_NAV_ITEMS
+  const navItems = menuItems.length > 0 ? transformMenuToNavItems(menuItems) : FALLBACK_NAV_ITEMS
 
   const colorMap = buildRouteColorMap(navItems)
   const ctaButton = globalOptions.lien_du_cta_de_barre_superieure
@@ -120,9 +150,9 @@ export async function SiteHeader({ children }: { children?: ReactNode }) {
       <header className="fixed top-0 z-40 w-full bg-transparent">
         <CardNav
           topBarLinks={[
-            { label: "Visiter", href: "/visite-virtuelle", bgColor: "#56939F" },
-            { label: "Soutenir", href: "/soutenir", bgColor: "#78AD7D" },
+            { label: "Séjours", href: "/nos-sejours", bgColor: "#56939F" },
             { label: "Réserver", href: "/reserver", bgColor: "#E75754" },
+            { label: "Soutenir", href: "/soutenir-le-projet/don-association", bgColor: "#78AD7D" },
           ]}
           centerLogo="/logo-arcs-coral.png"
           centerLogoAlt="Logo ARCS"

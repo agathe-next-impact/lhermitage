@@ -133,6 +133,40 @@ export const PAGE_FIELDS = gql`
         }
       }
     }
+    pageLocalisation {
+      adresse {
+        ligne1
+        ligne2
+        description
+        image {
+          node {
+            ...ImageFields
+          }
+        }
+        carteUrl
+      }
+      moyensAcces {
+        titre
+        icone
+        couleur
+        duree
+        contenu
+      }
+      logistique {
+        titre
+        texte
+        services {
+          label
+          icone
+        }
+        note
+        image {
+          node {
+            ...ImageFields
+          }
+        }
+      }
+    }
     pagePatrimoine {
       introduction {
         citation

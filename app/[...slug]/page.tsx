@@ -14,6 +14,7 @@ import type {
 } from "@/lib/wordpress/types"
 import { REVALIDATION } from "@/lib/constants"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
+import { GuidedTourClient } from "@/app/(special)/visite-virtuelle/guided-tour-client"
 
 // Routes with dedicated page.tsx files — excluded from catch-all SSG
 const DEDICATED_ROUTES = [
@@ -122,17 +123,21 @@ export default async function CatchAllPage({ params }: PageProps) {
   const isHistoirePage = fullPath === "tiers-lieu-rural/lhistoire-du-lieu"
   const isEquipePage = fullPath === "tiers-lieu-rural/lequipe"
   const isSeminairesPage = fullPath.startsWith("seminaires")
+  const isDomainePage = fullPath === "tiers-lieu-rural/le-domaine-de-l-hermitage"
   let page = null
   let teamMembers: WPPost<TeamMemberACF>[] = []
   let seminairesData: SeminairesACF | null = null
+  let mapPinPoints: Awaited<ReturnType<typeof wpApi.getMapPinPoints>> = []
 
   try {
-    const [fetchedPage, fetchedTeamMembers] = await Promise.all([
+    const [fetchedPage, fetchedTeamMembers, fetchedMapPinPoints] = await Promise.all([
       getPageByPath(fullPath),
       isEquipePage ? wpApi.getTeamMembers() : Promise.resolve([]),
+      isDomainePage ? wpApi.getMapPinPoints() : Promise.resolve([]),
     ])
     page = fetchedPage
     teamMembers = fetchedTeamMembers
+    mapPinPoints = fetchedMapPinPoints
 
     // Only fetch séminaires data for séminaires pages (avoids overriding patrimoine and other pages)
     if (page && isSeminairesPage) {
@@ -170,6 +175,20 @@ export default async function CatchAllPage({ params }: PageProps) {
           />
         )}
         <TeamMasonry members={teamMembers} />
+      </div>
+    )
+  } else if (isDomainePage) {
+    content = (
+      <div className="relative z-10 mx-auto space-y-8">
+        {page.content.rendered && (
+          <div
+            className="prose prose-stone max-w-none mb-6 px-4 py-2"
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }}
+          />
+        )}
+        <div className="container mx-auto p-2">
+          <GuidedTourClient mapPinPoints={mapPinPoints} />
+        </div>
       </div>
     )
   } else if (page.acf?.patrimoine?.sections && page.acf.patrimoine.sections.length > 0) {

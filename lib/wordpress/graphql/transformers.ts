@@ -308,6 +308,49 @@ export function transformPage(
     }
   }
 
+  // "pageLocalisation" — localisation page: adresse, moyens d'accès, logistique
+  const locData = gqlPage.pageLocalisation
+  if (locData) {
+    const hasContent =
+      locData.adresse?.ligne1 ||
+      locData.adresse?.ligne2 ||
+      (locData.moyensAcces && locData.moyensAcces.length > 0) ||
+      locData.logistique?.titre
+    if (hasContent) {
+      pageAcf.localisation_page = {
+        adresse: locData.adresse
+          ? {
+              ligne_1: locData.adresse.ligne1,
+              ligne_2: locData.adresse.ligne2,
+              description: locData.adresse.description,
+              image: locData.adresse.image
+                ? transformAcfMediaEdge(locData.adresse.image)
+                : undefined,
+              carte_url: locData.adresse.carteUrl,
+            }
+          : undefined,
+        moyens_acces: locData.moyensAcces?.map((item: any) => ({
+          titre: item.titre,
+          icone: item.icone,
+          couleur: item.couleur,
+          duree: item.duree,
+          contenu: item.contenu ? transformContentLinks(item.contenu) : undefined,
+        })),
+        logistique: locData.logistique
+          ? {
+              titre: locData.logistique.titre,
+              texte: locData.logistique.texte,
+              services: locData.logistique.services,
+              note: locData.logistique.note,
+              image: locData.logistique.image
+                ? transformAcfMediaEdge(locData.logistique.image)
+                : undefined,
+            }
+          : undefined,
+      }
+    }
+  }
+
   // "pagePatrimoine" — patrimoine page sections, valeurs, publics
   const patData = gqlPage.pagePatrimoine
   if (patData?.sections && Array.isArray(patData.sections) && patData.sections.length > 0) {

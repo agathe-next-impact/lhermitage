@@ -107,6 +107,30 @@ export interface PageACF {
       image_de_section?: WPImage
     }
   }
+  // Page Localisation fields
+  localisation_page?: {
+    adresse?: {
+      ligne_1?: string
+      ligne_2?: string
+      description?: string
+      image?: WPImage
+      carte_url?: string
+    }
+    moyens_acces?: Array<{
+      titre?: string
+      icone?: string
+      couleur?: string
+      duree?: string
+      contenu?: string
+    }>
+    logistique?: {
+      titre?: string
+      texte?: string
+      services?: Array<{ label?: string; icone?: string }>
+      note?: string
+      image?: WPImage
+    }
+  }
   // Page Patrimoine fields
   patrimoine?: PatrimoineACF
   // Page Séminaires fields
