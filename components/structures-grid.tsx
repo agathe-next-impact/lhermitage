@@ -350,12 +350,12 @@ export function StructuresGrid({
       {internalStructures.length > 0 && (
         <BentoHeaderContent
           title={sectionInternes?.titre_de_section || "Structures internes"}
-          color={BRAND_COLORS.rose}
+          color={BRAND_COLORS.coral}
           columnImage={sectionInternes?.image_de_section?.url}
         >
           <StructuresSectionGrid
             structures={internalStructures}
-            color={BRAND_COLORS.rose}
+            color={BRAND_COLORS.coral}
           />
         </BentoHeaderContent>
       )}
