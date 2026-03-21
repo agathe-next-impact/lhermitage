@@ -132,11 +132,11 @@ const ExpandedCard: React.FC<{
             {structure.acf?.nom || structure.title.rendered}
           </motion.h3>
 
-          <div className="bg-white rounded-xl p-5">
+          <div className="bg-white/60 rounded-xl p-5">
             {/* Full description */}
             {structure.acf?.descriptif && (
               <motion.div
-                className="prose prose-sm max-w-none [&_p]:text-stone-700 [&_a]:underline"
+                className="prose prose-sm max-w-none [&_p]:text-stone-900 [&_a]:underline"
                 dangerouslySetInnerHTML={{ __html: sanitizeHtml(structure.acf.descriptif) }}
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -145,40 +145,7 @@ const ExpandedCard: React.FC<{
               />
             )}
 
-            {/* Action buttons */}
-            <motion.div
-              className="flex flex-wrap gap-3 mt-4"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              transition={{ delay: 0.3, duration: 0.3 }}
-            >
-              <Button
-                asChild
-                size="sm"
-                className="rounded-full font-semibold text-sm h-9 px-6"
-                style={{ backgroundColor: color, color: "white" }}
-              >
-                <Link href={`/structure/${structure.slug}`}>Voir la fiche</Link>
-              </Button>
 
-              {structure.acf?.lien?.url && (
-                <Button
-                  asChild
-                  variant="outline"
-                  size="sm"
-                  className="rounded-full text-sm h-9 px-6"
-                >
-                  <a
-                    href={sanitizeUrl(structure.acf.lien.url)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {structure.acf.lien.title || "Site web"}
-                  </a>
-                </Button>
-              )}
-            </motion.div>
           </div>
         </div>
 

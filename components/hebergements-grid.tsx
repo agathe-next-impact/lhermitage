@@ -17,6 +17,15 @@ interface HebergementsGridProps {
 
 /* ── Shared helpers ── */
 
+const CARD_COLORS = [
+  BRAND_COLORS.green,
+  BRAND_COLORS.teal,
+  BRAND_COLORS.coral,
+  BRAND_COLORS.rose,
+  BRAND_COLORS.orange,
+  BRAND_COLORS.darkBlue,
+] as const
+
 function getImage(h: WPPost<HebergementACF>) {
   return {
     url:
@@ -41,7 +50,8 @@ const CollapsedCard: React.FC<{
   return (
     <motion.div
       layoutId={`card-${hebergement.id}`}
-      className="h-full flex flex-col justify-between p-2 pt-6 shadow-sm hover:shadow-md rounded-xl overflow-hidden relative bg-brand-green cursor-pointer"
+      style={{ backgroundColor: color }}
+      className="h-full flex flex-col justify-between p-2 pt-6 shadow-sm hover:shadow-md rounded-xl overflow-hidden relative cursor-pointer"
       transition={{ layout: { duration: 0.25, ease: [0.4, 0, 0.2, 1] } }}
       data-hebergement-card
       onClick={onExpand}
@@ -66,7 +76,8 @@ const CollapsedCard: React.FC<{
         <Button
           onClick={onExpand}
           size="sm"
-          className="rounded-full bg-white text-brand-green font-semibold transition-colors hover:bg-white/90 shadow-md text-sm h-9 px-6"
+          style={{ color }}
+          className="rounded-full bg-white font-semibold transition-colors hover:bg-white/90 shadow-md text-sm h-9 px-6"
         >
           Découvrir
         </Button>
@@ -101,7 +112,8 @@ const ExpandedCard: React.FC<{
   return (
     <motion.div
       layoutId={`card-${hebergement.id}`}
-      className="flex flex-col p-2 pt-6 shadow-lg rounded-xl overflow-hidden relative bg-brand-green"
+      style={{ backgroundColor: color }}
+      className="flex flex-col p-2 pt-6 shadow-lg rounded-xl overflow-hidden relative"
       transition={{ layout: { duration: 0.25, ease: [0.4, 0, 0.2, 1] } }}
     >
       {/* Close button */}
@@ -127,7 +139,7 @@ const ExpandedCard: React.FC<{
             {hebergement.acf?.nom || hebergement.title.rendered}
           </motion.h3>
 
-          <div className="bg-white rounded-xl p-5">
+          <div className="bg-white/60 rounded-xl p-5">
             {/* Info badges */}
             <motion.div
               className="flex flex-wrap gap-3 mb-4"
@@ -137,17 +149,17 @@ const ExpandedCard: React.FC<{
               transition={{ delay: 0.15, duration: 0.3 }}
             >
               {hebergement.acf?.capacite_daccueil != null && (
-                <span className="inline-flex items-center gap-1.5 bg-brand-green/10 rounded-full px-3 py-1.5 text-sm text-stone-700">
+                <span className="inline-flex items-center gap-1.5 bg-brand-green/10 rounded-full px-3 py-1.5 text-base text-stone-900">
                   <Users className="w-4 h-4" /> {hebergement.acf.capacite_daccueil} personnes
                 </span>
               )}
               {hebergement.acf?.repartition_des_chambres && (
-                <span className="inline-flex items-center gap-1.5 bg-brand-green/10 rounded-full px-3 py-1.5 text-sm text-stone-700">
-                  <BedDouble className="w-4 h-4" /> {hebergement.acf.repartition_des_chambres}
+                <span className="inline-flex items-center gap-1.5 bg-brand-green/10 rounded-full px-3 py-1.5 text-sm text-stone-900">
+                  {hebergement.acf.repartition_des_chambres}
                 </span>
               )}
               {hebergement.acf?.disponibilite && (
-                <span className="inline-flex items-center gap-1.5 bg-brand-green/10 rounded-full px-3 py-1.5 text-sm text-stone-700">
+                <span className="inline-flex items-center gap-1.5 bg-brand-green/10 rounded-full px-3 py-1.5 text-sm text-stone-900">
                   <CalendarDays className="w-4 h-4" /> {hebergement.acf.disponibilite}
                 </span>
               )}
@@ -155,7 +167,7 @@ const ExpandedCard: React.FC<{
 
             {hebergement.acf?.commodites && (
               <motion.p
-                className="text-stone-600 text-sm mb-4"
+                className="text-stone-800 text-sm mb-4"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -336,8 +348,9 @@ export function HebergementsGrid({ hebergements }: HebergementsGridProps) {
   return (
     <LayoutGroup>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-        {hebergements.map((hebergement) => {
+        {hebergements.map((hebergement, index) => {
           const isExpanded = hebergement.id === expandedId
+          const color = CARD_COLORS[index % CARD_COLORS.length]
 
           if (isExpanded) {
             return (
@@ -350,7 +363,7 @@ export function HebergementsGrid({ hebergements }: HebergementsGridProps) {
               >
                 <ExpandedCard
                   hebergement={hebergement}
-                  color={BRAND_COLORS.rose}
+                  color={color}
                   onCollapse={handleCollapse}
                 />
               </motion.div>
@@ -368,7 +381,7 @@ export function HebergementsGrid({ hebergements }: HebergementsGridProps) {
             >
               <CollapsedCard
                 hebergement={hebergement}
-                color={BRAND_COLORS.rose}
+                color={color}
                 onExpand={() => handleExpand(hebergement.id)}
               />
             </motion.div>

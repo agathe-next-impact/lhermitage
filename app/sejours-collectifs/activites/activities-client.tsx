@@ -5,7 +5,6 @@ import { useState, useRef, useCallback, useEffect } from "react"
 import { motion, LayoutGroup } from "framer-motion"
 import Image from "next/image"
 import { CategoryFilter } from "@/components/category-filter"
-import { getCategoryColor } from "@/lib/wordpress/category-colors"
 import { truncateText } from "@/lib/utils"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 import { X } from "lucide-react"
@@ -161,11 +160,11 @@ const ExpandedCard: React.FC<{
             {activity.title}
           </motion.h3>
 
-          <div className="bg-white rounded-xl p-5">
+          <div className="bg-white/60 rounded-xl p-5">
             {/* Full description */}
             {cleanDescriptionHtml ? (
               <motion.div
-                className="prose prose-sm max-w-none [&_p]:text-stone-700 [&_a]:underline"
+                className="prose prose-sm max-w-none [&_p]:text-stone-900 [&_a]:underline"
                 style={{ "--tw-prose-links": color } as React.CSSProperties}
                 dangerouslySetInnerHTML={{ __html: sanitizeHtml(cleanDescriptionHtml) }}
                 initial={{ opacity: 0, y: 15 }}
@@ -360,7 +359,7 @@ export function ActivitiesClient({ categories, activities }: ActivitiesClientPro
 
       {sortedCategories.map((categoryName, catIndex) => {
         const categoryData = activitiesByCategory[categoryName]
-        const color = getCategoryColor(categoryData.slug)
+        const color = categories.find((c) => c.slug === categoryData.slug)?.color || "#E75754"
         // Count activities in previous categories to determine global index
         const prevCount = sortedCategories
           .slice(0, catIndex)

@@ -483,6 +483,8 @@ function mergeMainAndMapPinPoints(
     if (result.nom === undefined && mapPinPoints.nomPin) result.nom = mapPinPoints.nomPin
     if (result.descriptif === undefined && mapPinPoints.descriptif)
       result.descriptif = mapPinPoints.descriptif
+    // Toujours conserver le descriptif spécifique au pin point
+    if (mapPinPoints.descriptif) result.descriptifPinPoint = mapPinPoints.descriptif
     if (mapPinPoints.visibilite !== undefined) result.visibilite = mapPinPoints.visibilite
     if (mapPinPoints.position) result.position = mapPinPoints.position
     if (mapPinPoints.images) result.images = mapPinPoints.images
@@ -502,6 +504,7 @@ export function transformHebergementAcf(gqlPost: Record<string, any>): Hebergeme
   return {
     nom: merged.nom,
     descriptif: transformContentLinks(merged.descriptif || ""),
+    descriptifPinPoint: merged.descriptifPinPoint,
     disponibilite: mainAcf?.disponibilite,
     capacite_daccueil:
       mainAcf?.capaciteDaccueil != null ? Number(mainAcf.capaciteDaccueil) : undefined,
@@ -544,6 +547,7 @@ export function transformStructureAcf(gqlPost: Record<string, any>): StructureAC
     nom: merged.nom,
     type_de_structure: mainAcf?.typeDeStructure || undefined,
     descriptif: transformContentLinks(merged.descriptif || ""),
+    descriptifPinPoint: merged.descriptifPinPoint,
     photos: transformAcfMediaConnection(merged.photos),
     lien: merged.lien ? transformLink(merged.lien) : undefined,
     video: merged.video,
@@ -610,6 +614,7 @@ export function transformEspaceDeTravailAcf(gqlPost: Record<string, any>): Espac
   return {
     nom: merged.nom,
     descriptif: transformContentLinks(merged.descriptif || ""),
+    descriptifPinPoint: merged.descriptifPinPoint,
     photos: transformAcfMediaConnection(merged.photos),
     video: merged.video,
     visibilite: merged.visibilite,

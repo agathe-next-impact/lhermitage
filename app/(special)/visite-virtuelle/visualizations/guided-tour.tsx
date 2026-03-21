@@ -26,16 +26,16 @@ interface GuidedTourProps {
 
 function buildTourStops(mapPinPoints: MapPinPointData[]): TourStop[] {
   const overviewStop: TourStop = {
-    name: "Vue d'ensemble",
+    name: "SURVOLEZ L'HERMITAGE",
     description:
-      "Bienvenue dans la visite virtuelle de l'Hermitage Saint-Antoine. Découvrez les différents points d'intérêt en cliquant sur les vignettes.",
+      "",
     longitude: DEFAULT_CENTER.lng,
     latitude: DEFAULT_CENTER.lat,
     zoom: DEFAULT_ZOOM,
-    image: "/logo-hermitage.webp",
+    image: "/logo-arcs-coral.png",
     link: "",
     externalLink: "",
-    type: "vue-panoramique",
+    type: "",
     slug: "overview",
     pointId: 0,
   }

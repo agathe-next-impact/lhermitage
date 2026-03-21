@@ -5,6 +5,7 @@ import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 import { stripHtml } from "@/lib/utils"
 import { ActivitiesClient } from "./activities-client"
 import { REVALIDATION } from "@/lib/constants"
+import { getCategoryColorByIndex } from "@/lib/wordpress/category-colors"
 
 export const revalidate = REVALIDATION.listing
 
@@ -18,17 +19,6 @@ function extractImagesFromHtml(html: string): { src: string; alt: string }[] {
     images.push({ src: match[1], alt: altMatch?.[1] || "" })
   }
   return images
-}
-
-function getCategoryColor(slug: string): string {
-  const colorMap: Record<string, string> = {
-    "atelier-de-facilitation": "#C14C66",
-    "zero-dechets": "#78AD7D",
-    "prendre-lair": "#56939F",
-    festivite: "#DC6F45",
-    "decouverte-du-site": "#2A4A51",
-  }
-  return colorMap[slug] || "#E75754"
 }
 
 export default async function ActivitesPage() {
@@ -48,14 +38,16 @@ export default async function ActivitesPage() {
           slug: categoryData.slug,
           description:
             categoryData.description || `Découvrez nos activités de type ${categoryData.name}`,
-          color: getCategoryColor(categoryData.slug),
           displayOrder: categoryData.display_order ?? 0,
         })
       }
     }
   })
 
-  const categories = Array.from(categoriesMap.values()).sort((a, b) => a.displayOrder - b.displayOrder)
+  // Trier puis attribuer une couleur unique par index (cycle sur la palette)
+  const categories = Array.from(categoriesMap.values())
+    .sort((a, b) => a.displayOrder - b.displayOrder)
+    .map((cat, index) => ({ ...cat, color: getCategoryColorByIndex(index) }))
 
   const activitiesData = activites.map((activite) => {
     const categoryInfo = activite._embedded?.["wp:term"]?.[0]?.[0]

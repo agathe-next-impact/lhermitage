@@ -149,10 +149,10 @@ const ExpandedCard: React.FC<{
             {espace.title}
           </motion.h3>
 
-          <div className="bg-white rounded-xl p-5">
+          <div className="bg-white/60 rounded-xl p-5">
             {cleanDescriptionHtml ? (
               <motion.div
-                className="prose prose-sm max-w-none [&_p]:text-stone-700 [&_a]:underline"
+                className="prose prose-sm max-w-none [&_p]:text-stone-900 [&_a]:underline"
                 style={{ "--tw-prose-links": color } as React.CSSProperties}
                 dangerouslySetInnerHTML={{ __html: sanitizeHtml(cleanDescriptionHtml) }}
                 initial={{ opacity: 0, y: 15 }}

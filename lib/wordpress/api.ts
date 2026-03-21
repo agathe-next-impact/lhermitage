@@ -493,8 +493,9 @@ export class WordPressAPI {
               }))
             : []
 
-          const shortDescription = post.acf?.descriptif
-            ? post.acf.descriptif.replace(/<[^>]*>/g, "").substring(0, 100)
+          const pinPointDescription = post.acf?.descriptifPinPoint || post.acf?.descriptif
+          const shortDescription = pinPointDescription
+            ? pinPointDescription.replace(/<[^>]*>/g, "").substring(0, 100)
             : undefined
 
           return {

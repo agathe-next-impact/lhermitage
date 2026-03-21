@@ -209,6 +209,7 @@ export interface EvenementACF {
 export interface HebergementACF {
   nom?: string
   descriptif?: string
+  descriptifPinPoint?: string
   disponibilite?: string
   capacite_daccueil?: number
   repartition_des_chambres?: string
@@ -253,6 +254,7 @@ export interface SejourACF {
 export interface StructureACF {
   nom?: string
   descriptif?: string
+  descriptifPinPoint?: string
   photos?: WPImage[]
   lien?: WPLink
   video?: string
@@ -270,6 +272,7 @@ export interface StructureACF {
 export interface EspaceDeTravailACF {
   nom?: string
   descriptif?: string
+  descriptifPinPoint?: string
   photos?: WPImage[]
   lien?: WPLink
   video?: string

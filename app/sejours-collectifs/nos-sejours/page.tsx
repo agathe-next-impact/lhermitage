@@ -58,7 +58,7 @@ export default async function NosSejoursPage() {
   // Séminaires ACF → header plein écran avec vidéo/image
   if (seminairesData) {
     return (
-      <div>
+      <div className="overflow-x-clip">
         <SejoursHeader
           title={pageTitle}
           video={seminairesData.hero_seminaires?.video}

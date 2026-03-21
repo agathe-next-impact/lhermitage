@@ -268,7 +268,7 @@ export function SeminairesPage({ acf, serviceTypes = [] }: SeminairesPageProps) 
   const sectionColor = menuColor || getColorForPath(pathname) || BRAND_COLORS.green
 
   return (
-    <div className="pt-4 pl-4">
+    <div className="pt-4 px-4">
       <div className="max-w-7xl space-y-16">
         {/* ─── 1. LA PROMESSE ─── */}
         {promesse && (
@@ -445,14 +445,14 @@ export function SeminairesPage({ acf, serviceTypes = [] }: SeminairesPageProps) 
                     >
                       <div className="px-2 pb-4">
                         <h5
-                          className="text-base font-bold mb-1"
-                          style={{ color: BRAND_COLORS.teal }}
+                          className="text-lg font-semibold mb-1"
+                          style={{ color: BRAND_COLORS.darkBlue }}
                         >
                           {activite.acf?.nom || activite.title.rendered}
                         </h5>
                         {activite.acf?.descriptif && (
                           <div
-                            className="text-brand-gray/70 text-xs line-clamp-3 [&_p]:m-0"
+                            className="text-brand-gray/70 text-sm line-clamp-3 [&_p]:m-0"
                             dangerouslySetInnerHTML={{
                               __html: sanitizeHtml(activite.acf.descriptif),
                             }}
