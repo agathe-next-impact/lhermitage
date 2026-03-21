@@ -216,6 +216,24 @@ export const PAGE_FIELDS = gql`
         }
       }
     }
+    pageContacts {
+      contactsEquipe {
+        nom
+        role
+        organisation
+        photo {
+          node {
+            ...ImageFields
+          }
+        }
+        email
+        telephones {
+          numero
+          label
+        }
+        adresse
+      }
+    }
     pagePatrimoine {
       introduction {
         citation

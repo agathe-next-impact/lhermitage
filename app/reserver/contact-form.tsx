@@ -21,14 +21,13 @@ import {
 
 const OBJET_COLORS: Record<ContactObject, string> = {
   sejour: BRAND_COLORS.teal,
-  evenement: BRAND_COLORS.orange,
+  information: BRAND_COLORS.orange,
   partenariat: BRAND_COLORS.green,
   presse: BRAND_COLORS.rose,
   autre: BRAND_COLORS.darkBlue,
 }
 import { ContactFormFields } from "@/components/features/contact/contact-form-fields"
 import { ContactSejourFields } from "@/components/features/contact/contact-sejour-fields"
-import { ContactEvenementFields } from "@/components/features/contact/contact-evenement-fields"
 import { ContactSuccess } from "@/components/features/contact/contact-success"
 import { submitContactForm } from "./actions"
 
@@ -72,12 +71,6 @@ export function ContactForm() {
         "budgetEstime",
       ] as any)
     }
-    if (currentObjet !== "evenement") {
-      form.unregister(["typeEvenement", "dateSouhaitee"] as any)
-      if (currentObjet !== "sejour") {
-        form.unregister(["nombreParticipants"] as any)
-      }
-    }
     form.clearErrors()
   }, [currentObjet, form])
 
@@ -114,11 +107,11 @@ export function ContactForm() {
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-4xl space-y-6  pl-4" noValidate>
+    <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-4xl space-y-6" noValidate>
       {/* Sélecteur d'objet */}
       <div className="space-y-3">
         <div
-          className="flex flex-wrap gap-2 pt-6"
+          className="flex flex-wrap gap-2"
           role="radiogroup"
           aria-label="Objet de votre demande"
         >
@@ -159,11 +152,6 @@ export function ContactForm() {
             <ContactSejourFields form={form} />
           </motion.div>
         )}
-        {currentObjet === "evenement" && (
-          <motion.div key="evenement-fields" {...fieldAnimation}>
-            <ContactEvenementFields form={form} />
-          </motion.div>
-        )}
       </AnimatePresence>
 
       {/* Message */}
@@ -176,9 +164,7 @@ export function ContactForm() {
           placeholder={
             currentObjet === "sejour"
               ? "Décrivez votre projet de séjour : objectifs, attentes particulières, besoins spécifiques..."
-              : currentObjet === "evenement"
-                ? "Décrivez votre événement : format, besoins techniques, restauration..."
-                : "Votre message..."
+              : "Votre message..."
           }
           aria-required="true"
           aria-invalid={!!form.formState.errors.message}

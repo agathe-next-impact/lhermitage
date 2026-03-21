@@ -412,6 +412,20 @@ export function transformPage(
     }
   }
 
+  // "pageContacts" — contacts page: team members repeater
+  const contactsData = gqlPage.pageContacts?.contactsEquipe
+  if (Array.isArray(contactsData) && contactsData.length > 0) {
+    pageAcf.contacts_equipe = contactsData.map((member: any) => ({
+      nom: member.nom,
+      role: member.role,
+      organisation: member.organisation || undefined,
+      photo: member.photo ? transformAcfMediaEdge(member.photo) : undefined,
+      email: member.email || undefined,
+      telephones: member.telephones?.length ? member.telephones : undefined,
+      adresse: member.adresse || undefined,
+    }))
+  }
+
   // "pagePatrimoine" — patrimoine page sections, valeurs, publics
   const patData = gqlPage.pagePatrimoine
   if (patData?.sections && Array.isArray(patData.sections) && patData.sections.length > 0) {

@@ -1,10 +1,19 @@
 import { Mail, Phone, MapPin, Building2 } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PageHeader } from "@/components/layout/page-header"
 import { BentoHeaderContent } from "@/components/layout/bento-header-content"
 import { wpApi } from "@/lib/wordpress/api"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 import { ContactForm } from "@/app/reserver/contact-form"
+import { BRAND_COLORS, type BrandColor } from "@/lib/theme/colors"
+
+const CARD_COLORS: BrandColor[] = [
+  BRAND_COLORS.rose,
+  BRAND_COLORS.teal,
+  BRAND_COLORS.orange,
+  BRAND_COLORS.green,
+  BRAND_COLORS.darkBlue,
+  BRAND_COLORS.coral,
+]
 
 interface ContactTelephone {
   numero: string
@@ -72,55 +81,67 @@ export default async function ContactsPage() {
       />
 
       <BentoHeaderContent title={page?.acf?.hero?.["sous-titre"]}>
-        <div className="container mx-auto px-4 py-12">
+        <div className="w-full pl-2 pt-2">
           {/* Grille des contacts */}
-          <h2 className="text-2xl font-bold mb-8 text-center">L&apos;équipe</h2>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-16">
-            {members.map((member) => (
-              <Card key={member.nom} className="flex flex-col">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">{member.nom}</CardTitle>
-                  <p className="text-sm text-muted-foreground leading-snug">{member.role}</p>
-                </CardHeader>
-                <CardContent className="flex flex-col gap-2 text-sm mt-auto">
-                  {member.organisation && (
-                    <div className="flex items-start gap-2 text-muted-foreground">
-                      <Building2 className="h-4 w-4 mt-0.5 shrink-0" />
-                      <span>{member.organisation}</span>
-                    </div>
-                  )}
-                  {member.telephones?.map((t) => {
-                    const display = formatPhone(t.numero, t.label)
-                    return (
-                      <div key={display} className="flex items-center gap-2 text-muted-foreground">
-                        <Phone className="h-4 w-4 shrink-0" />
-                        <a href={`tel:${t.numero.replace(/\s/g, "")}`} className="hover:underline">
-                          {display}
+          <div className="grid gap-2 sm:grid-cols-2 mx-auto mb-16">
+            {members.map((member, index) => (
+              <div
+                key={member.nom}
+                className="flex gap-4 rounded-lg p-5 text-white"
+                style={{ backgroundColor: CARD_COLORS[index % CARD_COLORS.length] }}
+              >
+                {member.photo && (
+                  <img
+                    src={member.photo.url}
+                    alt={member.photo.alt || member.nom}
+                    className="h-16 w-16 rounded-full object-cover shrink-0"
+                  />
+                )}
+                <div className="flex flex-col gap-3 min-w-0">
+                  <div>
+                    <h3 className="font-semibold leading-tight">{member.nom}</h3>
+                    <p className="text-sm text-white leading-snug">{member.role}</p>
+                  </div>
+                  <div className="flex flex-col gap-2 rounded-md bg-white/20 p-3">
+                    {member.organisation && (
+                      <div className="flex items-start gap-2 text-sm text-white/90">
+                        <Building2 className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                        <span>{member.organisation}</span>
+                      </div>
+                    )}
+                    {member.telephones?.map((t) => {
+                      const display = formatPhone(t.numero, t.label)
+                      return (
+                        <div key={display} className="flex items-center gap-2 text-sm text-white/90">
+                          <Phone className="h-3.5 w-3.5 shrink-0" />
+                          <a href={`tel:${t.numero.replace(/\s/g, "")}`} className="hover:underline">
+                            {display}
+                          </a>
+                        </div>
+                      )
+                    })}
+                    {member.email && (
+                      <div className="flex items-center gap-2 text-sm text-white/90">
+                        <Mail className="h-3.5 w-3.5 shrink-0" />
+                        <a href={`mailto:${member.email}`} className="hover:underline break-all">
+                          {member.email}
                         </a>
                       </div>
-                    )
-                  })}
-                  {member.email && (
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Mail className="h-4 w-4 shrink-0" />
-                      <a href={`mailto:${member.email}`} className="hover:underline">
-                        {member.email}
-                      </a>
-                    </div>
-                  )}
-                  {member.adresse && (
-                    <div className="flex items-start gap-2 text-muted-foreground">
-                      <MapPin className="h-4 w-4 mt-0.5 shrink-0" />
-                      <span>{member.adresse}</span>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                    )}
+                    {member.adresse && (
+                      <div className="flex items-start gap-2 text-sm text-white/90">
+                        <MapPin className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                        <span>{member.adresse}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
 
           {/* Formulaire de contact */}
-          <h2 className="text-2xl font-bold mb-8 text-center">Nous contacter</h2>
+          <h2 className="text-2xl font-bold mb-8">Nous écrire</h2>
           <ContactForm />
 
           {page?.content.rendered && (

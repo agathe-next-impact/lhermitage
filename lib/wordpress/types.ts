@@ -168,6 +168,16 @@ export interface PageACF {
       texte?: string
     }
   }
+  // Page Contacts fields
+  contacts_equipe?: Array<{
+    nom: string
+    role: string
+    organisation?: string
+    photo?: WPImage
+    email?: string
+    telephones?: Array<{ numero: string; label?: string }>
+    adresse?: string
+  }>
   // Page Patrimoine fields
   patrimoine?: PatrimoineACF
   // Page Séminaires fields

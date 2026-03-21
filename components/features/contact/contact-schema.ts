@@ -1,12 +1,12 @@
 import { z } from "zod"
 
-export const CONTACT_OBJECTS = ["sejour", "evenement", "partenariat", "presse", "autre"] as const
+export const CONTACT_OBJECTS = ["sejour", "information", "partenariat", "presse", "autre"] as const
 
 export type ContactObject = (typeof CONTACT_OBJECTS)[number]
 
 export const CONTACT_OBJECT_LABELS: Record<ContactObject, string> = {
   sejour: "Demande de séjour",
-  evenement: "Événement / Location",
+  information: "Demande d'information",
   partenariat: "Partenariat",
   presse: "Presse / Média",
   autre: "Autre",
@@ -58,26 +58,13 @@ const sejourSchema = z.object({
   budgetEstime: z.string().optional(),
 })
 
-const evenementSchema = z.object({
-  objet: z.literal("evenement"),
-  ...commonFields,
-  typeEvenement: z.string().min(2, "Veuillez préciser le type d'événement"),
-  nombreParticipants: z
-    .number({ invalid_type_error: "Nombre invalide" })
-    .int()
-    .min(1, "Minimum 1 participant")
-    .max(500, "Maximum 500 participants"),
-  dateSouhaitee: z.string().optional(),
-})
-
 const genericSchema = z.object({
-  objet: z.enum(["partenariat", "presse", "autre"] as const),
+  objet: z.enum(["information", "partenariat", "presse", "autre"] as const),
   ...commonFields,
 })
 
 export const contactFormSchema = z.discriminatedUnion("objet", [
   sejourSchema,
-  evenementSchema,
   genericSchema,
 ])
 
