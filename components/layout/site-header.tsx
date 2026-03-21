@@ -150,7 +150,7 @@ export async function SiteHeader({ children }: { children?: ReactNode }) {
       <header className="fixed top-0 z-40 w-full bg-transparent">
         <CardNav
           topBarLinks={[
-            { label: "Séjours", href: "/nos-sejours", bgColor: "#56939F" },
+            { label: "Séjours", href: "/sejours-collectifs/nos-sejours", bgColor: "#56939F" },
             { label: "Réserver", href: "/reserver", bgColor: "#E75754" },
             { label: "Soutenir", href: "/soutenir-le-projet/don-association", bgColor: "#78AD7D" },
           ]}
