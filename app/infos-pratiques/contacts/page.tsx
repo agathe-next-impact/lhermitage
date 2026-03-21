@@ -102,7 +102,7 @@ export default async function ContactsPage() {
                     <h3 className="font-semibold leading-tight">{member.nom}</h3>
                     <p className="text-sm text-white leading-snug">{member.role}</p>
                   </div>
-                  <div className="flex flex-col gap-2 rounded-md bg-white/20 p-3">
+                  <div className="flex flex-col gap-2 rounded-md bg-white/10 p-3">
                     {member.organisation && (
                       <div className="flex items-start gap-2 text-sm text-white/90">
                         <Building2 className="h-3.5 w-3.5 mt-0.5 shrink-0" />
