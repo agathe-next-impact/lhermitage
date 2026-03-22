@@ -400,7 +400,7 @@ export function SeminairesPage({ acf, serviceTypes = [] }: SeminairesPageProps) 
                 )}
                 {activites_teambuilding.sous_titre && (
                   <div
-                    className="text-base text-white/80 [&_p]:m-0"
+                    className="text-base text-white/60 [&_p]:m-0"
                     dangerouslySetInnerHTML={{
                       __html: sanitizeHtml(activites_teambuilding.sous_titre),
                     }}
@@ -429,8 +429,9 @@ export function SeminairesPage({ acf, serviceTypes = [] }: SeminairesPageProps) 
               </motion.div>
 
               {/* Cartes activités */}
-              {(activites_teambuilding.activites || []).slice(0, 3).map((activite, i) => {
+              {(activites_teambuilding.activites || []).slice(0, 5).map((activite, i) => {
                 const featuredImage = activite._embedded?.["wp:featuredmedia"]?.[0]
+                const imageUrl = featuredImage?.source_url
                 return (
                   <motion.div
                     key={activite.id}
@@ -459,21 +460,39 @@ export function SeminairesPage({ acf, serviceTypes = [] }: SeminairesPageProps) 
                           />
                         )}
                       </div>
-                      {featuredImage && (
-                        <Image
-                          src={featuredImage.source_url || "/placeholder.svg"}
-                          alt={featuredImage.alt_text || activite.acf?.nom || ""}
-                          width={600}
-                          height={400}
-                          className="rounded-xl object-cover w-full h-36"
-                          sizes="(max-width: 768px) 100vw, 50vw"
-                        />
-                      )}
+                      <Image
+                        src={imageUrl || "/placeholder.svg"}
+                        alt={featuredImage?.alt_text || activite.acf?.nom || ""}
+                        width={600}
+                        height={400}
+                        className="rounded-xl object-cover w-full h-36"
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                      />
                     </MinimalCard>
                   </motion.div>
                 )
               })}
             </div>
+                <Link
+                  href="/sejours-collectifs/activites"
+                  className="w-max inline-flex items-end gap-2 mt-4 px-5 py-2.5 rounded-full text-sm font-semibold transition-all hover:scale-105 hover:brightness-110 shadow-sm"
+                  style={{ backgroundColor: BRAND_COLORS.teal, color: "white" }}
+                >
+                  Voir toutes les activités
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M5 12h14" />
+                    <path d="m12 5 7 7-7 7" />
+                  </svg>
+                </Link>
           </section>
         )}
 

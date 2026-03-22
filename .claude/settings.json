@@ -1,7 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(for dir:*)",
+      "Bash(do echo:*)",
+      "Read(//c/dev/lhermitage/components/**)",
+      "Bash(done)",
+      "Bash(ls -la *.json)",
+      "Bash(cat:*)"
     ]
   }
 }
