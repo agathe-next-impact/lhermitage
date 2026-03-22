@@ -44,6 +44,54 @@ function HistoryCarousel({
   const wrapperRef = useRef<HTMLDivElement>(null)
   const [active, setActive] = useState(0)
   const isScrolling = useRef(false)
+  const [maxSlideHeight, setMaxSlideHeight] = useState<number | undefined>(undefined)
+
+  // Measure all slides and apply the tallest height to all
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    const measure = () => {
+      const slides = el.querySelectorAll<HTMLElement>("[data-slide-inner]")
+      if (slides.length === 0) return
+      // Reset height so we measure natural content height
+      slides.forEach((s) => (s.style.height = "auto"))
+      let max = 0
+      slides.forEach((s) => {
+        max = Math.max(max, s.scrollHeight)
+      })
+      setMaxSlideHeight(max)
+    }
+    // Measure after images load
+    const images = el.querySelectorAll("img")
+    let loaded = 0
+    const total = images.length
+    const onLoad = () => {
+      loaded++
+      if (loaded >= total) measure()
+    }
+    if (total === 0) {
+      measure()
+    } else {
+      images.forEach((img) => {
+        if (img.complete) {
+          loaded++
+        } else {
+          img.addEventListener("load", onLoad)
+          img.addEventListener("error", onLoad)
+        }
+      })
+      if (loaded >= total) measure()
+    }
+    // Also remeasure on resize
+    window.addEventListener("resize", measure)
+    return () => {
+      window.removeEventListener("resize", measure)
+      images.forEach((img) => {
+        img.removeEventListener("load", onLoad)
+        img.removeEventListener("error", onLoad)
+      })
+    }
+  }, [sections])
 
   const goTo = useCallback(
     (idx: number) => {
@@ -122,12 +170,6 @@ function HistoryCarousel({
     return () => window.removeEventListener("keydown", onKey)
   }, [next, prev])
 
-  const slideVariants = {
-    enter: { opacity: 0 },
-    center: { opacity: 1 },
-    exit: { opacity: 0 },
-  }
-
   return (
     <div ref={wrapperRef} className="relative">
       {/* Scroll container */}
@@ -141,100 +183,125 @@ function HistoryCarousel({
 
           return (
             <div key={idx} className="snap-start flex-shrink-0 w-full">
-              <div className="relative min-h-[70vh] md:min-h-[60vh] flex flex-col md:flex-row rounded-2xl overflow-hidden mx-1">
-                {/* Panneau image — fond immersif */}
-                <div className="relative w-full md:w-1/2 min-h-[35vh] md:min-h-[60vh]">
+              <div
+                data-slide-inner
+                className="relative rounded-xl overflow-hidden mx-1 min-h-[80vh] max-h-[80vh] flex items-end"
+                style={maxSlideHeight ? { height: maxSlideHeight } : undefined}
+              >
+                {/* Image plein fond */}
+                <div className="absolute inset-0">
                   {section.image ? (
-                    <>
-                      <Image
-                        src={section.image.url || "/placeholder.svg"}
-                        alt={section.image.alt || section.titre || ""}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                        quality={85}
-                        priority={idx === 0}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-black/30 hidden md:block" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent md:hidden" />
-                    </>
+                    <Image
+                      src={section.image.url || "/placeholder.svg"}
+                      alt={section.image.alt || section.titre || ""}
+                      fill
+                      className="object-cover"
+                      sizes="100vw"
+                      quality={85}
+                      priority={idx === 0}
+                    />
                   ) : (
                     <div className="absolute inset-0" style={{ backgroundColor: bgColor }} />
                   )}
-
-                  {/* Badge année */}
-                  {section.annee && (
-                    <div
-                      className="absolute top-6 left-6 px-4 py-2 rounded-full text-white text-sm md:text-base font-bold tracking-wider"
-                      style={{ backgroundColor: bgColor }}
-                    >
-                      {section.annee}
-                    </div>
-                  )}
-
-                  {/* Numéro de slide — overlay bas gauche */}
-                  <div className="absolute bottom-6 left-6 flex items-baseline gap-1">
-                    <span className="text-5xl md:text-7xl font-black text-white/20 leading-none">
-                      {String(idx + 1).padStart(2, "0")}
-                    </span>
-                  </div>
+                  <div className="absolute inset-0 bg-black/30" />
                 </div>
 
-                {/* Panneau contenu */}
-                <div className="w-full md:w-1/2 p-6 md:p-10 lg:p-14 flex flex-col justify-center bg-white">
+                {/* Badge année — haut gauche */}
+                {section.annee && (
+                  <div
+                    className="absolute top-6 left-6 z-10 px-4 py-2 rounded-full text-white text-sm md:text-base font-bold tracking-wider"
+                    style={{ backgroundColor: bgColor }}
+                  >
+                    {section.annee}
+                  </div>
+                )}
+
+                {/* Numéro de slide — bas gauche */}
+                <div className="absolute bottom-6 left-6 z-10 flex items-baseline gap-1">
+                  <span className="text-5xl md:text-7xl font-black text-white/20 leading-none">
+                    {String(idx + 1).padStart(2, "0")}
+                  </span>
+                </div>
+
+                {/* Boîte contenu — pleine largeur, par dessus l'image */}
+                <div className="relative z-10 flex flex-col justify-end min-h-[100vh]">
                   <AnimatePresence mode="wait">
                     {active === idx && (
                       <motion.div
                         key={idx}
-                        variants={slideVariants}
-                        initial="enter"
-                        animate="center"
-                        exit="exit"
-                        transition={{ duration: 0.4, ease: "easeOut" }}
+                        initial={{ opacity: 0, y: 40 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.5, ease: "easeOut", delay: 0.15 }}
+                        className="m-4 md:m-6"
                       >
-                        {section.titre && (
-                          <h3 className="text-2xl md:text-3xl mb-4" style={{ color: sectionColor }}>
-                            {decodeHtmlEntities(section.titre)}
-                          </h3>
-                        )}
+                        <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 md:p-8 lg:p-10 shadow-xl">
+                          {section.titre && (
+                            <h3 className="text-2xl md:text-3xl mb-4" style={{ color: bgColor }}>
+                              {decodeHtmlEntities(section.titre)}
+                            </h3>
+                          )}
 
-                        {section.accroche && (
-                          <p className="mb-4 text-base md:text-lg font-medium italic text-brand-gray/70">
-                            {decodeHtmlEntities(section.accroche)}
-                          </p>
-                        )}
+                          {section.accroche && (
+                            <p className="mb-4 text-base md:text-lg font-medium italic text-brand-gray/70">
+                              {decodeHtmlEntities(section.accroche)}
+                            </p>
+                          )}
 
-                        {section.contenu && (
-                          <div
-                            className="prose prose-stone prose-sm md:prose-base max-w-none text-brand-gray/80 [&>p]:mb-3 [&>ul]:mb-3 [&>ol]:mb-3"
-                            dangerouslySetInnerHTML={{ __html: sanitizeHtml(section.contenu) }}
-                          />
-                        )}
-
-                        {section.citation && (
-                          <blockquote
-                            className="mt-6 border-l-4 pl-4 italic text-muted-foreground text-sm md:text-base"
-                            style={{ borderColor: bgColor }}
-                          >
-                            {decodeHtmlEntities(section.citation)}
-                          </blockquote>
-                        )}
-
-                        {section.video_url && (
-                          <div className="mt-6 aspect-video overflow-hidden rounded-xl">
-                            <iframe
-                              src={section.video_url.replace("watch?v=", "embed/")}
-                              title={section.titre || "Vidéo"}
-                              allow="fullscreen"
-                              sandbox="allow-scripts allow-same-origin allow-presentation"
-                              className="h-full w-full border-0"
-                              loading="lazy"
+                          {section.contenu && (
+                            <div
+                              className="prose prose-stone prose-sm md:prose-base max-w-none text-brand-gray/80 [&>p]:mb-3 [&>ul]:mb-3 [&>ol]:mb-3"
+                              dangerouslySetInnerHTML={{ __html: sanitizeHtml(section.contenu) }}
                             />
-                          </div>
-                        )}
+                          )}
+
+                          {section.citation && (
+                            <blockquote
+                              className="mt-6 border-l-4 pl-4 italic text-muted-foreground text-sm md:text-base"
+                              style={{ borderColor: bgColor }}
+                            >
+                              {decodeHtmlEntities(section.citation)}
+                            </blockquote>
+                          )}
+
+                          {section.video_url && (
+                            <div className="mt-6 aspect-video overflow-hidden rounded-xl">
+                              <iframe
+                                src={section.video_url.replace("watch?v=", "embed/")}
+                                title={section.titre || "Vidéo"}
+                                allow="fullscreen"
+                                sandbox="allow-scripts allow-same-origin allow-presentation"
+                                className="h-full w-full border-0"
+                                loading="lazy"
+                              />
+                            </div>
+                          )}
+                        </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
+                </div>
+
+                {/* Contenu invisible pour la mesure de hauteur */}
+                <div className="invisible absolute inset-x-0 bottom-0 z-0 m-4 md:m-6 p-6 md:p-8 lg:p-10" aria-hidden="true">
+                  {section.titre && (
+                    <h3 className="text-2xl md:text-3xl mb-4">{decodeHtmlEntities(section.titre)}</h3>
+                  )}
+                  {section.accroche && (
+                    <p className="mb-4 text-base md:text-lg">{decodeHtmlEntities(section.accroche)}</p>
+                  )}
+                  {section.contenu && (
+                    <div
+                      className="prose prose-sm md:prose-base max-w-none [&>p]:mb-3 [&>ul]:mb-3 [&>ol]:mb-3"
+                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(section.contenu) }}
+                    />
+                  )}
+                  {section.citation && (
+                    <blockquote className="mt-6 border-l-4 pl-4 text-sm md:text-base">
+                      {decodeHtmlEntities(section.citation)}
+                    </blockquote>
+                  )}
+                  {section.video_url && <div className="mt-6 aspect-video" />}
                 </div>
               </div>
             </div>
@@ -340,27 +407,27 @@ export function PatrimoinePage({ acf }: PatrimoinePageProps) {
   }
 
   return (
-    <div className="overflow-x-hidden pt-4">
+    <div className="overflow-x-hidden pt-2 pl-0.5">
       <div className="max-w-7xl space-y-16">
-        {/* Introduction : citation + texte */}
+        {/* Introduction : citation + texte 
         {(introduction?.citation || introduction?.texte) && (
-          <div className="space-y-6 mt-2 pl-2 pt-2">
+          <div className="space-y-3 rounded-lg p-2">
             {introduction.citation && (
-              <blockquote
-                className="border-l-4 pl-6 py-2 text-xl md:text-2xl font-medium italic text-brand-gray/80"
-                style={{ color: BRAND_COLORS.dark, borderColor: sectionColor }}
+              <div
+                className="border-l-2 pl-4 py-2 text-xl md:text-2xl font-medium italic text-dark"
               >
                 {decodeHtmlEntities(introduction.citation)}
-              </blockquote>
+              </div>
             )}
             {introduction.texte && (
               <div
-                className="prose prose-stone prose-lg max-w-none text-brand-gray/80"
+                className="prose prose-stone prose-lg max-w-none text-dark/80"
                 dangerouslySetInnerHTML={{ __html: sanitizeHtml(introduction.texte) }}
               />
             )}
           </div>
         )}
+          */}
 
         {/* Sections historiques — scroll horizontal immersif */}
         <HistoryCarousel sections={sections} sectionColor={sectionColor} />
@@ -384,8 +451,6 @@ export function PatrimoinePage({ acf }: PatrimoinePageProps) {
                     className="flex items-start gap-4 p-5 md:p-6 rounded-xl shadow-md cursor-pointer"
                     style={{ backgroundColor: cardColor, color: "white" }}
                     whileHover={{
-                      scale: 1.02,
-                      x: -8,
                       filter: "brightness(1.1)",
                       boxShadow:
                         "0 8px 12px -1px rgba(0, 0, 0, 0.2), 0 4px 6px -1px rgba(0, 0, 0, 0.1)",
