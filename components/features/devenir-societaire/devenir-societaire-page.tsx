@@ -52,7 +52,7 @@ export function DevenirSocietairePage({ page }: Props) {
   ]
 
   return (
-    <div className="overflow-x-hidden pl-4 pt-4">
+    <div className="overflow-x-hidden md:pl-4 md:pt-4">
       <div className="max-w-7xl space-y-16">
         {/* Qu'est-ce que la SCIC */}
         {scicInfo.titre &&
@@ -89,7 +89,7 @@ export function DevenirSocietairePage({ page }: Props) {
             {pourquoiRejoindre.raisons &&
               Array.isArray(pourquoiRejoindre.raisons) &&
               pourquoiRejoindre.raisons.length > 0 && (
-                <ul className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 pt-10">
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-12 md:pt-10">
                   {pourquoiRejoindre.raisons.map((item: any, idx: number) => {
                     const bgColor = pourquoiRejoindreColors[idx % pourquoiRejoindreColors.length]
 
@@ -100,8 +100,6 @@ export function DevenirSocietairePage({ page }: Props) {
                         style={{ backgroundColor: bgColor, color: "white" }}
                         initial={{ opacity: 1 }}
                         whileHover={{
-                          scale: 1.02,
-                          x: -8,
                           filter: "brightness(1.1)",
                           boxShadow:
                             "0 8px 12px -1px rgba(0, 0, 0, 0.2), 0 4px 6px -1px rgba(0, 0, 0, 0.1)",

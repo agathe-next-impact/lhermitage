@@ -171,7 +171,7 @@ export default async function HorairesPage() {
                         className={`border-none shadow-md${href ? " transition-transform hover:scale-[1.03]" : ""}`}
                         style={{ backgroundColor: color }}
                       >
-                        <CardContent className="flex items-center gap-4 p-5">
+                        <CardContent className="flex items-center gap-4 md:p-5">
                           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/20">
                             <Icon className="h-6 w-6 text-white" />
                           </div>
@@ -227,7 +227,7 @@ export default async function HorairesPage() {
               {/* Tableau horaires */}
               <Card className="md:col-span-3 border-none shadow-none bg-transparent">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
+                  <CardTitle className="flex items-start gap-2 text-lg">
                     <Clock className="h-5 w-5" style={{ color: BRAND_COLORS.coral }} />
                     Horaires d&apos;ouverture
                   </CardTitle>
@@ -331,7 +331,7 @@ export default async function HorairesPage() {
                     className="object-cover rounded-xl"
                   />
                 </div>
-                <div className="p-8 md:col-span-3">
+                <div className="pr-4 md:p-8 md:col-span-3">
                   <p className="mb-6 text-white/90 leading-relaxed">{domaine.texte}</p>
                   <div className="grid gap-4 sm:grid-cols-3">
                     {domaineBadges.map((badge: any, i: number) => {
@@ -374,7 +374,7 @@ export default async function HorairesPage() {
             <p className="mb-8 text-muted-foreground">{sejours.sous_titre}</p>
 
             <Card className="border-none shadow-md" style={{ backgroundColor: BRAND_COLORS.teal }}>
-              <CardContent className="p-8">
+              <CardContent className="md:p-8">
                 <div className="flex flex-col items-center gap-6 text-center sm:flex-row sm:text-left">
                   <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white/20">
                     <Sunset className="h-8 w-8 text-white" />

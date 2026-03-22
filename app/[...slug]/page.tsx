@@ -182,11 +182,11 @@ export default async function CatchAllPage({ params }: PageProps) {
       <div className="relative z-10 mx-auto space-y-8">
         {page.content.rendered && (
           <div
-            className="prose prose-stone max-w-none mb-6 px-4 py-2"
+            className="prose prose-stone max-w-none mb-6 md:px-4 md:py-2"
             dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }}
           />
         )}
-        <div className="container mx-auto p-2">
+        <div className="container mx-auto md:p-2">
           <GuidedTourClient mapPinPoints={mapPinPoints} />
         </div>
       </div>

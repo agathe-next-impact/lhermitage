@@ -23,11 +23,11 @@ export function HomePageClient({
 
   return (
     <div className="mt-[60px] flex flex-col">
-      {/* Hero Section - Grid 4 colonnes × 5 lignes */}
-      <section className="w-[calc(100%-1rem)] mx-auto relative h-[calc(100vh-82px)] grid grid-cols-4 grid-rows-5">
-        {/* Vidéo : couvre toute la grille en fond */}
+      {/* Hero Section */}
+      <section className="w-[calc(100%-1rem)] mx-auto relative flex flex-col md:h-[calc(100vh-82px)] md:grid md:grid-cols-4 md:grid-rows-5">
+        {/* Vidéo : pleine largeur mobile, couvre toute la grille en desktop */}
         <div
-          className="col-start-1 col-end-5 row-start-1 row-end-6 relative overflow-hidden bg-black"
+          className="relative overflow-hidden bg-black aspect-video md:aspect-auto md:col-start-1 md:col-end-5 md:row-start-1 md:row-end-6"
           style={{ borderRadius: "15px" }}
         >
           {videoUrl ? (
@@ -52,23 +52,23 @@ export function HomePageClient({
             />
           )}
         </div>
-        {/* Masque coin supérieur droit : crée la forme en escalier (3 col haut / 4 col bas) */}
-        <div className="col-start-4 col-end-5 row-start-1 row-end-3 z-10 bg-background relative flex items-end pb-2 pl-2 rounded-bl-2xl">
-          <div className="h-full flex flex-col justify-between p-4 bg-brand-coral backdrop-blur-sm rounded-lg">
+        {/* Logo + titre : en dessous sur mobile, superposé en haut à droite sur desktop */}
+        <div className="p-0 pt-2 md:p-0 md:col-start-4 md:col-end-5 md:row-start-1 md:row-end-3 md:z-10 md:bg-background md:relative md:flex md:items-end md:pb-2 md:pl-2 md:rounded-bl-2xl">
+          <div className="flex flex-col justify-between p-4 bg-brand-coral backdrop-blur-sm rounded-lg md:h-full">
             <Image
               src="/logo-hermitage-new.png"
               alt="Logo du Tiers-Lieu Rural"
               width={300}
               height={150}
-              className="mb-2 w-full h-full object-contain"
+              className="mb-6 md:mb-2 w-1/3 md:w-full h-auto md:h-full object-contain"
             />
-            <h1 className="font-heading text-2xl font-bold leading-tight text-white">
+            <h1 className="font-heading text-xl md:text-2xl font-bold leading-tight text-white">
               {homepage.acf?.slogan || "Bienvenue au Tiers-Lieu Rural"}
             </h1>
           </div>
-          {/* Arrondi convexe - fin de la 1ère ligne */}
+          {/* Arrondi convexe - fin de la 1ère ligne (desktop only) */}
           <div
-            className="absolute top-0 -left-[15px]"
+            className="hidden md:block absolute top-0 -left-[15px]"
             style={{
               width: "15px",
               height: "15px",
@@ -76,9 +76,9 @@ export function HomePageClient({
                 "radial-gradient(circle at 0% 100%, transparent 15px, var(--background) 15px)",
             }}
           />
-          {/* Arrondi convexe - début de la 3e ligne (pleine largeur) */}
+          {/* Arrondi convexe - début de la 3e ligne (desktop only) */}
           <div
-            className="absolute bottom-0 right-0 translate-y-full"
+            className="hidden md:block absolute bottom-0 right-0 translate-y-full"
             style={{
               width: "15px",
               height: "15px",

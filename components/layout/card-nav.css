@@ -132,6 +132,12 @@ header {
   transition: opacity 0.3s ease;
 }
 
+@media (max-width: 640px) {
+  .hamburger-label {
+    font-size: 0.65rem;
+  }
+}
+
 /* Removed .warno-container styles as the white logo is being removed */
 
 /* Added centered logo styling */

@@ -111,7 +111,7 @@ export default async function LocalisationPage() {
       />
 
       <BentoHeaderContent title={page?.acf?.hero?.["sous-titre"] || "Comment nous rejoindre"}>
-        <div className="container mx-auto p-2">
+        <div className="container mx-auto md:p-2">
           {/* --- Adresse & carte --- */}
           <section className="mb-16">
             <div className="grid gap-2 md:grid-cols-5">
@@ -215,7 +215,7 @@ export default async function LocalisationPage() {
                     className="object-cover rounded-xl"
                   />
                 </div>
-                <div className="pl-8 py-8 md:col-span-3">
+                <div className="md:pl-8 md:py-8 md:col-span-3">
                   <h2 className="mb-4 text-2xl font-bold flex items-center gap-3">
                     <div
                       className="flex h-10 w-10 items-center justify-center rounded-full"

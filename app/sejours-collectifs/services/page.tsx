@@ -92,7 +92,7 @@ export default async function ServicesPage() {
       />
 
       <BentoHeaderContent title={page?.acf?.hero?.["sous-titre"]}>
-        <div className="container mx-auto pl-2 py-2">
+        <div className="container mx-auto md:pl-2 md:py-2">
           {page?.content.rendered && (
             <div
               className="prose prose-stone mb-12 max-w-none"

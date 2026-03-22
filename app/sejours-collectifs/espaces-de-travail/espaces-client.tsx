@@ -124,7 +124,7 @@ const ExpandedCard: React.FC<{
   return (
     <motion.div
       layoutId={`card-${espace.id}`}
-      className="flex flex-col p-2 pt-6 shadow-lg rounded-xl overflow-hidden relative"
+      className="flex flex-col p-2 md:pt-6 shadow-lg rounded-xl overflow-hidden relative"
       style={{ backgroundColor: color }}
       transition={{ layout: { duration: 0.25, ease: [0.4, 0, 0.2, 1] } }}
     >

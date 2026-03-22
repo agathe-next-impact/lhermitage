@@ -22,7 +22,7 @@ export function TeamMasonry({ members }: TeamMasonryProps) {
   }
 
   return (
-    <div className="w-full pt-2 pl-2">
+    <div className="w-full md:pt-2 md:pl-2">
       <div className="flex flex-col gap-16">
         {members.map((member, index) => {
           const photo = member.acf?.photo

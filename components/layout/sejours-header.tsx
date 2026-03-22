@@ -68,7 +68,7 @@ export function SejoursHeader({
   return (
     <div className="w-[calc(100%-1rem)] mt-3 mx-auto relative pt-10">
       {/* ====== MOBILE / TABLET ====== */}
-      <section className="lg:hidden flex flex-col gap-2">
+      <section className="lg:hidden flex flex-col">
         {/* Ligne 1 : Logo + Titre côte à côte */}
         <div className="flex gap-2 items-stretch">
           <Link

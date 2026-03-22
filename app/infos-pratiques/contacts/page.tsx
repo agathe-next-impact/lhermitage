@@ -81,7 +81,7 @@ export default async function ContactsPage() {
       />
 
       <BentoHeaderContent title={page?.acf?.hero?.["sous-titre"]}>
-        <div className="w-full pl-2 pt-2">
+        <div className="w-full md:pl-2 md:pt-2">
           {/* Grille des contacts */}
           <div className="grid gap-2 sm:grid-cols-2 mx-auto mb-16">
             {members.map((member, index) => (

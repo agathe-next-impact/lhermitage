@@ -268,7 +268,7 @@ export function SeminairesPage({ acf, serviceTypes = [] }: SeminairesPageProps) 
   const sectionColor = menuColor || getColorForPath(pathname) || BRAND_COLORS.green
 
   return (
-    <div className="pt-4 px-4">
+    <div className="pt-4 md:px-4">
       <div className="max-w-7xl space-y-16">
         {/* ─── 1. LA PROMESSE ─── */}
         {promesse && (
@@ -337,7 +337,7 @@ export function SeminairesPage({ acf, serviceTypes = [] }: SeminairesPageProps) 
 
         {/* ─── 2. HÉBERGEMENTS ─── */}
         {hebergements_seminaires && (
-          <section className="space-y-6">
+          <section className="space-y-6 pt-12">
             {hebergements_seminaires.titre && (
               <motion.h2
                 initial={{ opacity: 0, y: 20 }}
@@ -383,7 +383,7 @@ export function SeminairesPage({ acf, serviceTypes = [] }: SeminairesPageProps) 
 
         {/* ─── 3. ACTIVITÉS TEAM BUILDING ─── */}
         {activites_teambuilding && (
-          <section>
+          <section className="py-12">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               {/* Titre + description */}
               <motion.div
@@ -558,7 +558,7 @@ export function SeminairesPage({ acf, serviceTypes = [] }: SeminairesPageProps) 
 
         {/* ─── 5. SERVICES (Types de services) ─── */}
         {serviceTypes.length > 0 && (
-          <section>
+          <section className="py-12">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               {/* Titre + CTA */}
               <motion.div

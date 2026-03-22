@@ -24,7 +24,7 @@ export default async function PartenairesPage() {
       />
 
       <BentoHeaderContent title={page?.acf?.hero?.["sous-titre"]}>
-        <div className="p-2">
+        <div className="md:p-2">
           {page?.content.rendered && (
             <div className="container px-4 mb-12">
               <div

@@ -23,7 +23,7 @@ export default async function VisiteVirtuellePage() {
         image="/ciel.jpg"
       />
       <BentoHeaderContent title="Survolez le domaine">
-        <div className="container mx-auto p-2">
+        <div className="container mx-auto md:p-2">
           <GuidedTourClient mapPinPoints={mapPinPoints} />
         </div>
       </BentoHeaderContent>

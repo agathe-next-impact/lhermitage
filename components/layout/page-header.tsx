@@ -39,8 +39,63 @@ export function PageHeader({
 
   return (
     <div className={`w-[calc(100%-1rem)] mt-3 mx-auto relative pt-8 ${className}`}>
-      {/* Container principal */}
-      <div className="relative" style={{ height: "clamp(160px, 35vh, 480px)" }}>
+      {/* ===== MOBILE : 2 lignes (logo+titre puis image) ===== */}
+      <div className="md:hidden">
+        {/* Ligne 1 : Logo + Titre */}
+        <div className="flex items-stretch gap-2 mb-2">
+          <Link
+            href="/"
+            className="flex-shrink-0 flex items-center justify-center rounded-2xl p-4 hover:opacity-80 transition-opacity"
+            style={{ backgroundColor: mainBlobColor }}
+          >
+            <Image
+              src="/logo-arcs-light.png"
+              alt="Retour à l'accueil"
+              width={36}
+              height={36}
+              className="object-contain"
+            />
+          </Link>
+          <motion.div
+            className="flex-1 rounded-2xl flex items-center px-5 py-3"
+            style={{ backgroundColor: mainBlobColor }}
+            initial={{ clipPath: "inset(0 100% 0 0 round 16px)" }}
+            animate={{ clipPath: "inset(0 0% 0 0 round 16px)" }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.15 }}
+          >
+            <h1 className="font-sans font-bold text-sm sm:text-base text-white uppercase leading-tight drop-shadow-sm">
+              {title}
+            </h1>
+          </motion.div>
+        </div>
+
+        {/* Ligne 2 : Image d'en-tete */}
+        <motion.div
+          className="relative overflow-hidden rounded-2xl"
+          style={{
+            height: "clamp(120px, 25vh, 140px)",
+            backgroundColor: mainBlobColor,
+          }}
+          initial={{ clipPath: "inset(0 100% 0 0 round 16px)" }}
+          animate={{ clipPath: "inset(0 0% 0 0 round 16px)" }}
+          transition={{ duration: 1.15, ease: "easeOut", delay: 0.3 }}
+        >
+          {image && (
+            <Image
+              src={image}
+              alt=""
+              fill
+              className="object-cover"
+              sizes="100vw"
+              quality={80}
+              priority
+            />
+          )}
+        </motion.div>
+      </div>
+
+      {/* ===== DESKTOP : layout original avec encoches ===== */}
+      <div className="hidden md:block relative" style={{ height: "clamp(160px, 35vh, 480px)" }}>
         {/* Fond image – pleine largeur */}
         <motion.div
           className="absolute inset-0 overflow-hidden rounded-2xl"
@@ -51,7 +106,6 @@ export function PageHeader({
           animate={{ clipPath: "inset(0 0% 0 0 round 16px)" }}
           transition={{ duration: 1.15, ease: "easeOut", delay: 0.2 }}
           onAnimationComplete={(def) => {
-            // Retire le clipPath après l'animation pour laisser border-radius agir
             if (def === "animate") {
               const el = document.querySelector("[data-header-bg]") as HTMLElement
               if (el) el.style.clipPath = "none"
@@ -87,7 +141,6 @@ export function PageHeader({
               className="object-contain"
             />
           </Link>
-          {/* Arrondi convexe – droite de l'encoche logo */}
           <div
             className="absolute top-0 right-0 translate-x-full rotate-180"
             style={{
@@ -97,7 +150,6 @@ export function PageHeader({
                 "radial-gradient(circle at 0% 0%, transparent 15px, var(--background) 15px)",
             }}
           />
-          {/* Arrondi convexe – bas de l'encoche logo */}
           <div
             className="absolute bottom-0 left-0 translate-y-full rotate-180"
             style={{
@@ -118,11 +170,10 @@ export function PageHeader({
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <h1 className="font-sans text-xs sm:text-sm md:text-lg lg:text-xl xl:text-4xl text-white leading-tight drop-shadow-sm">
+            <h1 className="font-sans md:text-lg lg:text-xl xl:text-4xl text-white leading-tight drop-shadow-sm">
               {title}
             </h1>
           </motion.div>
-          {/* Arrondi convexe – gauche de l'encoche titre */}
           <div
             className="absolute top-0 -left-[15px]"
             style={{
@@ -132,7 +183,6 @@ export function PageHeader({
                 "radial-gradient(circle at 0% 100%, transparent 15px, var(--background) 15px)",
             }}
           />
-          {/* Arrondi convexe – bas droite */}
           <div
             className="absolute bottom-0 right-0 translate-y-full"
             style={{

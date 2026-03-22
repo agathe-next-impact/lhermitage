@@ -335,7 +335,7 @@ export function PartenairesClient({ partenaires, categories }: PartenairesClient
         </div>
       </div>
 
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto md:px-4">
         <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
           {filteredPartenaires.map((partenaire) => {
             const category = partenaire._embedded?.["wp:term"]?.[0]?.[0]

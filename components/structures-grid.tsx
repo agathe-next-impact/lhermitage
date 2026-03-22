@@ -291,7 +291,7 @@ function StructuresSectionGrid({
 
   return (
     <LayoutGroup>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 pt-2 pl-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 md:pt-2 md:pl-2">
         {structures.map((structure) => {
           const isExpanded = structure.id === expandedId
 
@@ -350,12 +350,12 @@ export function StructuresGrid({
       {internalStructures.length > 0 && (
         <BentoHeaderContent
           title={sectionInternes?.titre_de_section || "Structures internes"}
-          color={BRAND_COLORS.coral}
+          color={BRAND_COLORS.rose}
           columnImage={sectionInternes?.image_de_section?.url}
         >
           <StructuresSectionGrid
             structures={internalStructures}
-            color={BRAND_COLORS.coral}
+            color={BRAND_COLORS.rose}
           />
         </BentoHeaderContent>
       )}
