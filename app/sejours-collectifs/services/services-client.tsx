@@ -363,11 +363,15 @@ export function ServicesClient({ categories, services }: ServicesClientProps) {
           .slice(0, catIndex)
           .reduce((sum, cn) => sum + servicesByCategory[cn].services.length, 0)
 
+        const displayServices = categoryData.slug === "restauration"
+          ? [...categoryData.services].reverse()
+          : categoryData.services
+
         return (
           <div key={categoryName} className="mb-2">
             <LayoutGroup id={`svc-category-${categoryData.slug}`}>
               <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
-                {categoryData.services.map((service, svcIndex) => {
+                {displayServices.map((service, svcIndex) => {
                   const isExpanded = service.id === expandedId
                   const globalIndex = prevCount + svcIndex
 
