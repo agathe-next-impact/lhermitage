@@ -66,7 +66,9 @@
       "Bash(echo \"WP_API_URL=$WP_API_URL\")",
       "Bash(echo \"WORDPRESS_GRAPHQL_URL=$WORDPRESS_GRAPHQL_URL\")",
       "Bash(taskkill //F //IM node.exe)",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(git push:*)",
+      "WebFetch(domain:admin.hermitagelelab.com)"
     ],
     "additionalDirectories": [
       "c:\\Users\\agath\\Downloads"
