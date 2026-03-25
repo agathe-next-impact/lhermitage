@@ -19,6 +19,7 @@ import { wpApi } from "@/lib/wordpress/api"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 import { BRAND_COLORS } from "@/lib/theme/colors"
 import { LocalisationMap } from "@/components/localisation-map"
+import { GuidedTourClient } from "@/app/(special)/visite-virtuelle/guided-tour-client"
 import type { LucideIcon } from "lucide-react"
 
 const ICON_MAP: Record<string, LucideIcon> = {
@@ -92,7 +93,10 @@ const FALLBACK_LOGISTIQUE = {
 }
 
 export default async function LocalisationPage() {
-  const page = await wpApi.getPageByPath("infos-pratiques/localisation")
+  const [page, mapPinPoints] = await Promise.all([
+    wpApi.getPageByPath("infos-pratiques/localisation"),
+    wpApi.getMapPinPoints(),
+  ])
 
   const loc = page?.acf?.localisation_page
   const adresse = loc?.adresse ?? FALLBACK_ADRESSE
@@ -112,6 +116,12 @@ export default async function LocalisationPage() {
 
       <BentoHeaderContent title={page?.acf?.hero?.["sous-titre"] || "Comment nous rejoindre"}>
         <div className="container mx-auto md:p-2">
+          {/* --- Visite virtuelle --- */}
+          <section className="mb-16">
+            <h2 className="mb-6 text-2xl font-bold">Visite virtuelle du domaine</h2>
+            <GuidedTourClient mapPinPoints={mapPinPoints} />
+          </section>
+
           {/* --- Adresse & carte --- */}
           <section className="mb-16">
             <div className="grid gap-2 md:grid-cols-5">

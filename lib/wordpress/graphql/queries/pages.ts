@@ -34,6 +34,24 @@ export const GET_ALL_PAGES = gql`
   ${PAGE_FIELDS}
 `
 
+// Separate query for tiers-lieu innovation page video — isolated so it can fail
+// gracefully without breaking the main page query if the ACF field group is not
+// yet configured in WordPress.
+export const GET_PAGE_VIDEO_DENTETE = gql`
+  query GetPageVideoDentete($slug: ID!) {
+    page(id: $slug, idType: URI) {
+      pageTiersLieuDInnovation {
+        videoDentete {
+          node {
+            mediaItemUrl
+            mimeType
+          }
+        }
+      }
+    }
+  }
+`
+
 // Lightweight query for generateStaticParams — only fetches link, no ACF fields
 export const GET_ALL_PAGE_PATHS = gql`
   query GetAllPagePaths($first: Int!, $after: String) {

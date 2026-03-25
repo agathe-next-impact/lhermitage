@@ -38,6 +38,7 @@ import {
   GET_PAGE_BY_ID,
   GET_ALL_PAGES,
   GET_ALL_PAGE_PATHS,
+  GET_PAGE_VIDEO_DENTETE,
 } from "./graphql/queries/pages"
 import {
   GET_HEBERGEMENTS,
@@ -646,6 +647,32 @@ export class WordPressAPI {
   }
 
   // --- Taxonomy ---
+
+  async getPageVideo(
+    pagePath: string
+  ): Promise<{ url: string; mimeType: string } | null> {
+    try {
+      const data = await gqlRequest<{
+        page: {
+          pageTiersLieuDInnovation?: {
+            videoDentete?: {
+              node?: { mediaItemUrl: string; mimeType: string }
+            }
+          }
+        } | null
+      }>(GET_PAGE_VIDEO_DENTETE, { slug: pagePath })
+
+      const videoNode =
+        data.page?.pageTiersLieuDInnovation?.videoDentete?.node
+      if (videoNode?.mediaItemUrl) {
+        return { url: videoNode.mediaItemUrl, mimeType: videoNode.mimeType }
+      }
+      return null
+    } catch {
+      // Field group not yet configured in WordPress — fail silently
+      return null
+    }
+  }
 
   async getTaxonomyTerms(taxonomy: string): Promise<WPTerm[]> {
     try {
