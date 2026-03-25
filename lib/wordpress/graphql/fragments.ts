@@ -61,7 +61,7 @@ export const PAGE_FIELDS = gql`
         }
       }
     }
-    pageHistorique {
+    pageHistoire {
       timeline {
         titre
         annee
@@ -232,33 +232,6 @@ export const PAGE_FIELDS = gql`
           label
         }
         adresse
-      }
-    }
-    pagePatrimoine {
-      introduction {
-        citation
-        texte
-      }
-      sections {
-        annee
-        titre
-        accroche
-        contenu
-        citation
-        image {
-          node {
-            ...ImageFields
-          }
-        }
-        videoUrl
-      }
-      valeurs {
-        titre
-        descriptif
-      }
-      publics {
-        public
-        proposition
       }
     }
   }

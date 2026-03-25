@@ -213,15 +213,15 @@ export function transformPage(
   // Try page-specific ACF field groups that may have sous-titre
   if (!pageAcf.hero?.["sous-titre"]) {
     const pageSpecific =
-      gqlPage.pageDevenirSocietaire || gqlPage.pageHistorique || gqlPage.pageServices
+      gqlPage.pageDevenirSocietaire || gqlPage.pageHistoire || gqlPage.pageServices
     if (pageSpecific?.sousTitre) {
       if (!pageAcf.hero) pageAcf.hero = {}
       pageAcf.hero["sous-titre"] = pageSpecific.sousTitre
     }
   }
 
-  // Extract timeline from pageHistorique ACF field group
-  const historiqueData = gqlPage.pageHistorique
+  // Extract timeline from pageHistoire ACF field group
+  const historiqueData = gqlPage.pageHistoire
   if (historiqueData?.timeline && Array.isArray(historiqueData.timeline)) {
     pageAcf.timeline = historiqueData.timeline.map((item: any) => ({
       titre: item.titre,
