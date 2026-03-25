@@ -61,18 +61,6 @@ export const PAGE_FIELDS = gql`
         }
       }
     }
-    pageHistoire {
-      timeline {
-        titre
-        annee
-        descriptif
-        image {
-          node {
-            ...ImageFields
-          }
-        }
-      }
-    }
     pageDevenirSocietaire {
       chapeau
       bandeau {
