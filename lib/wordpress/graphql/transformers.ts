@@ -585,7 +585,7 @@ export function transformEvenementAcf(gqlPost: Record<string, any>): EvenementAC
   if (!acf) return {}
 
   return {
-    eventDateStart: acf.eventDateStart,
+    eventDateStart: acf.eventdatestart,
     eventDateEnd: acf.eventDateEnd,
     eventDateLabel: acf.eventDateLabel,
     eventPitch: acf.eventPitch ? transformContentLinks(acf.eventPitch) : undefined,

@@ -318,7 +318,7 @@ export const GET_EVENEMENTS = gql`
           }
         }
         evenementFields {
-          eventDateStart
+          eventdatestart
           eventDateEnd
           eventDateLabel
           eventPitch

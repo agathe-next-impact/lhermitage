@@ -39,6 +39,8 @@ interface Evenement {
   monthKey?: string
   /** Display label: "Mars 2026" */
   monthLabel?: string
+  /** Timestamp used for sorting (pre-computed server-side) */
+  sortTimestamp: number
 }
 
 interface EvenementsClientProps {
@@ -87,7 +89,7 @@ const MonthFilter: React.FC<{
       onClick={() => onSelect(null)}
       className={`text-sm font-semibold px-4 py-2 rounded-lg transition-all ${
         selected === null
-          ? "bg-stone-800 text-white shadow-lg"
+          ? "bg-brand-dark text-white shadow-lg"
           : "bg-stone-200 text-stone-600 opacity-80 hover:opacity-100"
       }`}
     >
@@ -130,6 +132,13 @@ const CollapsedCard: React.FC<{
       onClick={onExpand}
     >
       <div className="px-2 pb-6">
+          {(evenement.dateLabel || evenement.dateDeDebut) && (
+            <span className="inline-flex items-center gap-1.5 text-sm font-semibold bg-white/70 rounded-full px-2.5 py-1 mb-3" style={{ color: color }}>
+              <Calendar className="w-3 h-3" />
+              {evenement.dateLabel || formatEventDate(evenement.dateDeDebut)}
+            </span>
+          )}
+
         <motion.h3
           layoutId={`title-${evenement.id}`}
           className="text-xl font-bold mb-2 text-white"
@@ -139,14 +148,8 @@ const CollapsedCard: React.FC<{
 
         {/* Date & venue badges */}
         <div className="flex flex-wrap gap-2 mb-3">
-          {(evenement.dateLabel || evenement.dateDeDebut) && (
-            <span className="inline-flex items-center gap-1.5 text-xs text-white/90 bg-white/20 rounded-full px-2.5 py-1">
-              <Calendar className="w-3 h-3" />
-              {evenement.dateLabel || formatEventDate(evenement.dateDeDebut)}
-            </span>
-          )}
           {evenement.venueLabel && (
-            <span className="inline-flex items-center gap-1.5 text-xs text-white/90 bg-white/20 rounded-full px-2.5 py-1">
+            <span className="inline-flex items-center gap-1.5 text-xs text-white/70 bg-white/20 rounded-full px-2.5 py-1">
               <MapPin className="w-3 h-3" />
               {evenement.venueLabel}
             </span>
@@ -236,7 +239,7 @@ const ExpandedCard: React.FC<{
             transition={{ delay: 0.2, duration: 0.3 }}
           >
             {(evenement.dateLabel || evenement.dateDeDebut) && (
-              <span className="inline-flex items-center gap-1.5 text-sm text-stone-700 bg-white/80 rounded-full px-3 py-1.5">
+              <span className="inline-flex items-center gap-1.5 text-sm text-white rounded-full px-3 py-1.5" style={{ backgroundColor: color, opacity: 0.8 }}>
                 <Calendar className="w-4 h-4" />
                 {evenement.dateLabel || (
                   <>
@@ -249,13 +252,13 @@ const ExpandedCard: React.FC<{
               </span>
             )}
             {evenement.venueLabel && (
-              <span className="inline-flex items-center gap-1.5 text-sm text-stone-700 bg-white/80 rounded-full px-3 py-1.5">
+              <span className="inline-flex items-center gap-1.5 text-sm text-white rounded-full px-3 py-1.5" style={{ backgroundColor: color, opacity: 0.8 }}>
                 <MapPin className="w-4 h-4" />
                 {evenement.venueLabel}
               </span>
             )}
             {evenement.accessType && (
-              <span className="inline-flex items-center gap-1.5 text-sm text-stone-700 bg-white/80 rounded-full px-3 py-1.5">
+              <span className="inline-flex items-center gap-1.5 text-sm text-white rounded-full px-3 py-1.5" style={{ backgroundColor: color, opacity: 0.8 }}>
                 {evenement.accessType === "gratuit" ? "Gratuit" :
                  evenement.accessType === "payant" ? "Payant" :
                  evenement.accessType === "libre" ? "Prix libre" :
@@ -341,7 +344,7 @@ export function EvenementsClient({ categories, evenements }: EvenementsClientPro
       .map(([key, label]) => ({ key, label }))
   }, [evenements])
 
-  // Filter by category then by month
+  // Filter by category then by month (sort order preserved from server)
   const filteredEvenements = useMemo(() => {
     let filtered = evenements
     if (selectedCategory) {
@@ -353,17 +356,26 @@ export function EvenementsClient({ categories, evenements }: EvenementsClientPro
     return filtered
   }, [evenements, selectedCategory, selectedMonth])
 
+  // Accent color for month filter: match selected category or fallback
+  const activeAccentColor = useMemo(() => {
+    if (selectedCategory) {
+      const cat = categories.find((c) => c.slug === selectedCategory)
+      if (cat) return cat.color
+    }
+    return BRAND_COLORS.green
+  }, [selectedCategory, categories])
+
   // Default color for events without a custom accent
   const defaultColor = "#78AD7D"
 
-  /** Resolve color for a given event: custom accent > category color > default */
+  /** Resolve color for a given event: category color > custom accent > default */
   const getEventColor = useCallback(
     (evt: Evenement) => {
-      if (evt.eventColorAccent) return evt.eventColorAccent
       if (evt.categorySlug) {
         const cat = categories.find((c) => c.slug === evt.categorySlug)
         if (cat) return cat.color
       }
+      if (evt.eventColorAccent) return evt.eventColorAccent
       return defaultColor
     },
     [categories]
@@ -447,7 +459,7 @@ export function EvenementsClient({ categories, evenements }: EvenementsClientPro
           categories={categories}
           onCategoryChange={setSelectedCategory}
           allLabel="Tous les événements"
-          allDescription="Découvrez tous les événements à venir à L'Hermitage"
+          hideDescription
         />
       )}
 
@@ -458,7 +470,7 @@ export function EvenementsClient({ categories, evenements }: EvenementsClientPro
             months={availableMonths}
             selected={selectedMonth}
             onSelect={setSelectedMonth}
-            accentColor={defaultColor}
+            accentColor={activeAccentColor}
           />
         </div>
       )}
