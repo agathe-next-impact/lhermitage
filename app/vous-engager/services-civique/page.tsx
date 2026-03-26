@@ -36,17 +36,14 @@ export default async function ServicesCiviquePage() {
     <div>
       <PageHeader title={heroTitle} subtitle={heroSubtitle} image={heroImage} />
       <BentoHeaderContent title={heroSubtitle} lateralImages={page.acf?.hero?.images_laterales}>
-        <div className="relative z-10">
-          {recrutement ? (
-            <RecrutementPage acf={recrutement} />
-          ) : (
-            page.content?.rendered && (
-              <div
-                className="prose prose-stone max-w-none"
-                dangerouslySetInnerHTML={{ __html: page.content.rendered }}
-              />
-            )
+        <div className="relative z-10 space-y-16 md:space-y-20">
+          {page.content?.rendered && (
+            <div
+              className="prose prose-stone max-w-none"
+              dangerouslySetInnerHTML={{ __html: page.content.rendered }}
+            />
           )}
+          {recrutement && <RecrutementPage acf={recrutement} />}
         </div>
       </BentoHeaderContent>
     </div>
