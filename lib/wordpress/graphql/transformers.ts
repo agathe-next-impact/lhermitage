@@ -15,6 +15,7 @@ import type {
   EspaceDeTravailACF,
   ServiceACF,
   SeminairesACF,
+  RecrutementACF,
   GlobalOptionsACF,
   WPLink,
   WPGoogleMap,
@@ -193,6 +194,12 @@ export function transformPage(
     pageAcf.hero = {
       "sous-titre": heroData.sousTitre,
       image: heroData.image ? transformAcfMediaEdge(heroData.image) : undefined,
+      images_laterales: heroData.imagesLaterales?.nodes?.map(
+        (node: { sourceUrl: string; altText?: string }) => ({
+          url: node.sourceUrl,
+          alt: node.altText || "",
+        })
+      ),
     }
   }
 
@@ -450,6 +457,15 @@ export function transformPage(
     }
   }
 
+  // "pageRecrutement" — recrutement/engagement pages (offres, stages, alternance, etc.)
+  const recData = gqlPage.pageRecrutement
+  if (recData) {
+    const recrutement = transformRecrutementData(recData)
+    if (recrutement) {
+      pageAcf.recrutement = recrutement
+    }
+  }
+
   const post = transformPost(gqlPage, pageAcf, "page")
   return {
     ...post,
@@ -565,16 +581,32 @@ export function transformStructureAcf(gqlPost: Record<string, any>): StructureAC
 }
 
 export function transformEvenementAcf(gqlPost: Record<string, any>): EvenementACF {
-  const acf = gqlPost.evenements
-  if (!acf) return { nom: gqlPost.title || "" }
+  const acf = gqlPost.evenementFields
+  if (!acf) return {}
 
   return {
-    nom: acf.nom || gqlPost.title || "",
-    descriptif: transformContentLinks(acf.descriptif || ""),
-    date_de_debut: acf.dateDeDebut,
-    date_de_fin: acf.dateDeFin,
-    heure_de_debut: acf.heureDeDebut,
-    heure_de_fin: acf.heureDeFin,
+    eventDateStart: acf.eventDateStart,
+    eventDateEnd: acf.eventDateEnd,
+    eventDateLabel: acf.eventDateLabel,
+    eventPitch: acf.eventPitch ? transformContentLinks(acf.eventPitch) : undefined,
+    eventVenue: acf.eventVenue,
+    eventVenueLabel: acf.eventVenueLabel,
+    eventAddress: acf.eventAddress,
+    eventZip: acf.eventZip,
+    eventCity: acf.eventCity,
+    eventAccessType: acf.eventAccessType,
+    eventCapacityLimited: acf.eventCapacityLimited,
+    eventCapacityTotal: acf.eventCapacityTotal,
+    eventBookingRequired: acf.eventBookingRequired,
+    eventBookingType: acf.eventBookingType,
+    eventBookingCtaLabel: acf.eventBookingCtaLabel,
+    eventFoodAvailable: acf.eventFoodAvailable,
+    eventFoodDescription: acf.eventFoodDescription,
+    eventFoodLocal: acf.eventFoodLocal,
+    eventContactPhone: acf.eventContactPhone,
+    eventContactEmail: acf.eventContactEmail,
+    eventIcon: acf.eventIcon,
+    eventColorAccent: acf.eventColorAccent,
   }
 }
 
@@ -783,6 +815,83 @@ export function transformSejourAcf(gqlPost: Record<string, any>): SejourACF {
   }
 
   return result
+}
+
+// --- Recrutement page transformer ---
+
+export function transformRecrutementData(
+  recData: Record<string, any>
+): RecrutementACF | null {
+  if (!recData) return null
+
+  const intro = recData.introduction
+  const offres = recData.offres
+  const cadre = recData.cadreDeVie
+  const temos = recData.temoignages
+  const cand = recData.candidature
+
+  const hasContent =
+    intro?.titre || offres?.length || cadre?.titre || temos?.length || cand?.titre
+
+  if (!hasContent) return null
+
+  return {
+    introduction: intro
+      ? {
+          titre: intro.titre,
+          texte: transformContentLinks(intro.texte || ""),
+          chiffres_cles: intro.chiffresCles?.map((c: any) => ({
+            icone: c.icone,
+            categorie: c.categorie,
+            valeur: c.valeur,
+            description: c.description,
+          })),
+        }
+      : undefined,
+    offres: offres?.map((o: any) => ({
+      icone: o.icone,
+      titre: o.titre,
+      descriptif: o.descriptif,
+      missions: o.missions,
+      profil: o.profil,
+      cta_texte: o.ctaTexte,
+      cta_lien: o.ctaLien,
+    })),
+    cadre_de_vie: cadre
+      ? {
+          titre: cadre.titre,
+          blocs: cadre.blocs?.map((b: any) => ({
+            icone: b.icone,
+            titre: b.titre,
+            texte_intro: b.texteIntro,
+            elements: b.elements,
+            note: b.note,
+            image: b.image ? transformAcfMediaEdge(b.image) : undefined,
+          })),
+        }
+      : undefined,
+    temoignages: temos?.map((t: any) => ({
+      citation: t.citation,
+      auteur: t.auteur,
+      role: t.role,
+      photo: t.photo ? transformAcfMediaEdge(t.photo) : undefined,
+    })),
+    candidature: cand
+      ? {
+          titre: cand.titre,
+          texte: transformContentLinks(cand.texte || ""),
+          email: cand.email,
+          email_secondaire: cand.emailSecondaire,
+          activer_formulaire: cand.activerFormulaire,
+          champs: cand.champs?.map((ch: any) => ({
+            label: ch.label,
+            type_champ: ch.typeChamp,
+            requis: ch.requis,
+            options: ch.options,
+          })),
+        }
+      : undefined,
+  }
 }
 
 // --- Menu transformer ---

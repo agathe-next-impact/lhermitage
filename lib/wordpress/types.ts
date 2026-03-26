@@ -64,6 +64,7 @@ export interface PageACF {
   hero?: {
     "sous-titre"?: string
     image?: WPImage
+    images_laterales?: WPImage[]
   }
   timeline?: Array<{
     titre?: string
@@ -182,6 +183,8 @@ export interface PageACF {
   patrimoine?: PatrimoineACF
   // Page Séminaires fields
   seminaires?: SeminairesACF
+  // Page Recrutement fields
+  recrutement?: RecrutementACF
   [key: string]: any
 }
 
@@ -197,13 +200,28 @@ export interface ServiceACF {
 }
 
 export interface EvenementACF {
-  nom: string
-  descriptif?: string
-  date_de_debut?: string
-  date_de_fin?: string
-  heure_de_debut?: string
-  heure_de_fin?: string
-  localisation?: WPPost<StructureACF>
+  eventDateStart?: string
+  eventDateEnd?: string
+  eventDateLabel?: string
+  eventPitch?: string
+  eventVenue?: string | string[]
+  eventVenueLabel?: string
+  eventAddress?: string
+  eventZip?: string
+  eventCity?: string
+  eventAccessType?: string
+  eventCapacityLimited?: boolean
+  eventCapacityTotal?: number
+  eventBookingRequired?: boolean
+  eventBookingType?: string
+  eventBookingCtaLabel?: string
+  eventFoodAvailable?: boolean
+  eventFoodDescription?: string
+  eventFoodLocal?: boolean
+  eventContactPhone?: string
+  eventContactEmail?: string
+  eventIcon?: string
+  eventColorAccent?: string
 }
 
 export interface HebergementACF {
@@ -501,6 +519,75 @@ export interface FooterOptions {
     adresse: string
     telephone: string
     email: string
+  }
+}
+
+/* ─── Pages Recrutement / Engagement ─── */
+
+export interface RecrutementChiffreCle {
+  icone?: string
+  categorie?: string
+  valeur: string
+  description?: string
+}
+
+export interface RecrutementOffre {
+  icone?: string
+  titre: string
+  descriptif?: string
+  missions?: Array<{ texte: string }>
+  profil?: Array<{ texte: string }>
+  cta_texte?: string
+  cta_lien?: string
+}
+
+export interface RecrutementBlocElement {
+  titre?: string
+  description?: string
+}
+
+export interface RecrutementBloc {
+  icone?: string
+  titre: string
+  texte_intro?: string
+  elements?: RecrutementBlocElement[]
+  note?: string
+  image?: WPImage
+}
+
+export interface RecrutementTemoignage {
+  citation: string
+  auteur: string
+  role?: string
+  photo?: WPImage
+}
+
+export interface RecrutementChampFormulaire {
+  label: string
+  type_champ: "text" | "email" | "url" | "textarea" | "select" | "file"
+  requis?: boolean
+  options?: string
+}
+
+export interface RecrutementACF {
+  introduction?: {
+    titre?: string
+    texte?: string
+    chiffres_cles?: RecrutementChiffreCle[]
+  }
+  offres?: RecrutementOffre[]
+  cadre_de_vie?: {
+    titre?: string
+    blocs?: RecrutementBloc[]
+  }
+  temoignages?: RecrutementTemoignage[]
+  candidature?: {
+    titre?: string
+    texte?: string
+    email?: string
+    email_secondaire?: string
+    activer_formulaire?: boolean
+    champs?: RecrutementChampFormulaire[]
   }
 }
 

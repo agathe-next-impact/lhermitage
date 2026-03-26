@@ -31,6 +31,11 @@ const DEDICATED_ROUTES = [
   "infos-pratiques/jours-et-horaires-douverture",
   "infos-pratiques/localisation",
   "participer/devenir-societaire",
+  "vous-engager/offres-demploi",
+  "vous-engager/alternance",
+  "vous-engager/stages",
+  "vous-engager/services-civique",
+  "vous-engager/pass-permis",
 ]
 
 // Code-split: ces composants lourds ne sont chargés que pour leur page spécifique
@@ -127,7 +132,7 @@ export default async function CatchAllPage({ params }: PageProps) {
   let page = null
   let teamMembers: WPPost<TeamMemberACF>[] = []
   let seminairesData: SeminairesACF | null = null
-  let domaineVideo: { url: string; mimeType: string } | null = null
+  let domaineVideo: { url: string; mimeType: string; descriptif?: string } | null = null
 
   try {
     const [fetchedPage, fetchedTeamMembers, fetchedDomaineVideo] = await Promise.all([
@@ -199,10 +204,10 @@ export default async function CatchAllPage({ params }: PageProps) {
             </div>
           </div>
         )}
-        {page.content.rendered && (
+        {domaineVideo?.descriptif && (
           <div
             className="prose prose-stone max-w-none mb-6 md:px-4 md:py-2"
-            dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(domaineVideo.descriptif) }}
           />
         )}
       </div>
@@ -232,11 +237,14 @@ export default async function CatchAllPage({ params }: PageProps) {
     seminairesData?.hero_seminaires?.image?.url ||
     page.acf?.hero?.image?.url ||
     "/rural-retreat-landscape.jpg"
+  const heroLateralImages = page.acf?.hero?.images_laterales
 
   return (
     <div>
       <PageHeader title={heroTitle} subtitle={heroSubtitle} image={heroImage} />
-      <BentoHeaderContent title={heroSubtitle}>{content}</BentoHeaderContent>
+      <BentoHeaderContent title={heroSubtitle} lateralImages={heroLateralImages}>
+        {content}
+      </BentoHeaderContent>
     </div>
   )
 }

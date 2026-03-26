@@ -8,7 +8,15 @@
       "Bash(done)",
       "Bash(ls -la *.json)",
       "Bash(cat:*)",
-      "Bash(npx next:*)"
+      "Bash(npx next:*)",
+      "Bash(python3 -c \"import sys,json; data=json.load\\(sys.stdin\\); fields=[f[''''name''''] for f in data[''''data''''][''''__type''''][''''fields'''']]; [print\\(f\\) for f in sorted\\(fields\\)]\")",
+      "Bash(for path:*)",
+      "Bash(do)",
+      "Bash(echo \"=== $path ===\")",
+      "Bash(python3 -m json.tool)"
+    ],
+    "additionalDirectories": [
+      "C:\\dev\\lhermitage\\.next"
     ]
   }
 }

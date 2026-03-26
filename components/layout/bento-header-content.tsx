@@ -7,10 +7,16 @@ import { usePathname } from "next/navigation"
 import { getColorForPath, MENU_COLOR_SEQUENCE } from "@/lib/page-colors"
 import { useMenuColor } from "@/components/menu-colors-provider"
 
+interface LateralImage {
+  url: string
+  alt?: string
+}
+
 interface BentoHeaderContentProps {
   title?: string
   subtitle?: string
   columnImage?: string
+  lateralImages?: LateralImage[]
   className?: string
   color?: string
   children?: ReactNode
@@ -29,6 +35,7 @@ export function BentoHeaderContent({
   title,
   subtitle,
   columnImage,
+  lateralImages,
   className = "",
   color,
   children,
@@ -106,23 +113,44 @@ export function BentoHeaderContent({
           )}
         </motion.div>
 
-        {/* Image colonne 1 — occupe la hauteur restante sous le bloc L */}
-        {columnImage && (
-          <div className="hidden md:block col-span-1 relative rounded-[15px] overflow-hidden mt-2">
-            <Image
-              src={columnImage}
-              alt={title || "L'Hermitage"}
-              fill
-              quality={80}
-              sizes="25vw"
-              className="object-cover rounded-xl"
-            />
+        {/* Colonne 1 sous le pied du L — columnImage ou images latérales */}
+        {(columnImage || (lateralImages && lateralImages.length > 0)) && (
+          <div className="hidden md:flex col-span-1 flex-col gap-2 mt-2 self-start">
+            {columnImage && (
+              <div className="relative rounded-xl overflow-hidden aspect-[4/3]">
+                <Image
+                  src={columnImage}
+                  alt={title || "L'Hermitage"}
+                  fill
+                  quality={80}
+                  sizes="25vw"
+                  className="object-cover rounded-xl opacity-30 hover:opacity-100 transition-opacity duration-500"
+                />
+              </div>
+            )}
+            {lateralImages?.map((img, i) => (
+              <div key={i} className="relative rounded-xl overflow-hidden">
+                <Image
+                  src={img.url}
+                  alt={img.alt || title || "L'Hermitage"}
+                  width={400}
+                  height={300}
+                  quality={80}
+                  sizes="25vw"
+                  className="w-full h-auto object-contain rounded-xl opacity-30 hover:opacity-100 transition-opacity duration-500"
+                />
+              </div>
+            ))}
           </div>
         )}
 
-        {/* Contenu de page — colonnes 2-4 (ou décalé si pas d'image) */}
+        {/* Contenu de page — colonnes 2-4 (ou décalé si pas d'image/latérales) */}
         <div
-          className={`col-span-1 rounded-xl ${columnImage ? "md:col-span-3" : "md:col-start-2 md:col-span-3"} md:-mt-40 pt-3 relative z-10`}
+          className={`col-span-1 rounded-xl ${
+            columnImage || lateralImages?.length
+              ? "md:col-span-3"
+              : "md:col-start-2 md:col-span-3"
+          } md:-mt-40 pt-3 relative z-10`}
         >
           {children}
         </div>

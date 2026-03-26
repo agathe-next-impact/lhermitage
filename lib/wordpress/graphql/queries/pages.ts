@@ -47,6 +47,7 @@ export const GET_PAGE_VIDEO_DENTETE = gql`
             mimeType
           }
         }
+        descriptif
       }
     }
   }

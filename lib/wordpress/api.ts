@@ -359,11 +359,25 @@ export class WordPressAPI {
 
   async getEvenements(): Promise<WPPost<EvenementACF>[]> {
     try {
-      const data = await gqlRequestList<{ evNements: { nodes: any[] } }>(GET_EVENEMENTS)
-      const nodes = data.evNements?.nodes || []
-      return nodes.map((node) =>
-        transformPost<EvenementACF>(node, transformEvenementAcf(node), "evenement")
-      )
+      const data = await gqlRequestList<{ evenements: { nodes: any[] } }>(GET_EVENEMENTS)
+      const nodes = data.evenements?.nodes || []
+      return nodes.map((node) => {
+        const post = transformPost<EvenementACF>(node, transformEvenementAcf(node), "evenement")
+        // Inject taxonomy terms into _embedded["wp:term"] for filter compatibility
+        const catTerms = node.categoriesEvenement?.nodes
+        if (catTerms?.length) {
+          if (!post._embedded) post._embedded = {}
+          post._embedded["wp:term"] = [
+            catTerms.map((t: any) => ({
+              id: t.databaseId,
+              name: t.name,
+              slug: t.slug,
+              taxonomy: "categorie-evenement",
+            })),
+          ]
+        }
+        return post
+      })
     } catch (error) {
       logger.error("Failed to fetch evenements:", error)
       return []
@@ -650,7 +664,7 @@ export class WordPressAPI {
 
   async getPageVideo(
     pagePath: string
-  ): Promise<{ url: string; mimeType: string } | null> {
+  ): Promise<{ url: string; mimeType: string; descriptif?: string } | null> {
     try {
       const data = await gqlRequest<{
         page: {
@@ -658,14 +672,19 @@ export class WordPressAPI {
             videoDentete?: {
               node?: { mediaItemUrl: string; mimeType: string }
             }
+            descriptif?: string
           }
         } | null
       }>(GET_PAGE_VIDEO_DENTETE, { slug: pagePath })
 
-      const videoNode =
-        data.page?.pageTiersLieuDInnovation?.videoDentete?.node
-      if (videoNode?.mediaItemUrl) {
-        return { url: videoNode.mediaItemUrl, mimeType: videoNode.mimeType }
+      const tiersLieu = data.page?.pageTiersLieuDInnovation
+      const videoNode = tiersLieu?.videoDentete?.node
+      if (videoNode?.mediaItemUrl || tiersLieu?.descriptif) {
+        return {
+          url: videoNode?.mediaItemUrl || "",
+          mimeType: videoNode?.mimeType || "video/mp4",
+          descriptif: tiersLieu?.descriptif || undefined,
+        }
       }
       return null
     } catch {

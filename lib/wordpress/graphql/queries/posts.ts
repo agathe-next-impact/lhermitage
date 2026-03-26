@@ -297,7 +297,7 @@ export const GET_STRUCTURE_BY_SLUG = gql`
 
 export const GET_EVENEMENTS = gql`
   query GetEvenements {
-    evNements(first: 100, where: { orderby: { field: DATE, order: DESC } }) {
+    evenements(first: 100, where: { orderby: { field: DATE, order: DESC } }) {
       nodes {
         databaseId
         slug
@@ -310,13 +310,36 @@ export const GET_EVENEMENTS = gql`
             ...ImageFields
           }
         }
-        evenements {
-          nom
-          descriptif
-          dateDeDebut
-          dateDeFin
-          heureDeDebut
-          heureDeFin
+        categoriesEvenement {
+          nodes {
+            databaseId
+            name
+            slug
+          }
+        }
+        evenementFields {
+          eventDateStart
+          eventDateEnd
+          eventDateLabel
+          eventPitch
+          eventVenue
+          eventVenueLabel
+          eventAddress
+          eventZip
+          eventCity
+          eventAccessType
+          eventCapacityLimited
+          eventCapacityTotal
+          eventBookingRequired
+          eventBookingType
+          eventBookingCtaLabel
+          eventFoodAvailable
+          eventFoodDescription
+          eventFoodLocal
+          eventContactPhone
+          eventContactEmail
+          eventIcon
+          eventColorAccent
         }
       }
     }

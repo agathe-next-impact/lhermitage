@@ -152,18 +152,19 @@ export function HomePageClient({
             </h2>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {evenements.slice(0, 3).map((evenement) => {
-                const subtitle = evenement.acf?.date_de_debut
-                  ? `${evenement.acf.date_de_debut}${evenement.acf.heure_de_debut ? ` - ${evenement.acf.heure_de_debut}` : ""}`
-                  : undefined
+                const subtitle = evenement.acf?.eventDateLabel
+                  || (evenement.acf?.eventDateStart
+                    ? new Date(evenement.acf.eventDateStart).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })
+                    : undefined)
 
-                const description = evenement.acf?.descriptif
-                  ? evenement.acf.descriptif.replace(/<[^>]*>/g, "")
+                const description = evenement.acf?.eventPitch
+                  ? evenement.acf.eventPitch.replace(/<[^>]*>/g, "")
                   : undefined
 
                 return (
                   <HeroCard
                     key={evenement.id}
-                    title={evenement.acf?.nom || evenement.title.rendered}
+                    title={evenement.title.rendered}
                     subtitle={subtitle}
                     description={description}
                     image={evenement._embedded?.["wp:featuredmedia"]?.[0]?.source_url}

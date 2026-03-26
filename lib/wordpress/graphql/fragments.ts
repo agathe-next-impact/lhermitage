@@ -49,6 +49,11 @@ export const PAGE_FIELDS = gql`
             ...ImageFields
           }
         }
+        imagesLaterales {
+          nodes {
+            ...ImageFields
+          }
+        }
       }
     }
     pageDAccueil {
@@ -247,6 +252,72 @@ export const PAGE_FIELDS = gql`
           label
         }
         adresse
+      }
+    }
+    pageRecrutement {
+      introduction {
+        titre
+        texte
+        chiffresCles {
+          icone
+          categorie
+          valeur
+          description
+        }
+      }
+      offres {
+        icone
+        titre
+        descriptif
+        missions {
+          texte
+        }
+        profil {
+          texte
+        }
+        ctaTexte
+        ctaLien
+      }
+      cadreDeVie {
+        titre
+        blocs {
+          icone
+          titre
+          texteIntro
+          elements {
+            titre
+            description
+          }
+          note
+          image {
+            node {
+              ...ImageFields
+            }
+          }
+        }
+      }
+      temoignages {
+        citation
+        auteur
+        role
+        photo {
+          node {
+            ...ImageFields
+          }
+        }
+      }
+      candidature {
+        titre
+        texte
+        email
+        emailSecondaire
+        activerFormulaire
+        champs {
+          label
+          typeChamp
+          requis
+          options
+        }
       }
     }
   }
