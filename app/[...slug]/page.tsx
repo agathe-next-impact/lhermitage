@@ -123,6 +123,7 @@ export default async function CatchAllPage({ params }: PageProps) {
   const isEquipePage = fullPath === "tiers-lieu-rural/lequipe"
   const isSeminairesPage = fullPath.startsWith("seminaires")
   const isDomainePage = fullPath === "tiers-lieu-rural/le-domaine-de-l-hermitage"
+  const isPatrimoinePage = fullPath === "tiers-lieu-rural/un-patrimoine-historique"
   let page = null
   let teamMembers: WPPost<TeamMemberACF>[] = []
   let seminairesData: SeminairesACF | null = null
@@ -189,6 +190,9 @@ export default async function CatchAllPage({ params }: PageProps) {
                 controls
                 playsInline
                 className="w-full"
+                autoPlay
+                muted
+                loop
               >
                 <source src={domaineVideo.url} type={domaineVideo.mimeType} />
               </video>
@@ -203,7 +207,7 @@ export default async function CatchAllPage({ params }: PageProps) {
         )}
       </div>
     )
-  } else if (page.acf?.patrimoine?.sections && page.acf.patrimoine.sections.length > 0) {
+  } else if (isPatrimoinePage && page.acf?.patrimoine?.sections) {
     content = (
       <div className="relative z-10">
         <PatrimoinePage acf={page.acf.patrimoine as PatrimoineACF} />

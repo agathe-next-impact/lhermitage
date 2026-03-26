@@ -346,20 +346,6 @@ export function GuidedTour({ mapPinPoints }: GuidedTourProps) {
             </div>
           </div>
         </div>
-
-        {/* Info banner */}
-        <div className="rounded-lg border border-muted bg-muted/20 p-4">
-          <div className="flex items-start gap-3">
-            <Camera className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-            <div className="text-sm">
-              <p className="font-medium mb-1">Vue satellite haute résolution IGN</p>
-              <p className="text-muted-foreground text-xs">
-                Explorez chaque point d&apos;intérêt en vue satellite grâce aux orthophotos de
-                l&apos;Institut National de l&apos;Information Géographique et Forestière (IGN).
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Sidebar — vignettes des points d'intérêt */}

@@ -27,7 +27,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   train: Train,
   bike: Bike,
   bus: Bus,
-  plane: Navigation,
+  plane: MapPin,
   walk: Footprints,
   phone: Phone,
   "map-pin": MapPin,
@@ -42,6 +42,9 @@ function getIcon(key?: string): LucideIcon {
 }
 
 /* ---------- Fallback data (used when ACF fields are empty) ---------- */
+
+const DIRECTIONS_URL =
+  "https://www.openstreetmap.org/directions?engine=osrm_car&route=;49.437,3.128#map=15/49.437/3.128"
 
 const FALLBACK_ADRESSE = {
   ligne_1: "17 rue de l'Hermitage",
@@ -117,21 +120,15 @@ export default async function LocalisationPage() {
       <BentoHeaderContent title={page?.acf?.hero?.["sous-titre"] || "Comment nous rejoindre"}>
         <div className="container mx-auto md:p-2">
           {/* --- Visite virtuelle --- */}
-          <section className="mb-16">
-            <h2 className="mb-6 text-2xl font-bold">Visite virtuelle du domaine</h2>
+          <section className="mb-8">
             <GuidedTourClient mapPinPoints={mapPinPoints} />
           </section>
 
           {/* --- Adresse & carte --- */}
           <section className="mb-16">
-            <div className="grid gap-2 md:grid-cols-5">
-              {/* Carte interactive */}
-              <div className="md:col-span-3 overflow-hidden rounded-xl border shadow-sm h-[350px] md:h-[420px]">
-                <LocalisationMap />
-              </div>
 
               {/* Bloc adresse */}
-              <div className="flex flex-col gap-4 md:col-span-2">
+              <div className="flex flex-col md:flex-row gap-4 md:col-span-2">
                 <Card className="flex-1 border-none bg-transparent shadow-none">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-lg">
@@ -152,6 +149,16 @@ export default async function LocalisationPage() {
                         {adresse.description}
                       </p>
                     )}
+                    <a
+                      href={DIRECTIONS_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-4 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white shadow-md transition-opacity hover:opacity-90"
+                      style={{ backgroundColor: BRAND_COLORS.coral }}
+                    >
+                      <Navigation className="h-4 w-4" />
+                      Itinéraire
+                    </a>
                   </CardContent>
                 </Card>
 
@@ -166,7 +173,6 @@ export default async function LocalisationPage() {
                   />
                 </div>
               </div>
-            </div>
           </section>
 
           {/* --- Moyens d'accès --- */}
@@ -242,7 +248,7 @@ export default async function LocalisationPage() {
                     <p className="mt-3 mb-6 text-sm text-muted-foreground">{logistique.note}</p>
                   )}
                   {logistique.services && logistique.services.length > 0 && (
-                    <div className="grid gap-2 sm:grid-cols-3">
+                    <div className="flex flex-col md:flex-row md:flex-wrap gap-3">
                       {logistique.services.map((svc) => {
                         const SvcIcon = getIcon(svc.icone)
                         return (
@@ -252,7 +258,7 @@ export default async function LocalisationPage() {
                             style={{ backgroundColor: BRAND_COLORS.rose }}
                           >
                             <SvcIcon className="h-5 w-5 shrink-0 text-white" />
-                            <span className="text-sm font-medium text-white">{svc.label}</span>
+                            <span className="text-base font-medium text-white">{svc.label}</span>
                           </div>
                         )
                       })}

@@ -19,7 +19,7 @@ export default async function HebergementsPage() {
       />
 
       <BentoHeaderContent title={page?.acf?.hero?.["sous-titre"]}>
-        <div className="container mx-auto md:pl-2 md:py-0">
+        <div className="container mx-auto md:pl-2 md:pt-2 md:py-0">
           {page?.content.rendered && (
             <div
               className="prose prose-stone mb-12 max-w-none"

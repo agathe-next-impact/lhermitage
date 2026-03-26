@@ -204,6 +204,33 @@ export const PAGE_FIELDS = gql`
         }
       }
     }
+    pagePatrimoine {
+      introduction {
+        citation
+        texte
+      }
+      sections {
+        annee
+        titre
+        accroche
+        contenu
+        citation
+        videoUrl
+        image {
+          node {
+            ...ImageFields
+          }
+        }
+      }
+      valeurs {
+        titre
+        descriptif
+      }
+      publics {
+        public
+        proposition
+      }
+    }
     pageContacts {
       contactsEquipe {
         nom
