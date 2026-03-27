@@ -190,9 +190,9 @@ export default async function CatchAllPage({ params }: PageProps) {
     )
   } else if (isDomainePage) {
     content = (
-      <div className="relative z-10 mx-auto space-y-8">
+      <div className="relative z-10 mx-auto space-y-2 pt-2 pl-2">
         {domaineVideo && (
-          <div className="container mx-auto md:p-2">
+          <div className="container mx-auto">
             <div className="overflow-hidden rounded-xl">
               <video
                 src={domaineVideo.url}
@@ -210,7 +210,7 @@ export default async function CatchAllPage({ params }: PageProps) {
         )}
         {domaineVideo?.descriptif && (
           <div
-            className="prose prose-stone max-w-none mb-6 md:px-4 md:py-2"
+            className="prose text-brand-dark max-w-none mb-6 md:p-4 bg-white rounded-2xl"
             dangerouslySetInnerHTML={{ __html: sanitizeHtml(domaineVideo.descriptif) }}
           />
         )}
