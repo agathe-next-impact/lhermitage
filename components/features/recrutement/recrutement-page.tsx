@@ -15,13 +15,13 @@ interface RecrutementPageProps {
 
 export function RecrutementPage({ acf }: RecrutementPageProps) {
   return (
-    <div className="space-y-16 md:space-y-20">
+    <div className="space-y-4 pt-2 pl-2">
       {acf.introduction && <IntroductionSection introduction={acf.introduction} />}
       {acf.offres && acf.offres.length > 0 && <OffresSection offres={acf.offres} />}
-      {acf.cadre_de_vie && <CadreDeVieSection cadre={acf.cadre_de_vie} />}
       {acf.temoignages && acf.temoignages.length > 0 && (
         <TemoignagesSection temoignages={acf.temoignages} />
       )}
+      {acf.cadre_de_vie && <CadreDeVieSection cadre={acf.cadre_de_vie} />}
       {acf.candidature && <CandidatureSection candidature={acf.candidature} />}
     </div>
   )
