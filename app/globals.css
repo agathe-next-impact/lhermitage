@@ -149,3 +149,247 @@ html {
     @apply font-black uppercase;
   }
 }
+
+/* WordPress WYSIWYG / Block Editor styles */
+@layer components {
+  /* Alignments */
+  .alignleft {
+    float: left;
+    margin-right: 1.5rem;
+    margin-bottom: 1rem;
+    max-width: 50%;
+  }
+  .alignright {
+    float: right;
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+    max-width: 50%;
+  }
+  .aligncenter {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+  }
+  .alignwide {
+    margin-left: -2rem;
+    margin-right: -2rem;
+    max-width: calc(100% + 4rem);
+    width: calc(100% + 4rem);
+  }
+  .alignfull {
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+    max-width: 100vw;
+    width: 100vw;
+  }
+
+  /* WordPress block: image */
+  .wp-block-image {
+    margin-bottom: 1.5rem;
+  }
+  .wp-block-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+  }
+  .wp-block-image figcaption {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+    text-align: center;
+  }
+
+  /* WordPress block: gallery */
+  .wp-block-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .wp-block-gallery .wp-block-image {
+    margin-bottom: 0;
+  }
+
+  /* WordPress block: quote */
+  .wp-block-quote {
+    border-left: 4px solid var(--brand-coral);
+    padding-left: 1.25rem;
+    margin-bottom: 1.5rem;
+    font-style: italic;
+  }
+  .wp-block-quote cite {
+    display: block;
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    font-style: normal;
+    color: var(--muted-foreground);
+  }
+
+  /* WordPress block: pullquote */
+  .wp-block-pullquote {
+    border-top: 3px solid var(--brand-coral);
+    border-bottom: 3px solid var(--brand-coral);
+    padding: 1.5rem 0;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-size: 1.25rem;
+  }
+
+  /* WordPress block: separator */
+  .wp-block-separator {
+    border: none;
+    border-top: 2px solid var(--border);
+    margin: 2rem auto;
+    max-width: 100px;
+  }
+  .wp-block-separator.is-style-wide {
+    max-width: 100%;
+  }
+  .wp-block-separator.is-style-dots {
+    border: none;
+    max-width: 100%;
+    text-align: center;
+  }
+  .wp-block-separator.is-style-dots::before {
+    content: "···";
+    font-size: 1.5rem;
+    letter-spacing: 1rem;
+    color: var(--muted-foreground);
+  }
+
+  /* WordPress block: columns */
+  .wp-block-columns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  .wp-block-column {
+    flex: 1;
+    min-width: 0;
+  }
+  @media (max-width: 768px) {
+    .wp-block-columns {
+      flex-direction: column;
+    }
+  }
+
+  /* WordPress block: table */
+  .wp-block-table {
+    margin-bottom: 1.5rem;
+    overflow-x: auto;
+  }
+  .wp-block-table table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .wp-block-table th,
+  .wp-block-table td {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border);
+    text-align: left;
+  }
+  .wp-block-table th {
+    font-weight: 600;
+    background-color: var(--muted);
+  }
+  .wp-block-table.is-style-stripes tbody tr:nth-child(odd) {
+    background-color: var(--muted);
+  }
+
+  /* WordPress block: buttons */
+  .wp-block-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  .wp-block-button__link {
+    display: inline-block;
+    padding: 0.625rem 1.5rem;
+    border-radius: var(--radius);
+    font-weight: 600;
+    text-decoration: none;
+    transition: opacity 0.2s;
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+  }
+  .wp-block-button__link:hover {
+    opacity: 0.9;
+  }
+  .wp-block-button.is-style-outline .wp-block-button__link {
+    background: transparent;
+    border: 2px solid currentColor;
+    color: var(--primary);
+  }
+
+  /* WordPress block: embed / video */
+  .wp-block-embed {
+    margin-bottom: 1.5rem;
+  }
+  .wp-block-embed .wp-block-embed__wrapper {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+  }
+  .wp-block-embed .wp-block-embed__wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* WordPress: caption generique */
+  .wp-caption {
+    max-width: 100%;
+    margin-bottom: 1.5rem;
+  }
+  .wp-caption-text {
+    font-size: 0.875rem;
+    color: var(--muted-foreground);
+    text-align: center;
+    margin-top: 0.5rem;
+  }
+
+  /* WordPress text utilities */
+  .has-text-align-center {
+    text-align: center;
+  }
+  .has-text-align-right {
+    text-align: right;
+  }
+  .has-text-align-left {
+    text-align: left;
+  }
+  /*
+   * Neutralize WordPress WYSIWYG color and font-family overrides.
+   * Gutenberg injects classes like has-vivid-red-color, has-*-background-color,
+   * has-*-font-family — these must not override the project's design tokens.
+   */
+  [class*="has-"][class*="-color"] {
+    color: inherit !important;
+    background-color: inherit !important;
+  }
+  [class*="has-"][class*="-font-family"] {
+    font-family: inherit !important;
+  }
+
+  /*
+   * Neutralize any WordPress font-size class that would go below text-base (1rem).
+   * The prose base is already 1rem; this catches any WP utility trying to shrink text.
+   */
+  [class*="has-"][class*="-font-size"] {
+    font-size: max(var(--wp-font-size, 1rem), 1rem);
+  }
+  .has-large-font-size {
+    --wp-font-size: 1.5rem;
+  }
+  .has-medium-font-size {
+    --wp-font-size: 1.25rem;
+  }
+  .has-small-font-size {
+    --wp-font-size: 1rem;
+  }
+}

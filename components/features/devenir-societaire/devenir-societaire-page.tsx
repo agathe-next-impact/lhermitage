@@ -4,11 +4,12 @@ import { DevenirSocietaireSlideshow } from "@/components/features/devenir-societ
 import { DevenirSocietaireMotivations } from "@/components/features/devenir-societaire/devenir-societaire-motivations"
 import { WordPressLink } from "@/components/content/wordpress-link"
 import Image from "next/image"
-import { motion } from "framer-motion"
+
 import { usePathname } from "next/navigation"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 import { getColorForPath } from "@/lib/page-colors"
 import { useMenuColor } from "@/components/menu-colors-provider"
+import { BRAND_COLORS } from "@/lib/theme/colors"
 
 interface Props {
   page: any // WordPress page with ACF data
@@ -43,88 +44,57 @@ export function DevenirSocietairePage({ page }: Props) {
   const sectionColor = menuColor || getColorForPath(pathname) || "#E75754"
   const greenColor = "#78AD7D"
 
-  const pourquoiRejoindreColors = [
-    "#2A4A51", // dark teal
-    "#56939F", // lighter teal
-    "#78AD7D", // green
-    "#C14C66", // pink
-    "#DC6F45", // orange
-  ]
 
   return (
-    <div className="overflow-x-hidden md:pl-4 md:pt-4">
+    <div className="overflow-x-hidden md:pl-2 md:pt-2">
       <div className="max-w-7xl space-y-16">
         {/* Qu'est-ce que la SCIC */}
         {scicInfo.titre &&
           scicInfo.caracteristiques_de_la_scic &&
           Array.isArray(scicInfo.caracteristiques_de_la_scic) &&
           scicInfo.caracteristiques_de_la_scic.length > 0 && (
-            <div className="space-y-6 mt-2">
-              <div className="space-y-6">
-                {scicInfo.caracteristiques_de_la_scic.map((item: any, idx: number) => (
-                  <div key={idx} className="bg-brand-gray/5 rounded-lg space-y-4">
+            <div className="space-y-6">
+              <div className="space-y-2">
+                {scicInfo.caracteristiques_de_la_scic.map((item: any, idx: number) => {
+                  const scicColors = [BRAND_COLORS.teal, BRAND_COLORS.rose, BRAND_COLORS.green, BRAND_COLORS.dark]
+                  const bgColor = scicColors[idx % scicColors.length]
+                  return (
+                  <div key={idx} className="rounded-lg space-y-4 p-4" style={{ backgroundColor: bgColor }}>
                     {item.caracteristique?.titre && (
-                      <h3 className="text-2xl md:text-3xl">{item.caracteristique.titre}</h3>
+                      <h3 className="text-white text-2xl md:text-3xl">{item.caracteristique.titre}</h3>
                     )}
                     {item.caracteristique?.descriptif && (
                       <div
-                        className="text-brand-gray/80 prose prose-sm max-w-none"
+                        className="text-white/80 prose max-w-none"
                         dangerouslySetInnerHTML={{
                           __html: sanitizeHtml(item.caracteristique.descriptif),
                         }}
                       />
                     )}
                   </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
           )}
 
         {/* Pourquoi rejoindre */}
-        {pourquoiRejoindre.titre && (
-          <div className="space-y-6">
-            <h3 className="text-2xl md:text-3xl" style={{ color: sectionColor }}>
-              {pourquoiRejoindre.titre}
-            </h3>
-            {pourquoiRejoindre.raisons &&
-              Array.isArray(pourquoiRejoindre.raisons) &&
-              pourquoiRejoindre.raisons.length > 0 && (
-                <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-12 md:pt-10">
-                  {pourquoiRejoindre.raisons.map((item: any, idx: number) => {
-                    const bgColor = pourquoiRejoindreColors[idx % pourquoiRejoindreColors.length]
-
-                    return (
-                      <motion.li
-                        key={idx}
-                        className="text-base md:text-lg font-medium flex items-center gap-3 cursor-pointer px-4 py-4 rounded-xl shadow-md"
-                        style={{ backgroundColor: bgColor, color: "white" }}
-                        initial={{ opacity: 1 }}
-                        whileHover={{
-                          filter: "brightness(1.1)",
-                          boxShadow:
-                            "0 8px 12px -1px rgba(0, 0, 0, 0.2), 0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-                          transition: { duration: 0.2, ease: "easeOut" },
-                        }}
-                      >
-                        <div
-                          className="relative w-6 h-6 flex-shrink-0 flex items-center justify-center"
-                          style={{ transform: "rotate(-90deg)" }}
-                        >
-                          <Image
-                            src="/logo-arcs-light.png"
-                            alt=""
-                            fill
-                            className="object-contain"
-                          />
-                        </div>
-                        {item.raison}
-                      </motion.li>
-                    )
-                  })}
-                </ul>
-              )}
-          </div>
-        )}
+        {pourquoiRejoindre.titre &&
+          pourquoiRejoindre.raisons &&
+          Array.isArray(pourquoiRejoindre.raisons) &&
+          pourquoiRejoindre.raisons.length > 0 && (
+            <div className="space-y-6">
+              <h3 className="text-2xl md:text-3xl" style={{ color: sectionColor }}>
+                {pourquoiRejoindre.titre}
+              </h3>
+              <DevenirSocietaireMotivations
+                motivations={pourquoiRejoindre.raisons.map((item: any, idx: number) => ({
+                  number: idx + 1,
+                  text: item.raison,
+                }))}
+              />
+            </div>
+          )}
 
         {/* Bandeau */}
         {bandeau.titre && (
@@ -143,13 +113,10 @@ export function DevenirSocietairePage({ page }: Props) {
                 {bandeau.cta?.url && bandeau.titre && (
                   <WordPressLink
                     href={bandeau.cta.url}
-                    className="inline-flex items-center gap-3 mx-auto bg-white font-semibold px-6 md:px-8 py-2 rounded-full hover:bg-white/90 transition-all hover:scale-105 uppercase tracking-wide mt-6 text-sm md:text-base"
+                    className="inline-flex gap-3 bg-white font-semibold px-6 md:px-8 py-2 rounded-full hover:bg-white/90 transition-all hover:scale-105 uppercase tracking-wide mt-6 text-sm md:text-base"
                     style={{ color: sectionColor }}
                   >
                     <span className="font-black">{bandeau.titre}</span>
-                    <div className="relative w-5 h-5 md:w-6 md:h-6 -mr-4 md:-mr-6 flex-shrink-0">
-                      <Image src="/logo-arcs-coral.png" alt="" fill className="object-contain" />
-                    </div>
                   </WordPressLink>
                 )}
               </div>
@@ -179,27 +146,25 @@ export function DevenirSocietairePage({ page }: Props) {
 
       {Array.isArray(societariatInfo) && societariatInfo.length > 0 && (
         <div
-          className="w-full relative mt-16 py-2 md:py-6 rounded-xl"
-          style={{ backgroundColor: greenColor }}
-        >
-          <div className="max-w-7xl px-4 md:px-8 lg:px-12">
-            <h3 className="text-2xl md:text-3xl" style={{ color: greenColor }}>
+          className="w-full relative mt-16 py-4 rounded-xl bg-brand-pink">
+          <div className="max-w-7xl p-4">
+            <h3 className="text-2xl md:text-3xl text-white">
               Informations de sociétariat
             </h3>
-            <div className="grid grid-cols-1 gap-6 md:gap-8">
+            <div className="grid grid-cols-1 gap-6 md:gap-8 mt-8">
               {societariatInfo.map((item: any, idx: number) => (
                 <div
                   key={idx}
-                  className="p-4 md:p-6 rounded-lg shadow-lg bg-background backdrop-blur-sm"
+                  className="p-4 md:p-6 rounded-lg shadow-lg bg-white/10 backdrop-blur-sm"
                 >
                   {item.titre && (
-                    <h4 className="font-bold text-brand-dark mb-3 uppercase tracking-wide text-lg md:text-2xl">
+                    <h4 className="font-bold text-white mb-3 uppercase tracking-wide text-lg md:text-2xl">
                       {item.titre}
                     </h4>
                   )}
                   {item.descriptif && (
                     <div
-                      className="text-brand-gray prose prose-invert prose-sm max-w-none"
+                      className="text-white/80 prose prose-invert max-w-none [&_li]:marker:text-white"
                       dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.descriptif) }}
                     />
                   )}

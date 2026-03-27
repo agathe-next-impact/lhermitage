@@ -1,5 +1,5 @@
 import { gql } from "graphql-request"
-import { PAGE_FIELDS } from "../fragments"
+import { PAGE_FIELDS, IMAGE_FIELDS } from "../fragments"
 
 export const GET_PAGE_BY_SLUG = gql`
   query GetPageBySlug($slug: ID!) {
@@ -51,6 +51,44 @@ export const GET_PAGE_VIDEO_DENTETE = gql`
       }
     }
   }
+`
+
+// Separate query for patrimoine page data — isolated from PAGE_FIELDS to avoid
+// ACF meta key collision with pageRecrutement.introduction (WPGraphQL bug).
+export const GET_PAGE_PATRIMOINE_DATA = gql`
+  query GetPagePatrimoineData($slug: ID!) {
+    page(id: $slug, idType: URI) {
+      databaseId
+      pagePatrimoine {
+        introPatrimoine {
+          citation
+          texte
+        }
+        sections {
+          annee
+          titre
+          accroche
+          contenu
+          citation
+          videoUrl
+          image {
+            node {
+              ...ImageFields
+            }
+          }
+        }
+        valeurs {
+          titre
+          descriptif
+        }
+        publics {
+          public
+          proposition
+        }
+      }
+    }
+  }
+  ${IMAGE_FIELDS}
 `
 
 // Lightweight query for generateStaticParams — only fetches link, no ACF fields

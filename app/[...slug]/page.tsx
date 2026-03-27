@@ -132,19 +132,23 @@ export default async function CatchAllPage({ params }: PageProps) {
   let page = null
   let teamMembers: WPPost<TeamMemberACF>[] = []
   let seminairesData: SeminairesACF | null = null
+  let patrimoineData: PatrimoineACF | null = null
   let domaineVideo: { url: string; mimeType: string; descriptif?: string } | null = null
 
   try {
-    const [fetchedPage, fetchedTeamMembers, fetchedDomaineVideo] = await Promise.all([
-      getPageByPath(fullPath),
-      isEquipePage ? wpApi.getTeamMembers() : Promise.resolve([]),
-      isDomainePage
-        ? wpApi.getPageVideo("tiers-lieu-rural/le-domaine-de-l-hermitage")
-        : Promise.resolve(null),
-    ])
+    const [fetchedPage, fetchedTeamMembers, fetchedDomaineVideo, fetchedPatrimoine] =
+      await Promise.all([
+        getPageByPath(fullPath),
+        isEquipePage ? wpApi.getTeamMembers() : Promise.resolve([]),
+        isDomainePage
+          ? wpApi.getPageVideo("tiers-lieu-rural/le-domaine-de-l-hermitage")
+          : Promise.resolve(null),
+        isPatrimoinePage ? wpApi.getPatrimoineData(fullPath) : Promise.resolve(null),
+      ])
     page = fetchedPage
     teamMembers = fetchedTeamMembers
     domaineVideo = fetchedDomaineVideo
+    patrimoineData = fetchedPatrimoine
 
     // Only fetch séminaires data for séminaires pages (avoids overriding patrimoine and other pages)
     if (page && isSeminairesPage) {
@@ -212,10 +216,10 @@ export default async function CatchAllPage({ params }: PageProps) {
         )}
       </div>
     )
-  } else if (isPatrimoinePage && page.acf?.patrimoine?.sections) {
+  } else if (isPatrimoinePage && patrimoineData?.sections) {
     content = (
       <div className="relative z-10">
-        <PatrimoinePage acf={page.acf.patrimoine as PatrimoineACF} />
+        <PatrimoinePage acf={patrimoineData} />
       </div>
     )
   } else {

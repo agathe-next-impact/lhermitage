@@ -54,16 +54,14 @@ export function DevenirSocietaireMotivations({ motivations }: DevenirSocietaireM
   }, [motivations.length])
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 gap-1">
       {motivations.map((motivation, index) => (
         <motion.div
           key={index}
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.1 }}
-          className={`flex flex-col md:flex-row items-center md:items-start gap-4 p-6 rounded-lg transition-all duration-300 bg-white ${
-            activeIndex === index ? "shadow-lg" : "hover:shadow-md"
-          }`}
+          animate={{ opacity: activeIndex === index ? 1 : 0.7, y: 0, fontWeight: activeIndex === index ? 600 : 500 }}
+          transition={{ delay: index * 0.1, opacity: { duration: 0.2 }, fontWeight: { duration: 0.2 } }}
+          className="flex flex-col md:flex-row items-center md:items-start gap-4 p-6 rounded-lg"
         >
           <div
             className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center"
@@ -74,7 +72,7 @@ export function DevenirSocietaireMotivations({ motivations }: DevenirSocietaireM
             </span>
           </div>
 
-          <div className="flex-1 text-brand-gray text-lg leading-relaxed text-center md:text-left">
+          <div className="flex-1 text-brand-gray text-xl leading-relaxed text-center md:text-left">
             {motivation.text}
           </div>
         </motion.div>

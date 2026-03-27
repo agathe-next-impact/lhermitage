@@ -433,30 +433,6 @@ export function transformPage(
     }))
   }
 
-  // "pagePatrimoine" — patrimoine page sections, valeurs, publics
-  const patData = gqlPage.pagePatrimoine
-  if (patData?.sections && Array.isArray(patData.sections) && patData.sections.length > 0) {
-    pageAcf.patrimoine = {
-      introduction: patData.introduction
-        ? {
-            citation: patData.introduction.citation,
-            texte: transformContentLinks(patData.introduction.texte || ""),
-          }
-        : undefined,
-      sections: patData.sections.map((item: any) => ({
-        annee: item.annee,
-        titre: item.titre,
-        accroche: item.accroche,
-        contenu: transformContentLinks(item.contenu || ""),
-        citation: item.citation,
-        image: item.image ? transformAcfMediaEdge(item.image) : undefined,
-        video_url: item.videoUrl,
-      })),
-      valeurs: patData.valeurs || [],
-      publics: patData.publics || [],
-    }
-  }
-
   // "pageRecrutement" — recrutement/engagement pages (offres, stages, alternance, etc.)
   const recData = gqlPage.pageRecrutement
   if (recData) {
@@ -824,7 +800,7 @@ export function transformRecrutementData(
 ): RecrutementACF | null {
   if (!recData) return null
 
-  const intro = recData.introduction
+  const intro = recData.introRecrutement
   const offres = recData.offres
   const cadre = recData.cadreDeVie
   const temos = recData.temoignages
@@ -891,6 +867,35 @@ export function transformRecrutementData(
           })),
         }
       : undefined,
+  }
+}
+
+// --- Patrimoine data transformer (separate query to avoid ACF key collision) ---
+
+export function transformPatrimoineData(patData: Record<string, any>) {
+  if (!patData?.sections || !Array.isArray(patData.sections) || patData.sections.length === 0) {
+    return null
+  }
+
+  const introData = patData.introPatrimoine
+  return {
+    introduction: introData
+      ? {
+          citation: introData.citation,
+          texte: transformContentLinks(introData.texte || ""),
+        }
+      : undefined,
+    sections: patData.sections.map((item: any) => ({
+      annee: item.annee,
+      titre: item.titre,
+      accroche: item.accroche,
+      contenu: transformContentLinks(item.contenu || ""),
+      citation: item.citation,
+      image: item.image ? transformAcfMediaEdge(item.image) : undefined,
+      video_url: item.videoUrl,
+    })),
+    valeurs: patData.valeurs || [],
+    publics: patData.publics || [],
   }
 }
 

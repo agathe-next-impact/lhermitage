@@ -63,15 +63,42 @@ const ALLOWED_ATTR = {
 }
 
 /**
+ * Patterns de classes WordPress qui tentent d'imposer couleur ou font-family.
+ * Ces classes sont supprimées au niveau HTML pour éviter tout conflit avec le design system.
+ */
+const WP_BLOCKED_CLASS_PATTERNS = [
+  /\bhas-[\w-]+-color\b/g,
+  /\bhas-[\w-]+-background-color\b/g,
+  /\bhas-[\w-]+-font-family\b/g,
+]
+
+/**
+ * Supprime les classes WordPress de couleur et font-family d'une chaîne de classes.
+ */
+function stripBlockedClasses(classStr: string): string {
+  let result = classStr
+  for (const pattern of WP_BLOCKED_CLASS_PATTERNS) {
+    result = result.replace(pattern, "")
+  }
+  return result.replace(/\s{2,}/g, " ").trim()
+}
+
+/**
  * Sanitize du HTML provenant de WordPress (content.rendered, ACF descriptif, etc.).
  * Supprime les scripts, event handlers, iframes et tout contenu dangereux.
+ * Supprime également les classes WordPress de couleur et font-family.
  */
 export function sanitizeHtml(dirty: string): string {
   if (!dirty) return ""
-  return sanitize(dirty, {
+  const clean = sanitize(dirty, {
     allowedTags: ALLOWED_TAGS,
     allowedAttributes: ALLOWED_ATTR,
     disallowedTagsMode: "discard",
+  })
+  // Strip WordPress color/font-family classes from the sanitized output
+  return clean.replace(/\bclass="([^"]*)"/g, (_match, classes: string) => {
+    const filtered = stripBlockedClasses(classes)
+    return filtered ? `class="${filtered}"` : ""
   })
 }
 

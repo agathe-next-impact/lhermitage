@@ -14,6 +14,7 @@ import type {
   PartenaireACF,
   EspaceDeTravailACF,
   SeminairesACF,
+  PatrimoineACF,
   FooterOptions,
 } from "./types"
 import { gqlRequest, gqlRequestList } from "./graphql/client"
@@ -30,6 +31,7 @@ import {
   transformSejourAcf,
   transformServiceAcf,
   transformSeminairesData,
+  transformPatrimoineData,
   transformMenuItems,
   transformTerm,
 } from "./graphql/transformers"
@@ -39,6 +41,7 @@ import {
   GET_ALL_PAGES,
   GET_ALL_PAGE_PATHS,
   GET_PAGE_VIDEO_DENTETE,
+  GET_PAGE_PATRIMOINE_DATA,
 } from "./graphql/queries/pages"
 import {
   GET_HEBERGEMENTS,
@@ -689,6 +692,24 @@ export class WordPressAPI {
       return null
     } catch {
       // Field group not yet configured in WordPress — fail silently
+      return null
+    }
+  }
+
+  // Separate query for patrimoine page data — avoids ACF meta key collision
+  // with pageRecrutement when both are in the same GraphQL query.
+  async getPatrimoineData(
+    pagePath: string
+  ): Promise<PatrimoineACF | null> {
+    try {
+      const data = await gqlRequest<{
+        page: { pagePatrimoine?: Record<string, any> } | null
+      }>(GET_PAGE_PATRIMOINE_DATA, { slug: pagePath })
+
+      const patData = data.page?.pagePatrimoine
+      if (!patData) return null
+      return transformPatrimoineData(patData)
+    } catch {
       return null
     }
   }

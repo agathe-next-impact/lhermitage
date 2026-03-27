@@ -13,7 +13,7 @@ Site vitrine de L'Hermitage, tiers-lieu rural en France. Frontend Next.js headle
 - **Maps** : MapLibre GL
 - **State** : Zustand, React Context (menu)
 - **Forms** : React Hook Form + Zod
-- **Autres** : Embla Carousel, Lenis (smooth scroll), sanitize-html, date-fns, Recharts, @react-pdf/renderer
+- **Autres** : Embla Carousel, Lenis (smooth scroll), sanitize-html, date-fns, Recharts, @react-pdf/renderer, Sonner (toasts), HeroUI, Vercel Analytics
 
 ## Architecture
 
@@ -27,17 +27,20 @@ app/                    Pages (App Router) - Server Components par defaut
   structure/[slug]/     Detail structure
   sejours-collectifs/   Sous-pages: nos-sejours, activites, services, espaces-de-travail, packs-de-sejours
   sejours-individuels/
+  hebergements/         Listing hebergements
   ecosysteme-innovant/  Sous-pages: structures, partenaires, evenements
   infos-pratiques/      Sous-pages: contacts, localisation, jours-et-horaires-douverture
   participer/devenir-societaire/
+  vous-engager/         Sous-pages: alternance, benevole, faire-un-don, offres-demploi, pass-permis, services-civique, stages
   reserver/
   (special)/visite-virtuelle/
+middleware.ts           Detection redirections WordPress old-slug (cache 1h, HEAD request)
 
 components/
-  layout/               SiteHeader, Footer, CardNav, PageHeader, SejoursHeader
+  layout/               SiteHeader, Footer, CardNav, PageHeader, SejoursHeader, MenuButton, BentoHeaderContent
   content/              DetailPageSections, WordpressContent, WordpressLink
-  features/             Organises par domaine: home/, sejours/, devenir-societaire/, contact/, hebergements/, partenaires/, structures/
-  ui/                   shadcn/ui + composants custom (timeline, orbiting-circles, minimal-card)
+  features/             Organises par domaine: home/, sejours/, devenir-societaire/, contact/, recrutement/, hebergements/, partenaires/, structures/, vous-engager/
+  ui/                   shadcn/ui + composants custom (timeline, orbiting-circles, minimal-card, variable-proximity)
   [racine]              Composants orphelins (hebergements-grid, structures-grid, partenaires-client, etc.)
 
 lib/
@@ -135,20 +138,21 @@ npm run dev          # Serveur de dev (port 3000)
 npm run build        # Build production (TS strict, zero erreurs)
 npm run start        # Serveur production
 npm run lint         # ESLint
+npm run lint:fix     # ESLint --fix
 npm run format       # Prettier --write
 npm run format:check # Prettier --check
+npm run prepare      # Husky (git hooks)
 ```
 
 ## Variables d'environnement
 
 ```
 WP_GRAPHQL_URL       # Endpoint GraphQL (default: https://admin.hermitagelelab.com/graphql)
-WP_API_URL           # URL REST API (extraction hostname)
+WP_API_URL           # URL REST API (extraction hostname, fallback)
 SITE_URL             # URL canonique frontend
 HOMEPAGE_ID          # ID WordPress de la homepage (138)
 DEFAULT_CTA_URL      # URL CTA fallback (/contact)
 REVALIDATION_SECRET  # Secret pour webhook revalidation
-MAPBOX_TOKEN         # Token MapLibre/Mapbox
 ```
 
 ## Revalidation ISR
@@ -171,6 +175,24 @@ Definies dans `lib/theme/colors.ts` -> `BRAND_COLORS` :
 - `dark` (#535453)
 
 Chaque section du menu herite d'une couleur via `MENU_COLOR_SEQUENCE`. Les pages de detail utilisent `PAGE_COLORS` (fallback statique).
+
+## Pre-commit hooks
+
+- **Husky** 9.x + **lint-staged** 16.x : Prettier et ESLint automatiques avant chaque commit
+- Configures dans `package.json` sous `lint-staged`
+
+## Middleware
+
+- `middleware.ts` : Detection des redirections WordPress old-slug
+- HEAD request vers le backend WP, cache en memoire (TTL 1h)
+- Matcher : tous les chemins sauf `_next`, `api`, `favicon.ico`, fichiers statiques
+- Timeout : 3 secondes
+
+## Securite
+
+- **CSP** : Content-Security-Policy stricte dans `next.config.mjs`
+- Autorise YouTube embeds, API geospatiales (data.geopf.fr, IGN Panoramax)
+- `object-src: 'none'`, `upgrade-insecure-requests`
 
 ## Points d'attention
 

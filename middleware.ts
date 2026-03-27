@@ -22,12 +22,60 @@ const WP_ORIGIN = (() => {
   }
 })()
 
+// Routes handled by dedicated Next.js page.tsx files.
+// The middleware must NOT check WordPress for these paths — WP may return
+// redirects to its own hierarchy, which can conflict with next.config.mjs
+// redirects and create infinite redirect loops (ERR_TOO_MANY_REDIRECTS).
+const DEDICATED_ROUTES = new Set([
+  "/hebergements",
+  "/reserver",
+  "/sejours-collectifs",
+  "/sejours-collectifs/activites",
+  "/sejours-collectifs/espaces-de-travail",
+  "/sejours-collectifs/nos-sejours",
+  "/sejours-collectifs/packs-de-sejours",
+  "/sejours-collectifs/services",
+  "/sejours-individuels",
+  "/ecosysteme-innovant/structures",
+  "/ecosysteme-innovant/partenaires",
+  "/ecosysteme-innovant/evenements",
+  "/infos-pratiques/contacts",
+  "/infos-pratiques/jours-et-horaires-douverture",
+  "/infos-pratiques/localisation",
+  "/participer/devenir-societaire",
+  "/vous-engager/offres-demploi",
+  "/vous-engager/alternance",
+  "/vous-engager/stages",
+  "/vous-engager/services-civique",
+  "/vous-engager/pass-permis",
+])
+
+// Dynamic route prefixes — any path starting with these is handled by Next.js
+// (e.g. /sejour/mon-sejour, /activite/randonnee)
+const DYNAMIC_ROUTE_PREFIXES = [
+  "/sejour/",
+  "/hebergement/",
+  "/activite/",
+  "/structure/",
+]
+
+function isDedicatedRoute(pathname: string): boolean {
+  const normalized = pathname.replace(/\/+$/, "") || "/"
+  if (DEDICATED_ROUTES.has(normalized)) return true
+  return DYNAMIC_ROUTE_PREFIXES.some((prefix) => pathname.startsWith(prefix))
+}
+
 // In-memory redirect cache (per Edge instance, reset on each deployment)
 const redirectCache = new Map<string, { target: string | null; ts: number }>()
 const CACHE_TTL = 3_600_000 // 1 hour
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+
+  // Skip WordPress check for routes with dedicated Next.js pages
+  if (isDedicatedRoute(pathname)) {
+    return NextResponse.next()
+  }
 
   // Serve from cache if available
   const cached = redirectCache.get(pathname)

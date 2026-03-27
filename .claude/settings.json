@@ -13,7 +13,8 @@
       "Bash(for path:*)",
       "Bash(do)",
       "Bash(echo \"=== $path ===\")",
-      "Bash(python3 -m json.tool)"
+      "Bash(python3 -m json.tool)",
+      "Bash(find /c/dev/lhermitage -type f \\\\\\(-name *.css -o -name *.module.css \\\\\\))"
     ],
     "additionalDirectories": [
       "C:\\dev\\lhermitage\\.next"

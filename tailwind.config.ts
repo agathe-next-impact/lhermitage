@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss"
 import defaultTheme from "tailwindcss/defaultTheme"
 import tailwindcssAnimate from "tailwindcss-animate"
+import typography from "@tailwindcss/typography"
 
 const config: Config = {
   darkMode: ["class"],
@@ -65,6 +66,40 @@ const config: Config = {
         serif: ["var(--font-serif)", ...defaultTheme.fontFamily.serif],
         heading: ["var(--font-heading)", ...defaultTheme.fontFamily.sans],
       },
+      typography: {
+        DEFAULT: {
+          css: {
+            "h1, h2, h3": {
+              fontWeight: "900",
+              textTransform: "uppercase",
+            },
+            a: {
+              color: "var(--brand-coral)",
+              textDecoration: "underline",
+              textUnderlineOffset: "2px",
+              "&:hover": {
+                color: "var(--brand-teal)",
+              },
+            },
+            blockquote: {
+              borderLeftColor: "var(--brand-coral)",
+            },
+            img: {
+              borderRadius: "0.5rem",
+            },
+          },
+        },
+        stone: {
+          css: {
+            "--tw-prose-body": "var(--brand-gray)",
+            "--tw-prose-headings": "var(--brand-dark)",
+            "--tw-prose-links": "var(--brand-coral)",
+            "--tw-prose-bold": "inherit",
+            "--tw-prose-quotes": "var(--brand-gray)",
+            "--tw-prose-quote-borders": "var(--brand-coral)",
+          },
+        },
+      },
       keyframes: {
         "zoom-in-90": {
           from: { opacity: "0", transform: "scale(0.9)" },
@@ -107,7 +142,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [tailwindcssAnimate],
+  plugins: [tailwindcssAnimate, typography],
 }
 
 export default config
