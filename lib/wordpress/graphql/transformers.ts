@@ -22,6 +22,7 @@ import type {
 } from "../types"
 import { transformWordPressUrl, rewriteWordPressAssetUrl } from "../url-transform"
 import { transformContentLinks } from "../transform-content"
+import { PAGE_ID_TO_ROUTE } from "../../constants"
 
 // --- Image transformers ---
 
@@ -908,16 +909,35 @@ export function transformMenuItems(
     url: string
     parentDatabaseId?: number | null
     order?: number
+    connectedNode?: {
+      node?: {
+        databaseId?: number
+        slug?: string
+        uri?: string
+      } | null
+    } | null
   }>
 ): WPMenuItem[] {
-  // Build flat list first
-  const flat: WPMenuItem[] = gqlMenuItems.map((item) => ({
-    id: item.databaseId,
-    title: item.label,
-    url: transformWordPressUrl(item.url),
-    parent: item.parentDatabaseId || 0,
-    order: item.order || 0,
-  }))
+  // Build flat list — resolve frontend route from page ID + slug
+  const flat: WPMenuItem[] = gqlMenuItems.map((item) => {
+    const connectedNode = item.connectedNode?.node
+    const pageId = connectedNode?.databaseId
+    const nodeSlug = connectedNode?.slug
+    const nodeUri = connectedNode?.uri?.replace(/^\/+|\/+$/g, "")
+
+    // Priority: mapped frontend route (stable) → URI-based slug → WP URL transformation (fallback)
+    const url = (pageId && PAGE_ID_TO_ROUTE[pageId]) || (nodeUri ? `/${nodeUri}` : transformWordPressUrl(item.url))
+
+    return {
+      id: item.databaseId,
+      title: item.label,
+      url,
+      slug: nodeSlug,
+      parent: item.parentDatabaseId || 0,
+      order: item.order || 0,
+      ...(pageId && { pageId }),
+    }
+  })
 
   // Build tree structure
   const byId = new Map<number, WPMenuItem>()

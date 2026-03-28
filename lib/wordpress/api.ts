@@ -62,8 +62,26 @@ import { GET_MENU } from "./graphql/queries/menu"
 import { GET_TYPES_DE_PARTENAIRE } from "./graphql/queries/taxonomy"
 import { rewriteWordPressAssetUrl } from "./url-transform"
 import { logger } from "../logger"
+import { ROUTE_TO_PAGE_ID } from "../constants"
 
 export class WordPressAPI {
+  /**
+   * Resolve a frontend route path to a WordPress page database ID.
+   * Uses ROUTE_TO_PAGE_ID first, then falls back to the dynamic slug→ID map.
+   */
+  private async resolvePageId(path: string): Promise<number | null> {
+    const cleanPath = path.replace(/^\/+|\/+$/g, "")
+    const manualId = ROUTE_TO_PAGE_ID[cleanPath]
+    if (manualId) return manualId
+
+    try {
+      const slugToIdMap = await this.getPageSlugToIdMap()
+      return slugToIdMap.get(cleanPath) || null
+    } catch {
+      return null
+    }
+  }
+
   // --- Pages ---
 
   async getPages(): Promise<WPPage[]> {
@@ -95,8 +113,8 @@ export class WordPressAPI {
   }
 
   // Lightweight version of getPages() — only fetches link/slug for generateStaticParams
-  async getPagePaths(): Promise<{ link: string; slug: string }[]> {
-    const allPaths: { link: string; slug: string }[] = []
+  async getPagePaths(): Promise<{ link: string; slug: string; databaseId: number }[]> {
+    const allPaths: { link: string; slug: string; databaseId: number }[] = []
     let hasMore = true
     let after: string | null = null
 
@@ -114,13 +132,41 @@ export class WordPressAPI {
       })
 
       const nodes = data.pages?.nodes || []
-      allPaths.push(...nodes.map((n) => ({ link: n.link, slug: n.slug })))
+      allPaths.push(
+        ...nodes.map((n) => ({ link: n.link, slug: n.slug, databaseId: n.databaseId }))
+      )
 
       hasMore = data.pages?.pageInfo?.hasNextPage || false
       after = data.pages?.pageInfo?.endCursor || null
     }
 
     return allPaths
+  }
+
+  /**
+   * Dynamic mapping: cleaned WordPress URI path -> page databaseId.
+   * Cached in memory after first call. ROUTE_TO_PAGE_ID overrides take precedence.
+   */
+  private _pageSlugToIdMap: Map<string, number> | null = null
+
+  async getPageSlugToIdMap(): Promise<Map<string, number>> {
+    if (this._pageSlugToIdMap) return this._pageSlugToIdMap
+
+    const wpBaseUrl =
+      process.env.WP_API_URL?.replace("/wp-json/wp/v2", "") || "https://admin.hermitagelelab.com"
+
+    const pages = await this.getPagePaths()
+    const map = new Map<string, number>()
+
+    for (const page of pages) {
+      const cleanPath = page.link.replace(wpBaseUrl, "").replace(/^\/+|\/+$/g, "")
+      if (cleanPath) {
+        map.set(cleanPath, page.databaseId)
+      }
+    }
+
+    this._pageSlugToIdMap = map
+    return map
   }
 
   async getPageBySlug(slug: string): Promise<WPPage | null> {
@@ -138,13 +184,32 @@ export class WordPressAPI {
     const cleanPath = path.replace(/^\/+|\/+$/g, "")
     if (!cleanPath) return null
 
-    // WPGraphQL URI idType handles full paths — use it directly.
-    // No slug-only fallback to avoid matching a wrong page with the same slug
-    // under a different parent hierarchy.
+    // 1. Manual override: ROUTE_TO_PAGE_ID (for routes where Next.js path !== WP slug)
+    const manualId = ROUTE_TO_PAGE_ID[cleanPath]
+    if (manualId) {
+      try {
+        return await this.getPageById(manualId)
+      } catch {
+        logger.error("Failed to fetch page by mapped ID:", manualId, "for path:", cleanPath)
+      }
+    }
+
+    // 2. Dynamic mapping: all WP pages slug/path -> databaseId (always resolve by ID)
+    try {
+      const slugToIdMap = await this.getPageSlugToIdMap()
+      const dynamicId = slugToIdMap.get(cleanPath)
+      if (dynamicId) {
+        return await this.getPageById(dynamicId)
+      }
+    } catch {
+      logger.error("Failed to resolve page from dynamic map for path:", cleanPath)
+    }
+
+    // 3. Fallback: try URI lookup for pages not in any mapping
     const page = await this.getPageBySlug(cleanPath)
     if (page) return page
 
-    // Only fall back to slug-only for single-segment paths (no ambiguity)
+    // 4. Last resort for multi-segment paths: try last segment as slug
     const segments = cleanPath.split("/").filter(Boolean)
     if (segments.length > 1) {
       return this.getPageBySlug(segments[segments.length - 1])
@@ -450,7 +515,10 @@ export class WordPressAPI {
 
   async getSeminairesData(path: string): Promise<SeminairesACF | null> {
     try {
-      const data = await gqlRequest<{ page: any | null }>(GET_PAGE_SEMINAIRES, { slug: path })
+      const pageId = await this.resolvePageId(path)
+      if (!pageId) return null
+
+      const data = await gqlRequest<{ page: any | null }>(GET_PAGE_SEMINAIRES, { id: String(pageId) })
       if (!data.page?.pageSeminaires) return null
       return transformSeminairesData(data.page.pageSeminaires)
     } catch (error) {
@@ -588,6 +656,13 @@ export class WordPressAPI {
               url: string
               parentDatabaseId: number | null
               order: number
+              connectedNode?: {
+                node?: {
+                  databaseId?: number
+                  slug?: string
+                  uri?: string
+                } | null
+              } | null
             }>
           }
         } | null
@@ -669,6 +744,9 @@ export class WordPressAPI {
     pagePath: string
   ): Promise<{ url: string; mimeType: string; descriptif?: string } | null> {
     try {
+      const pageId = await this.resolvePageId(pagePath)
+      if (!pageId) return null
+
       const data = await gqlRequest<{
         page: {
           pageTiersLieuDInnovation?: {
@@ -678,7 +756,7 @@ export class WordPressAPI {
             descriptif?: string
           }
         } | null
-      }>(GET_PAGE_VIDEO_DENTETE, { slug: pagePath })
+      }>(GET_PAGE_VIDEO_DENTETE, { id: String(pageId) })
 
       const tiersLieu = data.page?.pageTiersLieuDInnovation
       const videoNode = tiersLieu?.videoDentete?.node
@@ -702,9 +780,12 @@ export class WordPressAPI {
     pagePath: string
   ): Promise<PatrimoineACF | null> {
     try {
+      const pageId = await this.resolvePageId(pagePath)
+      if (!pageId) return null
+
       const data = await gqlRequest<{
         page: { pagePatrimoine?: Record<string, any> } | null
-      }>(GET_PAGE_PATRIMOINE_DATA, { slug: pagePath })
+      }>(GET_PAGE_PATRIMOINE_DATA, { id: String(pageId) })
 
       const patData = data.page?.pagePatrimoine
       if (!patData) return null

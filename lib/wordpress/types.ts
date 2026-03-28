@@ -466,6 +466,7 @@ export interface WPMenuItem {
   slug?: string
   parent: number
   order: number
+  pageId?: number
   children?: WPMenuItem[]
 }
 

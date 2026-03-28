@@ -22,10 +22,10 @@ const WP_ORIGIN = (() => {
   }
 })()
 
-// Routes handled by dedicated Next.js page.tsx files.
+// Routes handled by the catch-all [..slug] page via PAGE_REGISTRY or dedicated pages.
 // The middleware must NOT check WordPress for these paths — WP may return
-// redirects to its own hierarchy, which can conflict with next.config.mjs
-// redirects and create infinite redirect loops (ERR_TOO_MANY_REDIRECTS).
+// redirects to its own SEO-suffixed slugs, which breaks the registry match
+// and causes content to disappear (only PageHeader renders, not BentoHeaderContent).
 const DEDICATED_ROUTES = new Set([
   "/hebergements",
   "/reserver",
@@ -48,6 +48,20 @@ const DEDICATED_ROUTES = new Set([
   "/vous-engager/stages",
   "/vous-engager/services-civique",
   "/vous-engager/pass-permis",
+  // Tiers-lieu rural pages (registry + ROUTE_TO_PAGE_ID)
+  "/tiers-lieu-rural",
+  "/tiers-lieu-rural/le-domaine-de-l-hermitage",
+  "/tiers-lieu-rural/un-patrimoine-historique",
+  "/tiers-lieu-rural/lhistoire-du-lieu",
+  "/tiers-lieu-rural/lequipe",
+  "/tiers-lieu-rural/le-projet",
+  "/tiers-lieu-rural/ecosysteme-innovant",
+  "/tiers-lieu-rural/organisation",
+  // Soutenir le projet pages
+  "/soutenir-le-projet",
+  "/soutenir-le-projet/devenir-societaire-cooperative-fonciere",
+  "/soutenir-le-projet/don-association",
+  "/soutenir-le-projet/contribuer-fond-dotation",
 ])
 
 // Dynamic route prefixes — any path starting with these is handled by Next.js

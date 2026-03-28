@@ -1,7 +1,7 @@
 import { wpApi } from "@/lib/wordpress/api"
 import { PageHeader } from "@/components/layout/page-header"
 import { BentoHeaderContent } from "@/components/layout/bento-header-content"
-import { GuidedTourClient } from "./guided-tour-client"
+import { GuidedTourClient } from "@/components/features/visite-virtuelle/guided-tour-client"
 import { REVALIDATION } from "@/lib/constants"
 
 export const revalidate = REVALIDATION.listing

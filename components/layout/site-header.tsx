@@ -20,7 +20,7 @@ function transformMenuToNavItems(menuItems: WPMenuItem[]): CardNavItem[] {
       textColor: "#ffffff",
       links: children.map((child) => ({
         label: child.title,
-        href: transformWordPressUrl(child.url),
+        href: child.url,
         ariaLabel: `Voir ${child.title}`,
       })),
     }

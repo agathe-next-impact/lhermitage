@@ -11,6 +11,20 @@ export const GET_MENU = gql`
           url
           parentDatabaseId
           order
+          connectedNode {
+            node {
+              ... on Page {
+                databaseId
+                slug
+                uri
+              }
+              ... on Post {
+                databaseId
+                slug
+                uri
+              }
+            }
+          }
         }
       }
     }

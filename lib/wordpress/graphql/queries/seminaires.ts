@@ -7,8 +7,8 @@ import { IMAGE_FIELDS, FEATURED_IMAGE_FRAGMENT } from "../fragments"
  * if the ACF field group hasn't been imported into WordPress yet.
  */
 export const GET_PAGE_SEMINAIRES = gql`
-  query GetPageSeminaires($slug: ID!) {
-    page(id: $slug, idType: URI) {
+  query GetPageSeminaires($id: ID!) {
+    page(id: $id, idType: DATABASE_ID) {
       databaseId
       pageSeminaires {
         heroSeminaires {

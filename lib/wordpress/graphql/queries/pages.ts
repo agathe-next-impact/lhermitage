@@ -38,8 +38,8 @@ export const GET_ALL_PAGES = gql`
 // gracefully without breaking the main page query if the ACF field group is not
 // yet configured in WordPress.
 export const GET_PAGE_VIDEO_DENTETE = gql`
-  query GetPageVideoDentete($slug: ID!) {
-    page(id: $slug, idType: URI) {
+  query GetPageVideoDentete($id: ID!) {
+    page(id: $id, idType: DATABASE_ID) {
       pageTiersLieuDInnovation {
         videoDentete {
           node {
@@ -56,8 +56,8 @@ export const GET_PAGE_VIDEO_DENTETE = gql`
 // Separate query for patrimoine page data — isolated from PAGE_FIELDS to avoid
 // ACF meta key collision with pageRecrutement.introduction (WPGraphQL bug).
 export const GET_PAGE_PATRIMOINE_DATA = gql`
-  query GetPagePatrimoineData($slug: ID!) {
-    page(id: $slug, idType: URI) {
+  query GetPagePatrimoineData($id: ID!) {
+    page(id: $id, idType: DATABASE_ID) {
       databaseId
       pagePatrimoine {
         introPatrimoine {

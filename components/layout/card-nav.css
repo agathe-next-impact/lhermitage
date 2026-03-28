@@ -188,8 +188,8 @@ header {
 
 .card-nav-content {
   display: grid;
-  /* Changed from 4 columns to 3 columns for bento layout */
-  grid-template-columns: repeat(3, 1fr);
+  /* 6-column grid: row 1 = 2 cards (span 3 each), row 2 = 3 cards (span 2 each) */
+  grid-template-columns: repeat(6, 1fr);
   /* Reduced gap from 1rem to 0.75rem to minimize empty spaces */
   gap: 0.75rem;
   padding: 0 1rem 1rem;
@@ -272,26 +272,18 @@ header {
 /* Removed fixed nth-child sizing to allow dynamic sizing based on content */
 /* Added dynamic card sizing based on number of children */
 
-/* Removed all multi-column spanning - all cards now occupy single column */
-/* Cards with 5+ children - single column, content height */
-.nav-card.has-many-children {
-  grid-column: span 1;
+/* Row 1: first 2 cards span 3 columns each (2 per row) */
+.nav-card:nth-child(-n+2) {
+  grid-column: span 3;
 }
 
-/* Cards with 3-4 children - single column, content height */
-.nav-card.has-medium-children {
-  grid-column: span 1;
+/* Row 2+: remaining cards span 2 columns each (3 per row) */
+.nav-card:nth-child(n+3) {
+  grid-column: span 2;
 }
 
-/* Cards with 1-2 children - single column, content height */
-.nav-card.has-few-children {
-  grid-column: span 1;
-}
-
-/* Cards with no children - single column, content height */
+/* Cards with no children - compact padding */
 .nav-card.has-no-children {
-  grid-column: span 1;
-  /* Removed min-height to allow content-based sizing */
   padding: 0.75rem 1rem;
 }
 
@@ -602,11 +594,9 @@ header {
     grid-template-columns: 1fr;
   }
 
-  /* Reset all dynamic sizing on mobile */
-  .nav-card.has-many-children,
-  .nav-card.has-medium-children,
-  .nav-card.has-few-children,
-  .nav-card.has-no-children {
+  /* Reset all dynamic sizing on mobile - single column */
+  .nav-card:nth-child(-n+2),
+  .nav-card:nth-child(n+3) {
     grid-column: span 1;
     grid-row: span 1;
     min-height: auto;
@@ -614,11 +604,6 @@ header {
 
   .nav-card.has-no-children .nav-card-label {
     font-size: 1.25rem;
-  }
-
-  .nav-card:nth-child(4),
-  .nav-card:nth-child(5) {
-    grid-column: span 1;
   }
 
   .nav-card.image-card {

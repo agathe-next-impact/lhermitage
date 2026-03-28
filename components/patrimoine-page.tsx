@@ -224,7 +224,7 @@ function HistoryCarousel({
                 </div>
 
                 {/* Boîte contenu — pleine largeur, par dessus l'image */}
-                <div className="relative z-10 flex flex-col justify-end min-h-[100vh]">
+                <div className="relative z-10 flex flex-col justify-end min-h-full">
                   <AnimatePresence mode="wait">
                     {active === idx && (
                       <motion.div

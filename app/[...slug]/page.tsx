@@ -1,55 +1,65 @@
 import { notFound } from "next/navigation"
-import dynamic from "next/dynamic"
 import type { Metadata } from "next"
-import type React from "react"
 import { wpApi, getPageByPath } from "@/lib/wordpress/api"
 import { PageHeader } from "@/components/layout/page-header"
 import { BentoHeaderContent } from "@/components/layout/bento-header-content"
-import type {
-  HistoireACF,
-  TeamMemberACF,
-  PatrimoineACF,
-  SeminairesACF,
-  WPPost,
-} from "@/lib/wordpress/types"
 import { REVALIDATION } from "@/lib/constants"
 import { sanitizeHtml } from "@/lib/wordpress/sanitize"
+import { getRouteConfig, isSeminairesPage } from "@/lib/page-registry"
 
-// Routes with dedicated page.tsx files — excluded from catch-all SSG
-const DEDICATED_ROUTES = [
-  "hebergements",
-  "reserver",
-  "sejours-collectifs",
-  "sejours-collectifs/activites",
-  "sejours-collectifs/packs-de-sejours",
-  "sejours-individuels",
-  "ecosysteme-innovant/structures",
-  "ecosysteme-innovant/partenaires",
-  "ecosysteme-innovant/evenements",
-  "services",
-  "infos-pratiques/contacts",
-  "infos-pratiques/jours-et-horaires-douverture",
-  "infos-pratiques/localisation",
-  "participer/devenir-societaire",
-  "vous-engager/offres-demploi",
-  "vous-engager/alternance",
-  "vous-engager/stages",
-  "vous-engager/services-civique",
-  "vous-engager/pass-permis",
-]
+// --- Renderers (dynamic imports for code splitting) ---
+import WpContentRenderer from "@/lib/page-renderers/wp-content-renderer"
+import ReserverRenderer from "@/lib/page-renderers/reserver-renderer"
+import RecrutementRenderer from "@/lib/page-renderers/recrutement-renderer"
+import DevenirSocietaireRenderer from "@/lib/page-renderers/devenir-societaire-renderer"
+import ContactsRenderer from "@/lib/page-renderers/contacts-renderer"
+import HorairesRenderer from "@/lib/page-renderers/horaires-renderer"
+import HebergementsRenderer from "@/lib/page-renderers/hebergements-renderer"
+import SejoursIndividuelsRenderer from "@/lib/page-renderers/sejours-individuels-renderer"
+import ActivitesRenderer from "@/lib/page-renderers/activites-renderer"
+import EspacesRenderer from "@/lib/page-renderers/espaces-renderer"
+import ServicesRenderer from "@/lib/page-renderers/services-renderer"
+import StructuresRenderer from "@/lib/page-renderers/structures-renderer"
+import PartenairesRenderer from "@/lib/page-renderers/partenaires-renderer"
+import EvenementsRenderer from "@/lib/page-renderers/evenements-renderer"
+import LocalisationRenderer from "@/lib/page-renderers/localisation-renderer"
+import NosSejoursRenderer from "@/lib/page-renderers/nos-sejours-renderer"
+import PacksSejoursRenderer from "@/lib/page-renderers/packs-sejours-renderer"
+import HistoireRenderer from "@/lib/page-renderers/histoire-renderer"
+import EquipeRenderer from "@/lib/page-renderers/equipe-renderer"
+import DomaineRenderer from "@/lib/page-renderers/domaine-renderer"
+import PatrimoineRenderer from "@/lib/page-renderers/patrimoine-renderer"
+import SeminairesRenderer from "@/lib/page-renderers/seminaires-renderer"
 
-// Code-split: ces composants lourds ne sont chargés que pour leur page spécifique
-const HistoireTimeline = dynamic(() =>
-  import("@/components/histoire-timeline").then((m) => m.HistoireTimeline)
-)
-const TeamMasonry = dynamic(() => import("@/components/team-masonry").then((m) => m.TeamMasonry))
-const PatrimoinePage = dynamic(() =>
-  import("@/components/patrimoine-page").then((m) => m.PatrimoinePage)
-)
-const SeminairesPage = dynamic(() =>
-  import("@/components/seminaires-page").then((m) => m.SeminairesPage)
-)
-export const revalidate = REVALIDATION.listing
+// Revalidation: 15min (most frequent page type) — covers all page types
+export const revalidate = REVALIDATION.frequent
+
+// Map renderer keys to components
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const RENDERERS: Record<string, React.ComponentType<any>> = {
+  wpContent: WpContentRenderer,
+  reserver: ReserverRenderer,
+  recrutement: RecrutementRenderer,
+  devenirSocietaire: DevenirSocietaireRenderer,
+  contacts: ContactsRenderer,
+  horaires: HorairesRenderer,
+  hebergements: HebergementsRenderer,
+  sejoursIndividuels: SejoursIndividuelsRenderer,
+  activites: ActivitesRenderer,
+  espaces: EspacesRenderer,
+  services: ServicesRenderer,
+  structures: StructuresRenderer,
+  partenaires: PartenairesRenderer,
+  evenements: EvenementsRenderer,
+  localisation: LocalisationRenderer,
+  nosSejours: NosSejoursRenderer,
+  packsSejours: PacksSejoursRenderer,
+  histoire: HistoireRenderer,
+  equipe: EquipeRenderer,
+  domaine: DomaineRenderer,
+  patrimoine: PatrimoineRenderer,
+  seminaires: SeminairesRenderer,
+}
 
 interface PageProps {
   params: Promise<{ slug: string[] }>
@@ -64,9 +74,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const page = await getPageByPath(fullPath)
 
     if (!page) {
-      return {
-        title: "Page non trouvée",
-      }
+      return { title: "Page non trouvée" }
     }
 
     const title = page.title?.rendered || "L'Hermitage"
@@ -79,18 +87,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
       title,
       description,
-      openGraph: {
-        title,
-        description,
-        images: [{ url: image }],
-        type: "website",
-      },
-      twitter: {
-        card: "summary_large_image",
-        title,
-        description,
-        images: [image],
-      },
+      openGraph: { title, description, images: [{ url: image }], type: "website" },
+      twitter: { card: "summary_large_image", title, description, images: [image] },
     }
   } catch {
     return {
@@ -102,14 +100,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export async function generateStaticParams() {
   try {
-    // Use lightweight query — only fetches link/slug, not full ACF fields
     const pages = await wpApi.getPagePaths()
     const wpBaseUrl =
       process.env.WP_API_URL?.replace("/wp-json/wp/v2", "") || "https://admin.hermitagelelab.com"
 
     return pages
       .map((page) => page.link.replace(wpBaseUrl, "").replace(/^\/+|\/+$/g, ""))
-      .filter((pagePath) => pagePath && !DEDICATED_ROUTES.includes(pagePath))
+      .filter((pagePath) => pagePath)
       .map((pagePath) => ({
         slug: pagePath.split("/").filter(Boolean),
       }))
@@ -121,133 +118,104 @@ export async function generateStaticParams() {
 
 export default async function CatchAllPage({ params }: PageProps) {
   const { slug } = await params
-
   const fullPath = slug.join("/")
 
-  const isHistoirePage = fullPath === "tiers-lieu-rural/lhistoire-du-lieu"
-  const isEquipePage = fullPath === "tiers-lieu-rural/lequipe"
-  const isSeminairesPage = fullPath.startsWith("seminaires")
-  const isDomainePage = fullPath === "tiers-lieu-rural/le-domaine-de-l-hermitage"
-  const isPatrimoinePage = fullPath === "tiers-lieu-rural/un-patrimoine-historique"
-  let page = null
-  let teamMembers: WPPost<TeamMemberACF>[] = []
-  let seminairesData: SeminairesACF | null = null
-  let patrimoineData: PatrimoineACF | null = null
-  let domaineVideo: { url: string; mimeType: string; descriptif?: string } | null = null
+  // 1. Look up page registry
+  const config = getRouteConfig(fullPath)
+
+  // 2. Fetch page + extra data in parallel
+  let page
+  let extra: Record<string, unknown> = {}
 
   try {
-    const [fetchedPage, fetchedTeamMembers, fetchedDomaineVideo, fetchedPatrimoine] =
-      await Promise.all([
-        getPageByPath(fullPath),
-        isEquipePage ? wpApi.getTeamMembers() : Promise.resolve([]),
-        isDomainePage
-          ? wpApi.getPageVideo("tiers-lieu-rural/le-domaine-de-l-hermitage")
-          : Promise.resolve(null),
-        isPatrimoinePage ? wpApi.getPatrimoineData(fullPath) : Promise.resolve(null),
-      ])
+    const [fetchedPage, fetchedExtra] = await Promise.all([
+      getPageByPath(fullPath),
+      config?.fetchExtra ? config.fetchExtra(wpApi) : Promise.resolve({}),
+    ])
     page = fetchedPage
-    teamMembers = fetchedTeamMembers
-    domaineVideo = fetchedDomaineVideo
-    patrimoineData = fetchedPatrimoine
-
-    // Only fetch séminaires data for séminaires pages (avoids overriding patrimoine and other pages)
-    if (page && isSeminairesPage) {
-      seminairesData = await wpApi.getSeminairesData(fullPath)
-    }
-  } catch (error) {
+    extra = fetchedExtra
+  } catch {
     notFound()
+  }
+
+  // 3. Handle seminaires pages (prefix-matched, not in registry)
+  if (!config && isSeminairesPage(fullPath) && page) {
+    const seminairesData = await wpApi.getSeminairesData(fullPath)
+    if (seminairesData) {
+      const heroTitle = seminairesData.hero_seminaires?.accroche || page.title.rendered
+      const heroSubtitle =
+        seminairesData.hero_seminaires?.sous_titre || page.acf?.hero?.["sous-titre"]
+      const heroImage =
+        seminairesData.hero_seminaires?.image?.url ||
+        page.acf?.hero?.image?.url ||
+        "/rural-retreat-landscape.jpg"
+
+      return (
+        <div>
+          <PageHeader title={heroTitle} subtitle={heroSubtitle} image={heroImage} />
+          <BentoHeaderContent title={heroSubtitle} lateralImages={page.acf?.hero?.images_laterales}>
+            <SeminairesRenderer extra={{ seminairesData }} />
+          </BentoHeaderContent>
+        </div>
+      )
+    }
   }
 
   if (!page) {
     notFound()
   }
 
-  let content: React.ReactNode = null
+  // 4. Render via registry
+  if (config) {
+    const Renderer = RENDERERS[config.renderer]
+    if (!Renderer) {
+      console.error(`No renderer found for key: ${config.renderer}`)
+      notFound()
+    }
 
-  if (seminairesData) {
-    content = (
-      <div className="relative z-10">
-        <SeminairesPage acf={seminairesData} />
-      </div>
-    )
-  } else if (isHistoirePage && page.acf) {
-    content = (
-      <div className="relative z-10">
-        <HistoireTimeline acf={page.acf as HistoireACF} />
-      </div>
-    )
-  } else if (isEquipePage) {
-    content = (
-      <div className="relative z-10 mx-auto">
-        {page.content.rendered && (
-          <div
-            className="prose prose-stone max-w-none mb-6"
-            dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }}
-          />
-        )}
-        <TeamMasonry members={teamMembers} />
-      </div>
-    )
-  } else if (isDomainePage) {
-    content = (
-      <div className="relative z-10 mx-auto space-y-2 pt-2 pl-2">
-        {domaineVideo && (
-          <div className="container mx-auto">
-            <div className="overflow-hidden rounded-xl">
-              <video
-                src={domaineVideo.url}
-                controls
-                playsInline
-                className="w-full"
-                autoPlay
-                muted
-                loop
-              >
-                <source src={domaineVideo.url} type={domaineVideo.mimeType} />
-              </video>
-            </div>
-          </div>
-        )}
-        {domaineVideo?.descriptif && (
-          <div
-            className="prose text-brand-dark max-w-none mb-6 md:p-4 bg-white rounded-2xl"
-            dangerouslySetInnerHTML={{ __html: sanitizeHtml(domaineVideo.descriptif) }}
-          />
-        )}
-      </div>
-    )
-  } else if (isPatrimoinePage && patrimoineData?.sections) {
-    content = (
-      <div className="relative z-10">
-        <PatrimoinePage acf={patrimoineData} />
-      </div>
-    )
-  } else {
-    content = (
-      <div className="relative z-10 mx-auto px-4 py-2">
-        {page.content.rendered && (
-          <div
-            className="prose prose-stone max-w-none mb-6"
-            dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }}
-          />
-        )}
+    // customLayout: renderer controls its own layout (includes PageHeader etc.)
+    if (config.customLayout) {
+      return <Renderer page={page} extra={extra} />
+    }
+
+    // Standard layout: PageHeader + BentoHeaderContent wrapper
+    return (
+      <div>
+        <PageHeader
+          title={page.title.rendered}
+          subtitle={page.acf?.hero?.["sous-titre"]}
+          image={page.acf?.hero?.image?.url || "/rural-retreat-landscape.jpg"}
+        />
+        <BentoHeaderContent
+          title={page.acf?.hero?.["sous-titre"]}
+          lateralImages={page.acf?.hero?.images_laterales}
+        >
+          <Renderer page={page} extra={extra} />
+        </BentoHeaderContent>
       </div>
     )
   }
 
-  const heroTitle = seminairesData?.hero_seminaires?.accroche || page.title.rendered
-  const heroSubtitle = seminairesData?.hero_seminaires?.sous_titre || page.acf?.hero?.["sous-titre"]
-  const heroImage =
-    seminairesData?.hero_seminaires?.image?.url ||
-    page.acf?.hero?.image?.url ||
-    "/rural-retreat-landscape.jpg"
-  const heroLateralImages = page.acf?.hero?.images_laterales
+  // 5. Default: render WP content (pages not in registry)
+  const heroTitle = page.title.rendered
+  const heroSubtitle = page.acf?.hero?.["sous-titre"]
+  const heroImage = page.acf?.hero?.image?.url || "/rural-retreat-landscape.jpg"
 
   return (
     <div>
       <PageHeader title={heroTitle} subtitle={heroSubtitle} image={heroImage} />
-      <BentoHeaderContent title={heroSubtitle} lateralImages={heroLateralImages}>
-        {content}
+      <BentoHeaderContent
+        title={heroSubtitle}
+        lateralImages={page.acf?.hero?.images_laterales}
+      >
+        <div className="relative z-10 mx-auto px-4 py-2">
+          {page.content.rendered && (
+            <div
+              className="prose prose-stone max-w-none mb-6"
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }}
+            />
+          )}
+        </div>
       </BentoHeaderContent>
     </div>
   )
