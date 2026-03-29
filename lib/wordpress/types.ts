@@ -60,6 +60,27 @@ export interface PageACF {
   slogan?: string
   video?: string
   video_auto_hebergee?: { url: string; mime_type: string }
+  hebergements_et_sejours?: {
+    titre?: string
+    descriptif?: string
+    images_du_bento?: WPImage[]
+  }
+  evenements_section?: {
+    titre?: string
+    description?: string
+    voir_agenda?: { url: string; title?: string; target?: string }
+    image?: WPImage
+  }
+  recrutement_section?: {
+    titre?: string
+    offre?: Array<{
+      titre?: string
+      type_de_poste?: string
+      mission_principale?: string
+    }>
+    voir_toutes_les_offres?: { url: string; title?: string; target?: string }
+    images?: WPImage[]
+  }
   // Hero section
   hero?: {
     "sous-titre"?: string

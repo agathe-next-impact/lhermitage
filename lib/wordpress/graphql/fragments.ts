@@ -50,6 +50,52 @@ export const PAGE_FIELDS = gql`
           mimeType
         }
       }
+      hebergementsEtSejours {
+        titre
+        descriptif
+        imagesDuBento {
+          nodes {
+            databaseId
+            sourceUrl
+            altText
+          }
+        }
+      }
+      evenements {
+        titre
+        description
+        voirToutesLesOffres {
+          url
+          title
+          target
+        }
+        image {
+          node {
+            sourceUrl
+            altText
+          }
+        }
+      }
+      recrutement {
+        titre
+        offre {
+          titre
+          typeDePoste
+          missionPrincipale
+        }
+        voirToutesLesOffres {
+          url
+          title
+          target
+        }
+        images {
+          nodes {
+            databaseId
+            sourceUrl
+            altText
+          }
+        }
+      }
     }
     pageDevenirSocietaire {
       chapeau

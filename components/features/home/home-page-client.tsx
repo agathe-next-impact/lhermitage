@@ -1,21 +1,17 @@
 "use client"
 
 import Image from "next/image"
-import { HeroCard } from "@/components/features/home/hero-card"
 import { VideoBackground } from "@/components/features/home/video-background"
+import HomePageScrollStack from "@/components/features/home/home-page-scroll-stack"
 import type { WPPage, WPPost, SejourACF, HebergementACF, EvenementACF } from "@/lib/wordpress/types"
 
 interface HomePageClientProps {
   homepage: WPPage
-  sejours: WPPost<SejourACF>[]
-  hebergements: WPPost<HebergementACF>[]
-  evenements: WPPost<EvenementACF>[]
+  evenements?: WPPost<EvenementACF>[]
 }
 
 export function HomePageClient({
   homepage,
-  sejours,
-  hebergements,
   evenements,
 }: HomePageClientProps) {
   const videoUrl = homepage.acf?.video || null
@@ -89,96 +85,14 @@ export function HomePageClient({
         </div>
       </section>
 
-      {/* Featured Stays */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <h2 className="mb-8 font-serif text-3xl font-bold text-center md:text-4xl">
-            Nos Séjours
-          </h2>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {sejours.slice(0, 3).map((sejour) => (
-              <HeroCard
-                key={sejour.id}
-                title={sejour.acf?.nom || sejour.title.rendered}
-                image={sejour._embedded?.["wp:featuredmedia"]?.[0]?.source_url}
-                imageAlt={
-                  sejour._embedded?.["wp:featuredmedia"]?.[0]?.alt_text || sejour.title.rendered
-                }
-                link={`/sejour/${sejour.slug}`}
-                linkText="En savoir plus"
-              />
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Scroll stack */}
+      <HomePageScrollStack
+        hebergementsEtSejours={homepage.acf?.hebergements_et_sejours}
+        evenementsSection={homepage.acf?.evenements_section}
+        recrutementSection={homepage.acf?.recrutement_section}
+        evenements={evenements}
+      />
 
-      {/* Featured Accommodations */}
-      <section className="bg-muted/50 py-16">
-        <div className="container mx-auto px-4">
-          <h2 className="mb-8 font-serif text-3xl font-bold text-center md:text-4xl">
-            Nos Hébergements
-          </h2>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {hebergements.slice(0, 3).map((hebergement) => {
-              const description = hebergement.acf?.descriptif
-                ? hebergement.acf.descriptif.replace(/<[^>]*>/g, "")
-                : undefined
-
-              return (
-                <HeroCard
-                  key={hebergement.id}
-                  title={hebergement.acf?.nom || hebergement.title.rendered}
-                  description={description}
-                  image={hebergement._embedded?.["wp:featuredmedia"]?.[0]?.source_url}
-                  imageAlt={
-                    hebergement._embedded?.["wp:featuredmedia"]?.[0]?.alt_text ||
-                    hebergement.title.rendered
-                  }
-                  link={`/hebergement/${hebergement.slug}`}
-                  linkText="Découvrir"
-                />
-              )
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Upcoming Events */}
-      {evenements.length > 0 && (
-        <section className="py-16">
-          <div className="container mx-auto px-4">
-            <h2 className="mb-8 font-serif text-3xl font-bold text-center md:text-4xl">
-              Événements à venir
-            </h2>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {evenements.slice(0, 3).map((evenement) => {
-                const subtitle = evenement.acf?.eventDateLabel
-                  || (evenement.acf?.eventDateStart
-                    ? new Date(evenement.acf.eventDateStart).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })
-                    : undefined)
-
-                const description = evenement.acf?.eventPitch
-                  ? evenement.acf.eventPitch.replace(/<[^>]*>/g, "")
-                  : undefined
-
-                return (
-                  <HeroCard
-                    key={evenement.id}
-                    title={evenement.title.rendered}
-                    subtitle={subtitle}
-                    description={description}
-                    image={evenement._embedded?.["wp:featuredmedia"]?.[0]?.source_url}
-                    imageAlt={
-                      evenement._embedded?.["wp:featuredmedia"]?.[0]?.alt_text ||
-                      evenement.title.rendered
-                    }
-                  />
-                )
-              })}
-            </div>
-          </div>
-        </section>
-      )}
     </div>
   )
 }

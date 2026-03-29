@@ -23,5 +23,9 @@ export default async function HomePage() {
     }),
   ])
 
-  return <HomePageClient homepage={homepage} sejours={sejours} hebergements={hebergements} evenements={evenements} />
+  return (
+    <>
+      <HomePageClient homepage={homepage} evenements={evenements} />
+    </>
+  )
 }

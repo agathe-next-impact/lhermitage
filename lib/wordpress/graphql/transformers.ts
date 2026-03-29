@@ -216,6 +216,69 @@ export function transformPage(
         mime_type: selfHosted.mimeType || "video/mp4",
       }
     }
+    const hebergementsSejours = accueilData.hebergementsEtSejours
+    if (hebergementsSejours) {
+      pageAcf.hebergements_et_sejours = {
+        titre: hebergementsSejours.titre || undefined,
+        descriptif: hebergementsSejours.descriptif || undefined,
+        images_du_bento: hebergementsSejours.imagesDuBento?.nodes?.map(
+          (img: { databaseId?: number; sourceUrl?: string; altText?: string }) => ({
+            id: img.databaseId || 0,
+            url: img.sourceUrl || "",
+            alt: img.altText || "",
+            width: 0,
+            height: 0,
+          })
+        ),
+      }
+    }
+    const evenementsSection = accueilData.evenements
+    if (evenementsSection) {
+      const evtImage = evenementsSection.image?.node
+      pageAcf.evenements_section = {
+        titre: evenementsSection.titre || undefined,
+        description: evenementsSection.description || undefined,
+        voir_agenda: evenementsSection.voirToutesLesOffres?.url
+          ? {
+              url: evenementsSection.voirToutesLesOffres.url,
+              title: evenementsSection.voirToutesLesOffres.title || undefined,
+              target: evenementsSection.voirToutesLesOffres.target || undefined,
+            }
+          : undefined,
+        image: evtImage?.sourceUrl
+          ? { id: 0, url: evtImage.sourceUrl, alt: evtImage.altText || "", width: 0, height: 0 }
+          : undefined,
+      }
+    }
+    const recrutementSection = accueilData.recrutement
+    if (recrutementSection) {
+      pageAcf.recrutement_section = {
+        titre: recrutementSection.titre || undefined,
+        offre: recrutementSection.offre?.map(
+          (o: { titre?: string; typeDePoste?: string; missionPrincipale?: string }) => ({
+            titre: o.titre || undefined,
+            type_de_poste: o.typeDePoste || undefined,
+            mission_principale: o.missionPrincipale || undefined,
+          })
+        ),
+        voir_toutes_les_offres: recrutementSection.voirToutesLesOffres?.url
+          ? {
+              url: recrutementSection.voirToutesLesOffres.url,
+              title: recrutementSection.voirToutesLesOffres.title || undefined,
+              target: recrutementSection.voirToutesLesOffres.target || undefined,
+            }
+          : undefined,
+        images: recrutementSection.images?.nodes?.map(
+          (img: { databaseId?: number; sourceUrl?: string; altText?: string }) => ({
+            id: img.databaseId || 0,
+            url: img.sourceUrl || "",
+            alt: img.altText || "",
+            width: 0,
+            height: 0,
+          })
+        ),
+      }
+    }
   }
 
   // Try page-specific ACF field groups that may have sous-titre
