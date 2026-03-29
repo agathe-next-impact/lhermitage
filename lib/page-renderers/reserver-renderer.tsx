@@ -11,7 +11,7 @@ export default function ReserverRenderer({ page }: { page: WPPage }) {
           dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content.rendered) }}
         />
       )}
-      <div className="py-8">
+      <div className="md:pl-2 md:pt-2">
         <ContactForm />
       </div>
     </div>

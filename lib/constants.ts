@@ -25,12 +25,14 @@ export const ROUTE_TO_PAGE_ID: Record<string, number> = {
   "sejours-collectifs/espaces-de-travail": 859,
   "sejours-collectifs/services": 73,
   "hebergements": 69,
+  "sejours-individuels": 64,
 
   // — Infos pratiques —
   "infos-pratiques/contacts": 104,
   "infos-pratiques/localisation": 100,
   "infos-pratiques/jours-et-horaires-douverture": 102,
   "ecosysteme-innovant/evenements": 96,
+  "ecosysteme-innovant/partenaires": 94,
 
   // — Soutenir / Participer —
   "soutenir-le-projet/devenir-societaire-cooperative-fonciere": 487,
@@ -48,6 +50,8 @@ export const ROUTE_TO_PAGE_ID: Record<string, number> = {
   "tiers-lieu-rural": 79,
   "tiers-lieu-rural/le-domaine-de-l-hermitage": 83,
   "tiers-lieu-rural/un-patrimoine-historique": 81,
+  "tiers-lieu-rural/lequipe": 85,
+  "tiers-lieu-rural/lhistoire-du-lieu": 87,
   "tiers-lieu-rural/le-projet": 2050,
   "tiers-lieu-rural/ecosysteme-innovant": 2065,
   "tiers-lieu-rural/organisation": 91,
@@ -71,12 +75,14 @@ export const PAGE_ID_TO_ROUTE: Record<number, string> = {
   // — Séjours collectifs —
   62: "/sejours-collectifs",
   67: "/sejours-collectifs/nos-sejours",
+  64: "/sejours-individuels",
   69: "/hebergements",
   71: "/sejours-collectifs/activites",
   73: "/sejours-collectifs/services",
   859: "/sejours-collectifs/espaces-de-travail",
   // — Infos pratiques —
   98: "/infos-pratiques",
+  94: "/ecosysteme-innovant/partenaires",
   96: "/ecosysteme-innovant/evenements",
   100: "/infos-pratiques/localisation",
   102: "/infos-pratiques/jours-et-horaires-douverture",
@@ -94,6 +100,8 @@ export const PAGE_ID_TO_ROUTE: Record<number, string> = {
   79: "/tiers-lieu-rural",
   81: "/tiers-lieu-rural/un-patrimoine-historique",
   83: "/tiers-lieu-rural/le-domaine-de-l-hermitage",
+  85: "/tiers-lieu-rural/lequipe",
+  87: "/tiers-lieu-rural/lhistoire-du-lieu",
   91: "/tiers-lieu-rural/organisation",
   2050: "/tiers-lieu-rural/le-projet",
   2065: "/tiers-lieu-rural/ecosysteme-innovant",

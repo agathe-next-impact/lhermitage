@@ -75,9 +75,11 @@ export const PAGE_FIELDS = gql`
           title
           target
         }
-        images {
+        galerie {
           nodes {
-            ...ImageFields
+            databaseId
+            sourceUrl
+            altText
           }
         }
       }
@@ -86,13 +88,6 @@ export const PAGE_FIELDS = gql`
         raisons {
           raison
         }
-      }
-      ceQuestDevenirSocietaire {
-        titre
-        motivation1
-        motivation2
-        motivation3
-        motivation4
       }
       questCeQueLaScic {
         titre
@@ -106,6 +101,33 @@ export const PAGE_FIELDS = gql`
       informationsSocietariat {
         titre
         descriptif
+      }
+      historique {
+        titre
+        descriptif
+        etapes {
+          annee
+          descriptif
+        }
+      }
+      documentsLegaux {
+        titre
+        fichiers {
+          nomDuDocument
+          fichierDuDocument {
+            node {
+              mediaItemUrl
+              title
+              mimeType
+              fileSize
+            }
+          }
+        }
+      }
+      impact {
+        titre
+        descriptif
+        citation
       }
     }
     pageStructures {

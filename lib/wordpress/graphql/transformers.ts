@@ -255,9 +255,9 @@ export function transformPage(
               target: dsData.bandeau.cta.target,
             }
           : undefined,
-        galerie: dsData.bandeau.images?.nodes
+        galerie: dsData.bandeau.galerie?.nodes
           ? {
-              images: dsData.bandeau.images.nodes.map((img: any) => ({
+              images: dsData.bandeau.galerie.nodes.map((img: any) => ({
                 ID: img.databaseId,
                 url: rewriteWordPressAssetUrl(img.sourceUrl),
                 alt: img.altText || "",
@@ -294,6 +294,42 @@ export function transformPage(
 
     if (dsData.informationsSocietariat) {
       pageAcf.informations_societariat = dsData.informationsSocietariat
+    }
+
+    if (dsData.historique) {
+      pageAcf.historique = {
+        titre: dsData.historique.titre,
+        descriptif: dsData.historique.descriptif,
+        etapes: dsData.historique.etapes,
+      }
+    }
+
+    if (dsData.documentsLegaux) {
+      const rawFichiers = dsData.documentsLegaux.fichiers
+      pageAcf.documents_legaux = {
+        titre: dsData.documentsLegaux.titre,
+        fichiers: Array.isArray(rawFichiers)
+          ? rawFichiers.map((f: any) => ({
+              nom: f.nomDuDocument,
+              fichier: f.fichierDuDocument?.node
+                ? {
+                    url: rewriteWordPressAssetUrl(f.fichierDuDocument.node.mediaItemUrl),
+                    title: f.fichierDuDocument.node.title,
+                    mimeType: f.fichierDuDocument.node.mimeType,
+                    fileSize: f.fichierDuDocument.node.fileSize,
+                  }
+                : undefined,
+            }))
+          : undefined,
+      }
+    }
+
+    if (dsData.impact) {
+      pageAcf.impact = {
+        titre: dsData.impact.titre,
+        descriptif: dsData.impact.descriptif,
+        citation: dsData.impact.citation,
+      }
     }
   }
 
