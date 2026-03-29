@@ -130,24 +130,6 @@ export const PAGE_FIELDS = gql`
         citation
       }
     }
-    pageStructures {
-      structuresInternes {
-        titreDeSection
-        imageDeSection {
-          node {
-            ...ImageFields
-          }
-        }
-      }
-      structuresHebergees {
-        titreDeSection
-        imageDeSection {
-          node {
-            ...ImageFields
-          }
-        }
-      }
-    }
     pageLocalisation {
       adresse {
         ligne1

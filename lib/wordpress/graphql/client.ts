@@ -5,8 +5,34 @@ import { logger } from "../../logger"
 const GRAPHQL_URL =
   process.env.WP_GRAPHQL_URL || "https://admin.hermitagelelab.com/graphql"
 
-// Longer timeout during build to handle concurrent requests overwhelming WordPress
 const REQUEST_TIMEOUT = 30_000
+
+/**
+ * Concurrency limiter — prevents overwhelming WordPress during build.
+ * Next.js generates all static pages in parallel, sending hundreds of
+ * simultaneous GraphQL requests. WordPress (shared hosting) cannot handle
+ * this and starts dropping connections, causing cascading failures.
+ */
+const MAX_CONCURRENT = 6
+let active = 0
+const queue: Array<() => void> = []
+
+function acquireSlot(): Promise<void> {
+  if (active < MAX_CONCURRENT) {
+    active++
+    return Promise.resolve()
+  }
+  return new Promise((resolve) => queue.push(resolve))
+}
+
+function releaseSlot(): void {
+  const next = queue.shift()
+  if (next) {
+    next()
+  } else {
+    active--
+  }
+}
 
 function createClient(revalidate: number = 900): GraphQLClient {
   return new GraphQLClient(GRAPHQL_URL, {
@@ -46,6 +72,8 @@ export async function gqlRequest<T>(
   const { revalidate = 900, retries = 3 } = options || {}
   const client = createClient(revalidate)
 
+  await acquireSlot()
+  let released = false
   try {
     const data = await client.request<T>(query, variables)
     return decodeObjectEntities(data)
@@ -53,6 +81,9 @@ export async function gqlRequest<T>(
     if (retries > 0 && isRetryableError(error)) {
       const delay = Math.pow(2, 4 - retries) * 1000
       logger.warn(`GraphQL request failed, retrying in ${delay}ms (${retries} left):`, error instanceof Error ? error.message : error)
+      // Free slot during backoff so other requests can proceed
+      releaseSlot()
+      released = true
       await new Promise((r) => setTimeout(r, delay))
       return gqlRequest<T>(query, variables, {
         revalidate,
@@ -62,6 +93,8 @@ export async function gqlRequest<T>(
 
     logger.error("GraphQL request failed:", error instanceof Error ? error.message : error)
     throw error
+  } finally {
+    if (!released) releaseSlot()
   }
 }
 
