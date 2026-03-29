@@ -73,14 +73,12 @@ const CollapsedCard: React.FC<{
           </span>
         )}
 
-        <Button
+        <span
           onClick={onExpand}
-          size="sm"
-          style={{ color }}
-          className="rounded-full bg-white font-semibold transition-colors hover:bg-white/90 shadow-md text-sm h-9 px-6"
+          className="inline-flex items-center rounded-full bg-white/20 text-white transition-colors hover:bg-white/30 shadow-sm text-xs h-8 px-4 font-medium"
         >
           Découvrir
-        </Button>
+        </span>
       </div>
       {imageUrl && (
         <motion.div layoutId={`image-${hebergement.id}`}>
