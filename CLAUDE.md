@@ -20,28 +20,23 @@ Site vitrine de L'Hermitage, tiers-lieu rural en France. Frontend Next.js headle
 ```
 app/                    Pages (App Router) - Server Components par defaut
   api/revalidate/       Webhook ISR on-demand depuis WordPress
-  [slug]/               Catch-all pour pages WordPress
+  [...slug]/            Catch-all pour pages WordPress (sejours, hebergements, ecosysteme, infos-pratiques, etc.)
   sejour/[slug]/        Detail sejour
   hebergement/[slug]/   Detail hebergement
   activite/[slug]/      Detail activite
   structure/[slug]/     Detail structure
-  sejours-collectifs/   Sous-pages: nos-sejours, activites, services, espaces-de-travail, packs-de-sejours
-  sejours-individuels/
-  hebergements/         Listing hebergements
-  ecosysteme-innovant/  Sous-pages: structures, partenaires, evenements
-  infos-pratiques/      Sous-pages: contacts, localisation, jours-et-horaires-douverture
-  participer/devenir-societaire/
-  vous-engager/         Sous-pages: alternance, benevole, faire-un-don, offres-demploi, pass-permis, services-civique, stages
-  reserver/
   (special)/visite-virtuelle/
 middleware.ts           Detection redirections WordPress old-slug (cache 1h, HEAD request)
 
 components/
   layout/               SiteHeader, Footer, CardNav, PageHeader, SejoursHeader, MenuButton, BentoHeaderContent
   content/              DetailPageSections, WordpressContent, WordpressLink
-  features/             Organises par domaine: home/, sejours/, devenir-societaire/, contact/, recrutement/, hebergements/, partenaires/, structures/, vous-engager/
+  features/             Organises par domaine: home/, sejours/, devenir-societaire/, contact/, recrutement/,
+                        activites/, espaces/, evenements/, services/, visite-virtuelle/
   ui/                   shadcn/ui + composants custom (timeline, orbiting-circles, minimal-card, variable-proximity)
-  [racine]              Composants orphelins (hebergements-grid, structures-grid, partenaires-client, etc.)
+  [racine]              Composants partages (hebergements-grid, structures-grid, partenaires-client,
+                        patrimoine-page, seminaires-page, histoire-timeline, localisation-map,
+                        category-filter, team-masonry, menu-colors-provider, providers, theme-provider)
 
 lib/
   wordpress/
@@ -59,6 +54,9 @@ lib/
     transform-content.ts  Transformation liens dans le contenu
     category-colors.ts  Couleurs par categorie
     menu.ts             Utilitaires menu
+  page-renderers/       Renderers par type de page (activites, contacts, hebergements, sejours, etc.)
+    transforms/         Utilitaires extraction categories, dates evenements, images HTML
+  page-registry.ts      Registre slug -> renderer pour le catch-all [...slug]
   theme/colors.ts       BRAND_COLORS (coral, teal, green, rose, orange, darkBlue, dark)
   constants.ts          REVALIDATION (homepage: 2h, listing: 1h, detail: 1h, frequent: 15min)
   utils.ts              cn(), stripHtml(), truncateText()
@@ -98,6 +96,7 @@ hooks/
 ### Patterns de code
 - **Server Components par defaut** : `"use client"` uniquement quand interactivite necessaire
 - **Fetching dans les pages** : Appels `wpApi.getXxx()` directement dans les Server Components
+- **Page Registry** : Le catch-all `[...slug]` utilise `page-registry.ts` pour router vers le bon renderer dans `page-renderers/`
 - **ACF generics** : `WPPost<HebergementACF>`, `WPPost<SejourACF>`, etc.
 - **Transformers** : Chaque CPT a son propre transformer dans `graphql/transformers.ts`
 - **Injection taxonomie** : Les filtres de categorie injectent `_embedded["wp:term"]` manuellement apres transformation
@@ -121,13 +120,19 @@ hooks/
 
 ### Data flow
 ```
-Page (Server Component)
-  -> wpApi.getXxx()
-    -> gqlRequest() avec retry + timeout
-      -> decodeObjectEntities() (HTML entities)
-      -> transformXxxAcf() (extraction champs ACF)
-      -> transformPost<T>() (wrapping WPPost)
-      -> injection taxonomie si besoin
+Catch-all [...slug] (Server Component)
+  -> page-registry.ts : slug -> renderer
+  -> renderer dans page-renderers/ :
+    -> wpApi.getXxx()
+      -> gqlRequest() avec retry + timeout
+        -> decodeObjectEntities() (HTML entities)
+        -> transformXxxAcf() (extraction champs ACF)
+        -> transformPost<T>() (wrapping WPPost)
+        -> injection taxonomie si besoin
+    -> Props vers Client Components
+
+Pages de detail (/sejour/[slug], /hebergement/[slug], etc.)
+  -> wpApi.getXxxBySlug() directement dans le Server Component
   -> Props vers Client Components
 ```
 
@@ -148,10 +153,10 @@ npm run prepare      # Husky (git hooks)
 
 ```
 WP_GRAPHQL_URL       # Endpoint GraphQL (default: https://admin.hermitagelelab.com/graphql)
-WP_API_URL           # URL REST API (extraction hostname, fallback)
+NEXT_PUBLIC_WP_API_URL  # URL REST API (extraction hostname, fallback)
 SITE_URL             # URL canonique frontend
 HOMEPAGE_ID          # ID WordPress de la homepage (138)
-DEFAULT_CTA_URL      # URL CTA fallback (/contact)
+DEFAULT_CTA_URL      # URL CTA fallback (/reserver)
 REVALIDATION_SECRET  # Secret pour webhook revalidation
 ```
 
@@ -172,7 +177,7 @@ Definies dans `lib/theme/colors.ts` -> `BRAND_COLORS` :
 - `rose` (#C14C66) - Tiers-lieu, Projet, Patrimoine
 - `orange` (#DC6F45) - Infos pratiques, Services
 - `darkBlue` (#2A4A51)
-- `dark` (#535453)
+- `dark` (#535353)
 
 Chaque section du menu herite d'une couleur via `MENU_COLOR_SEQUENCE`. Les pages de detail utilisent `PAGE_COLORS` (fallback statique).
 

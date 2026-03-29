@@ -41,21 +41,6 @@ export const PAGE_FIELDS = gql`
     featuredImage {
       ...FeaturedImageFields
     }
-    elementsDePage {
-      hero {
-        sousTitre
-        image {
-          node {
-            ...ImageFields
-          }
-        }
-        imagesLaterales {
-          nodes {
-            ...ImageFields
-          }
-        }
-      }
-    }
     pageDAccueil {
       slogan
       video

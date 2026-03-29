@@ -715,7 +715,7 @@ export class WordPressAPI {
           {
             title: "Écosystème",
             links: [
-              { label: "Structures", url: "/ecosysteme-innovant/structures-hebergees" },
+              { label: "Structures", url: "/ecosysteme-innovant/structures" },
               { label: "Partenaires", url: "/ecosysteme-innovant/partenaires" },
               { label: "Événements", url: "/ecosysteme-innovant/evenements" },
             ],
@@ -723,9 +723,9 @@ export class WordPressAPI {
           {
             title: "L'Hermitage",
             links: [
-              { label: "Notre histoire", url: "/histoire" },
-              { label: "Devenir sociétaire", url: "/devenir-societaire" },
-              { label: "Contact", url: "/contact" },
+              { label: "Notre histoire", url: "/tiers-lieu-rural/lhistoire-du-lieu" },
+              { label: "Devenir sociétaire", url: "/participer/devenir-societaire" },
+              { label: "Contact", url: "/infos-pratiques/contacts" },
             ],
           },
         ],

@@ -189,18 +189,18 @@ export function transformPage(
 ): WPPage {
   const pageAcf: PageACF = {}
 
-  // "elementsDePage" ACF field group — hero image + subtitle for all pages
-  const heroData = gqlPage.elementsDePage?.hero
-  if (heroData) {
+  // NOTE: "elementsDePage" ACF field group is not yet configured in WPGraphQL.
+  // Use featuredImage as fallback for hero image until it is enabled.
+  const featuredImg = gqlPage.featuredImage?.node
+  if (featuredImg) {
     pageAcf.hero = {
-      "sous-titre": heroData.sousTitre,
-      image: heroData.image ? transformAcfMediaEdge(heroData.image) : undefined,
-      images_laterales: heroData.imagesLaterales?.nodes?.map(
-        (node: { sourceUrl: string; altText?: string }) => ({
-          url: node.sourceUrl,
-          alt: node.altText || "",
-        })
-      ),
+      image: {
+        id: featuredImg.databaseId || 0,
+        url: rewriteWordPressAssetUrl(featuredImg.sourceUrl),
+        alt: featuredImg.altText || "",
+        width: featuredImg.mediaDetails?.width || 0,
+        height: featuredImg.mediaDetails?.height || 0,
+      },
     }
   }
 
@@ -948,6 +948,7 @@ export function transformMenuItems(
     connectedNode?: {
       node?: {
         databaseId?: number
+        title?: string
         slug?: string
         uri?: string
       } | null
@@ -964,9 +965,12 @@ export function transformMenuItems(
     // Priority: mapped frontend route (stable) → URI-based slug → WP URL transformation (fallback)
     const url = (pageId && PAGE_ID_TO_ROUTE[pageId]) || (nodeUri ? `/${nodeUri}` : transformWordPressUrl(item.url))
 
+    // Use page title from connectedNode so menu reflects WP page title changes
+    const title = connectedNode?.title || item.label
+
     return {
       id: item.databaseId,
-      title: item.label,
+      title,
       url,
       slug: nodeSlug,
       parent: item.parentDatabaseId || 0,

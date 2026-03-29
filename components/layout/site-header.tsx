@@ -58,7 +58,7 @@ const FALLBACK_NAV_ITEMS: CardNavItem[] = [
     links: [
       {
         label: "Structures Hébergées",
-        href: "/ecosysteme-innovant/structures-hebergees",
+        href: "/ecosysteme-innovant/structures",
         ariaLabel: "Voir les structures hébergées",
       },
       {
@@ -78,10 +78,18 @@ const FALLBACK_NAV_ITEMS: CardNavItem[] = [
     bgColor: MENU_COLOR_SEQUENCE[2],
     textColor: "#ffffff",
     links: [
-      { label: "Le Projet", href: "/le-projet", ariaLabel: "Découvrir le projet" },
-      { label: "Le Concept", href: "/le-concept", ariaLabel: "Comprendre le concept" },
-      { label: "Nos Valeurs", href: "/nos-valeurs", ariaLabel: "Découvrir nos valeurs" },
-      { label: "L'Équipe", href: "/lequipe", ariaLabel: "Rencontrer l'équipe" },
+      { label: "Le Projet", href: "/tiers-lieu-rural/le-projet", ariaLabel: "Découvrir le projet" },
+      {
+        label: "Le Domaine",
+        href: "/tiers-lieu-rural/le-domaine-de-l-hermitage",
+        ariaLabel: "Découvrir le domaine",
+      },
+      {
+        label: "Un Patrimoine Historique",
+        href: "/tiers-lieu-rural/un-patrimoine-historique",
+        ariaLabel: "Découvrir le patrimoine",
+      },
+      { label: "L'Équipe", href: "/tiers-lieu-rural/lequipe", ariaLabel: "Rencontrer l'équipe" },
     ],
   },
   {

@@ -15,11 +15,13 @@ export const GET_MENU = gql`
             node {
               ... on Page {
                 databaseId
+                title
                 slug
                 uri
               }
               ... on Post {
                 databaseId
+                title
                 slug
                 uri
               }
