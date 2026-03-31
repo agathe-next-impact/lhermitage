@@ -38,7 +38,7 @@ export function PageHeader({
   const mainBlobColor = color || menuColor || getColorForPath(pathname) || getHashColor(title)
 
   return (
-    <div className={`w-[calc(100%-1rem)] mt-3 mx-auto relative pt-8 ${className}`}>
+    <div className={`w-[calc(100%-1rem)] mt-8 mx-auto relative pt-8 ${className}`}>
       {/* ===== MOBILE : 2 lignes (logo+titre puis image) ===== */}
       <div className="md:hidden">
         {/* Ligne 1 : Logo + Titre */}

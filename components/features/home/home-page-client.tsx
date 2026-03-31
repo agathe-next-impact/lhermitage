@@ -20,7 +20,7 @@ export function HomePageClient({
   return (
     <div className="mt-[60px] flex flex-col">
       {/* Hero Section */}
-      <section className="w-[calc(100%-1rem)] mx-auto relative flex flex-col md:h-[calc(100vh-82px)] md:grid md:grid-cols-4 md:grid-rows-5">
+      <section className="w-[calc(100%-1rem)] mx-auto relative flex flex-col md:h-[calc(100vh-66px)] md:grid md:grid-cols-4 md:grid-rows-5">
         {/* Vidéo : pleine largeur mobile, couvre toute la grille en desktop */}
         <div
           className="relative overflow-hidden bg-black aspect-video md:aspect-auto md:col-start-1 md:col-end-5 md:row-start-1 md:row-end-6"

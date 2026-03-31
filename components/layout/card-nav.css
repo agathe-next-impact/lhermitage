@@ -4,7 +4,7 @@
   /* Start with narrower width, expand on hover */
   max-width: calc(100% - 0.5rem);
   /* Reduced top margin from 3rem to 1rem to allow video to be visible from top */
-  margin: 0 auto;
+  margin: 6px auto 0 auto;
   transition:
     max-width 0.5s ease,
     margin-top 0.5s ease;
