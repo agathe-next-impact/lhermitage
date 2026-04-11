@@ -9,6 +9,14 @@
  * Pages NOT in the registry fall through to the default WP content renderer.
  */
 import type { WordPressAPI } from "@/lib/wordpress/api"
+import type { WPPage, NousSoutenirACF } from "@/lib/wordpress/types"
+
+/** Optional bento header overrides. Each non-undefined field replaces the WP default. */
+export interface PageHeaderOverride {
+  title?: string
+  subtitle?: string
+  image?: string
+}
 
 export interface PageRouteConfig {
   /**
@@ -21,6 +29,17 @@ export interface PageRouteConfig {
   renderer: string
   /** If true, the renderer returns the full page (no PageHeader+BentoHeaderContent wrapper). */
   customLayout?: boolean
+  /**
+   * Optional override for the bento PageHeader (title/subtitle/image).
+   * Useful when the page has dedicated ACF hero fields that should drive
+   * the header instead of (or in addition to) the WP page title and the
+   * legacy "Elements de page" ACF group.
+   *
+   * Returned `undefined` fields keep the WP defaults; only provided fields
+   * are overridden. The function is called after `fetchExtra`, so it can
+   * read from the resolved `extra` payload.
+   */
+  getHeader?: (page: WPPage, extra: Record<string, unknown>) => PageHeaderOverride
 }
 
 export const PAGE_REGISTRY: Record<string, PageRouteConfig> = {
@@ -43,10 +62,21 @@ export const PAGE_REGISTRY: Record<string, PageRouteConfig> = {
   // --- Page « Nous soutenir » (ACF via query isolée) ---
   // Le slug WP réel est `don-association` sous le parent `soutenir-le-projet`
   // (page ID 491 dans constants.ts).
+  // Le bento header est dérivé des champs hero du field group `pageNousSoutenir`
+  // (heroTitre / heroSousTitre / heroImage) — fallback automatique sur les
+  // champs WP natifs si l'un d'eux est vide en admin.
   "soutenir-le-projet/don-association": {
     renderer: "nousSoutenir",
     fetchExtra: (api, path) =>
       api.getNousSoutenirData(path).then((d) => ({ nousSoutenirData: d })),
+    getHeader: (_page, extra) => {
+      const hero = (extra.nousSoutenirData as NousSoutenirACF | null)?.hero
+      return {
+        title: hero?.titre,
+        subtitle: hero?.sous_titre,
+        image: hero?.image?.url,
+      }
+    },
   },
 
   // --- Pages listing CPT ---

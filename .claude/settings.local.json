@@ -74,7 +74,8 @@
       "Bash(git show:*)",
       "Bash(git checkout:*)",
       "Bash(python3:*)",
-      "Bash(node -e \"JSON.parse\\(require\\('fs'\\).readFileSync\\('acf-nous-soutenir.json','utf8'\\)\\);console.log\\('OK'\\)\")"
+      "Bash(node -e \"JSON.parse\\(require\\('fs'\\).readFileSync\\('acf-nous-soutenir.json','utf8'\\)\\);console.log\\('OK'\\)\")",
+      "Bash(ls:*)"
     ],
     "additionalDirectories": [
       "c:\\Users\\agath\\Downloads"

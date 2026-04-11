@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
-import { wpApi, getPageByPath } from "@/lib/wordpress/api"
+import { wpApi, getPageByPath, getElementsDePageHero } from "@/lib/wordpress/api"
 import { PageHeader } from "@/components/layout/page-header"
 import { BentoHeaderContent } from "@/components/layout/bento-header-content"
 import { REVALIDATION } from "@/lib/constants"
@@ -73,18 +73,27 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const fullPath = slug.join("/")
 
   try {
-    const page = await getPageByPath(fullPath)
+    // Both calls are wrapped in React `cache()` and dedupe with the page render below.
+    const [page, elementsHero] = await Promise.all([
+      getPageByPath(fullPath),
+      getElementsDePageHero(fullPath),
+    ])
 
     if (!page) {
       return { title: "Page non trouvée" }
     }
 
-    const title = page.title?.rendered || "L'Hermitage"
+    const title =
+      elementsHero?.titre || page.acf?.hero?.titre || page.title?.rendered || "L'Hermitage"
     const description =
+      elementsHero?.["sous-titre"] ||
       page.acf?.hero?.["sous-titre"] ||
       page.excerpt?.rendered?.replace(/<[^>]*>/g, "").substring(0, 160) ||
       "Découvrez L'Hermitage, tiers-lieu rural dédié aux séjours et hébergements"
-    const image = page.acf?.hero?.image?.url || "/rural-retreat-hermitage-building-nature.jpg"
+    const image =
+      elementsHero?.image?.url ||
+      page.acf?.hero?.image?.url ||
+      "/rural-retreat-hermitage-building-nature.jpg"
 
     return {
       title,
@@ -125,26 +134,47 @@ export default async function CatchAllPage({ params }: PageProps) {
   // 1. Look up page registry
   const config = getRouteConfig(fullPath)
 
-  // 2. Fetch page + extra data in parallel
+  // 2. Fetch page + extra data + legacy "Elements de page" hero in parallel.
+  //    The elementsDePage hero is fetched via an isolated query that fails
+  //    silently if the ACF field group is not yet exposed on the Page type
+  //    (see lib/wordpress/graphql/queries/elements-de-page.ts). When it
+  //    returns data, we merge it into `page.acf.hero` so every render path
+  //    (registry, default, seminaires) picks it up transparently.
   let page
   let extra: Record<string, unknown> = {}
+  let elementsHero: Awaited<ReturnType<typeof getElementsDePageHero>> = null
 
   try {
-    const [fetchedPage, fetchedExtra] = await Promise.all([
+    const [fetchedPage, fetchedExtra, fetchedElementsHero] = await Promise.all([
       getPageByPath(fullPath),
       config?.fetchExtra ? config.fetchExtra(wpApi, fullPath) : Promise.resolve({}),
+      getElementsDePageHero(fullPath),
     ])
     page = fetchedPage
     extra = fetchedExtra
+    elementsHero = fetchedElementsHero
   } catch {
     notFound()
+  }
+
+  // Merge elementsDePage hero into page.acf.hero (overrides featured-image
+  // fallback set by transformPage when an explicit ACF image is provided).
+  if (page && elementsHero) {
+    const mergedHero = { ...(page.acf?.hero || {}) }
+    if (elementsHero.titre) mergedHero.titre = elementsHero.titre
+    if (elementsHero["sous-titre"]) mergedHero["sous-titre"] = elementsHero["sous-titre"]
+    if (elementsHero.image) mergedHero.image = elementsHero.image
+    page = { ...page, acf: { ...(page.acf || {}), hero: mergedHero } }
   }
 
   // 3. Handle seminaires pages (prefix-matched, not in registry)
   if (!config && isSeminairesPage(fullPath) && page) {
     const seminairesData = await wpApi.getSeminairesData(fullPath)
     if (seminairesData) {
-      const heroTitle = seminairesData.hero_seminaires?.accroche || page.title.rendered
+      const heroTitle =
+        seminairesData.hero_seminaires?.accroche ||
+        page.acf?.hero?.titre ||
+        page.title.rendered
       const heroSubtitle =
         seminairesData.hero_seminaires?.sous_titre || page.acf?.hero?.["sous-titre"]
       const heroImage =
@@ -181,15 +211,19 @@ export default async function CatchAllPage({ params }: PageProps) {
     }
 
     // Standard layout: PageHeader + BentoHeaderContent wrapper
+    // Optional getHeader() in the registry can override title/subtitle/image
+    // from the resolved `extra` payload (e.g. ACF hero fields).
+    const headerOverride = config.getHeader?.(page, extra) ?? {}
+    const headerTitle = headerOverride.title || page.acf?.hero?.titre || page.title.rendered
+    const headerSubtitle = headerOverride.subtitle || page.acf?.hero?.["sous-titre"]
+    const headerImage =
+      headerOverride.image || page.acf?.hero?.image?.url || "/rural-retreat-landscape.jpg"
+
     return (
       <div>
-        <PageHeader
-          title={page.title.rendered}
-          subtitle={page.acf?.hero?.["sous-titre"]}
-          image={page.acf?.hero?.image?.url || "/rural-retreat-landscape.jpg"}
-        />
+        <PageHeader title={headerTitle} subtitle={headerSubtitle} image={headerImage} />
         <BentoHeaderContent
-          title={page.acf?.hero?.["sous-titre"]}
+          title={headerSubtitle}
           lateralImages={page.acf?.hero?.images_laterales}
         >
           <Renderer page={page} extra={extra} />
@@ -199,7 +233,7 @@ export default async function CatchAllPage({ params }: PageProps) {
   }
 
   // 5. Default: render WP content (pages not in registry)
-  const heroTitle = page.title.rendered
+  const heroTitle = page.acf?.hero?.titre || page.title.rendered
   const heroSubtitle = page.acf?.hero?.["sous-titre"]
   const heroImage = page.acf?.hero?.image?.url || "/rural-retreat-landscape.jpg"
 

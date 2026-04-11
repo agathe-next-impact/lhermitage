@@ -16,6 +16,7 @@ import type {
   SeminairesACF,
   PatrimoineACF,
   NousSoutenirACF,
+  WPImage,
   FooterOptions,
 } from "./types"
 import { gqlRequest, gqlRequestList } from "./graphql/client"
@@ -34,6 +35,7 @@ import {
   transformSeminairesData,
   transformPatrimoineData,
   transformNousSoutenirData,
+  transformElementsDePageHero,
   transformMenuItems,
   transformTerm,
 } from "./graphql/transformers"
@@ -46,6 +48,7 @@ import {
   GET_PAGE_PATRIMOINE_DATA,
 } from "./graphql/queries/pages"
 import { GET_PAGE_NOUS_SOUTENIR_DATA } from "./graphql/queries/nous-soutenir"
+import { GET_PAGE_ELEMENTS_DE_PAGE } from "./graphql/queries/elements-de-page"
 import {
   GET_HEBERGEMENTS,
   GET_HEBERGEMENT_BY_SLUG,
@@ -798,6 +801,37 @@ export class WordPressAPI {
     }
   }
 
+  /**
+   * Isolated query for the legacy "Elements de page" ACF field group
+   * (which carries the bento `hero { sous-titre, image }` for every page).
+   *
+   * Fails silently and returns `null` if the field group is not yet
+   * exposed on the GraphQL `Page` type — the catch-all simply falls back
+   * to the WP-native title + featured image when this returns null.
+   *
+   * Required WP admin step (one-shot): on the « Elements de page » ACF
+   * field group, set `map_graphql_types_from_location_rules: 1` (or add
+   * `Page` to `graphql_types`). Until that flag is on, every call here
+   * silently returns null.
+   */
+  async getElementsDePageHero(
+    pagePath: string
+  ): Promise<{ titre?: string; "sous-titre"?: string; image?: WPImage } | null> {
+    try {
+      const pageId = await this.resolvePageId(pagePath)
+      if (!pageId) return null
+
+      const data = await gqlRequest<{
+        page: { elementsDePage?: Record<string, any> } | null
+      }>(GET_PAGE_ELEMENTS_DE_PAGE, { id: String(pageId) })
+
+      return transformElementsDePageHero(data.page?.elementsDePage)
+    } catch {
+      // Field group not yet wired in WPGraphQL — silently degrade.
+      return null
+    }
+  }
+
   // Separate query for the "Nous Soutenir" page ACF field group.
   // Isolated from PAGE_FIELDS so the central page query keeps working
   // even before the matching field group is configured in WordPress.
@@ -846,3 +880,6 @@ export const wpApi = new WordPressAPI()
 import { cache } from "react"
 
 export const getPageByPath = cache((path: string) => wpApi.getPageByPath(path))
+export const getElementsDePageHero = cache((path: string) =>
+  wpApi.getElementsDePageHero(path)
+)

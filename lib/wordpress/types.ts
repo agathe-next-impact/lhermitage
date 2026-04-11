@@ -83,6 +83,7 @@ export interface PageACF {
   }
   // Hero section
   hero?: {
+    titre?: string
     "sous-titre"?: string
     image?: WPImage
     images_laterales?: WPImage[]

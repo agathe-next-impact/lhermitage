@@ -37,6 +37,10 @@ export function HeroRotatingWords({
 
   if (!titre && words.length === 0 && !sousTitre) return null
 
+  // Mode compact : seulement les mots rotatifs (titre/sous-titre/image
+  // déjà rendus dans le bento header).
+  const compact = !titre && !sousTitre && !image?.url
+
   return (
     <section
       className="relative overflow-hidden rounded-2xl"
@@ -55,7 +59,11 @@ export function HeroRotatingWords({
         </div>
       )}
 
-      <div className="relative z-10 px-6 py-16 md:px-16 md:py-24 text-center">
+      <div
+        className={`relative z-10 text-center ${
+          compact ? "px-6 py-8 md:px-12 md:py-12" : "px-6 py-16 md:px-16 md:py-24"
+        }`}
+      >
         {titre && (
           <h1 className="text-3xl md:text-5xl lg:text-6xl font-black uppercase text-white tracking-tight leading-tight">
             {titre}

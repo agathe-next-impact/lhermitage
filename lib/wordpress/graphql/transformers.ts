@@ -970,6 +970,27 @@ export function transformRecrutementData(
   }
 }
 
+// --- Elements de page (legacy hero) transformer (isolated query) ---
+
+export function transformElementsDePageHero(
+  gqlData: Record<string, any> | null | undefined
+): { titre?: string; "sous-titre"?: string; image?: WPImage } | null {
+  const hero = gqlData?.hero
+  if (!hero) return null
+
+  const titre = hero.titre || undefined
+  const sousTitre = hero.sousTitre || undefined
+  const image = transformAcfMediaEdge(hero.image)
+
+  if (!titre && !sousTitre && !image) return null
+
+  return {
+    ...(titre && { titre }),
+    ...(sousTitre && { "sous-titre": sousTitre }),
+    ...(image && { image }),
+  }
+}
+
 // --- Nous Soutenir data transformer (isolated query) ---
 
 export function transformNousSoutenirData(

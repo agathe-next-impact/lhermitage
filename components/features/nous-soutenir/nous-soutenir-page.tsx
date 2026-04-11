@@ -41,14 +41,12 @@ export function NousSoutenirPage({ data }: NousSoutenirPageProps) {
   return (
     <div className="overflow-x-clip md:pl-2 md:pt-2">
       <div className="max-w-7xl space-y-16 md:space-y-24">
-        {/* === SECTION 1 — Hero === */}
-        <HeroRotatingWords
-          titre={data.hero?.titre}
-          motsRotatifs={data.hero?.mots_rotatifs}
-          sousTitre={data.hero?.sous_titre}
-          image={data.hero?.image}
-          sectionColor={heroColor}
-        />
+        {/* === SECTION 1 — Bandeau de mots rotatifs ===
+            Le titre / sous-titre / image du hero sont rendus par le bento
+            header (override `getHeader` dans page-registry.ts). Ici on ne
+            conserve que l'animation des mots rotatifs, qui est l'apport
+            unique du composant. */}
+        <HeroRotatingWords motsRotatifs={data.hero?.mots_rotatifs} sectionColor={heroColor} />
 
         {/* === SECTION 2–5 — Piliers === */}
         {Array.isArray(data.piliers) && data.piliers.length > 0 && (
