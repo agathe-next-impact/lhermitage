@@ -73,7 +73,8 @@
       "Bash(awk -f /tmp/extract_posts.awk C:devlhermitagel039hermitage.WordPress.2026-03-29.xml)",
       "Bash(git show:*)",
       "Bash(git checkout:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(node -e \"JSON.parse\\(require\\('fs'\\).readFileSync\\('acf-nous-soutenir.json','utf8'\\)\\);console.log\\('OK'\\)\")"
     ],
     "additionalDirectories": [
       "c:\\Users\\agath\\Downloads"

@@ -12,6 +12,7 @@ import WpContentRenderer from "@/lib/page-renderers/wp-content-renderer"
 import ReserverRenderer from "@/lib/page-renderers/reserver-renderer"
 import RecrutementRenderer from "@/lib/page-renderers/recrutement-renderer"
 import DevenirSocietaireRenderer from "@/lib/page-renderers/devenir-societaire-renderer"
+import NousSoutenirRenderer from "@/lib/page-renderers/nous-soutenir-renderer"
 import ContactsRenderer from "@/lib/page-renderers/contacts-renderer"
 import HorairesRenderer from "@/lib/page-renderers/horaires-renderer"
 import HebergementsRenderer from "@/lib/page-renderers/hebergements-renderer"
@@ -41,6 +42,7 @@ const RENDERERS: Record<string, React.ComponentType<any>> = {
   reserver: ReserverRenderer,
   recrutement: RecrutementRenderer,
   devenirSocietaire: DevenirSocietaireRenderer,
+  nousSoutenir: NousSoutenirRenderer,
   contacts: ContactsRenderer,
   horaires: HorairesRenderer,
   hebergements: HebergementsRenderer,
@@ -130,7 +132,7 @@ export default async function CatchAllPage({ params }: PageProps) {
   try {
     const [fetchedPage, fetchedExtra] = await Promise.all([
       getPageByPath(fullPath),
-      config?.fetchExtra ? config.fetchExtra(wpApi) : Promise.resolve({}),
+      config?.fetchExtra ? config.fetchExtra(wpApi, fullPath) : Promise.resolve({}),
     ])
     page = fetchedPage
     extra = fetchedExtra

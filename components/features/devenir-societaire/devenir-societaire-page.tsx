@@ -61,7 +61,7 @@ export function DevenirSocietairePage({ page }: Props) {
   const scicColors = [BRAND_COLORS.teal, BRAND_COLORS.rose, BRAND_COLORS.green, BRAND_COLORS.darkBlue]
 
   return (
-    <div className="overflow-x-hidden md:pl-2 md:pt-2">
+    <div className="overflow-x-clip md:pl-2 md:pt-2">
       <div className="max-w-7xl space-y-16">
         {/* --- Chapeau + CTA Bandeau --- */}
         {(chapeau || bandeau.titre) && (

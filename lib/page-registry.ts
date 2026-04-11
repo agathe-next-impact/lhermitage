@@ -11,8 +11,12 @@
 import type { WordPressAPI } from "@/lib/wordpress/api"
 
 export interface PageRouteConfig {
-  /** Extra data to fetch in parallel with the WP page. */
-  fetchExtra?: (api: WordPressAPI) => Promise<Record<string, unknown>>
+  /**
+   * Extra data to fetch in parallel with the WP page.
+   * Receives the catch-all `fullPath` so page-specific API calls
+   * (e.g. `api.getPatrimoineData(path)`) don't need to hardcode it.
+   */
+  fetchExtra?: (api: WordPressAPI, path: string) => Promise<Record<string, unknown>>
   /** Renderer key — maps to a dynamic import in the catch-all. */
   renderer: string
   /** If true, the renderer returns the full page (no PageHeader+BentoHeaderContent wrapper). */
@@ -35,6 +39,15 @@ export const PAGE_REGISTRY: Record<string, PageRouteConfig> = {
   "participer/devenir-societaire": { renderer: "devenirSocietaire" },
   "infos-pratiques/contacts": { renderer: "contacts" },
   "infos-pratiques/jours-et-horaires-douverture": { renderer: "horaires" },
+
+  // --- Page « Nous soutenir » (ACF via query isolée) ---
+  // Le slug WP réel est `don-association` sous le parent `soutenir-le-projet`
+  // (page ID 491 dans constants.ts).
+  "soutenir-le-projet/don-association": {
+    renderer: "nousSoutenir",
+    fetchExtra: (api, path) =>
+      api.getNousSoutenirData(path).then((d) => ({ nousSoutenirData: d })),
+  },
 
   // --- Pages listing CPT ---
   hebergements: {
@@ -84,9 +97,9 @@ export const PAGE_REGISTRY: Record<string, PageRouteConfig> = {
   },
   "sejours-collectifs/nos-sejours": {
     renderer: "nosSejours",
-    fetchExtra: async (api) => {
+    fetchExtra: async (api, path) => {
       const [seminairesData, services] = await Promise.all([
-        api.getSeminairesData("sejours-collectifs/nos-sejours"),
+        api.getSeminairesData(path),
         api.getServices(),
       ])
       return { seminairesData, services }
@@ -106,17 +119,13 @@ export const PAGE_REGISTRY: Record<string, PageRouteConfig> = {
   },
   "tiers-lieu-rural/le-domaine-de-l-hermitage": {
     renderer: "domaine",
-    fetchExtra: (api) =>
-      api
-        .getPageVideo("tiers-lieu-rural/le-domaine-de-l-hermitage")
-        .then((v) => ({ domaineVideo: v })),
+    fetchExtra: (api, path) =>
+      api.getPageVideo(path).then((v) => ({ domaineVideo: v })),
   },
   "tiers-lieu-rural/un-patrimoine-historique": {
     renderer: "patrimoine",
-    fetchExtra: (api) =>
-      api
-        .getPatrimoineData("tiers-lieu-rural/un-patrimoine-historique")
-        .then((p) => ({ patrimoineData: p })),
+    fetchExtra: (api, path) =>
+      api.getPatrimoineData(path).then((p) => ({ patrimoineData: p })),
   },
 }
 

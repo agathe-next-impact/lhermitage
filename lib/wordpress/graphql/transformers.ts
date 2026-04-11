@@ -970,6 +970,82 @@ export function transformRecrutementData(
   }
 }
 
+// --- Nous Soutenir data transformer (isolated query) ---
+
+export function transformNousSoutenirData(
+  nsData: Record<string, any>
+): import("../types").NousSoutenirACF | null {
+  if (!nsData) return null
+
+  const hasContent =
+    nsData.heroTitre ||
+    nsData.heroSousTitre ||
+    (Array.isArray(nsData.piliers) && nsData.piliers.length > 0) ||
+    nsData.presentationSurtitre ||
+    nsData.societaireTitre
+
+  if (!hasContent) return null
+
+  return {
+    hero: {
+      titre: nsData.heroTitre || undefined,
+      mots_rotatifs: Array.isArray(nsData.heroMotsRotatifs)
+        ? nsData.heroMotsRotatifs
+            .map((m: any) => m?.mot)
+            .filter((m: string | undefined): m is string => !!m)
+        : undefined,
+      sous_titre: nsData.heroSousTitre || undefined,
+      image: transformAcfMediaEdge(nsData.heroImage),
+    },
+    piliers: Array.isArray(nsData.piliers)
+      ? nsData.piliers.map((p: any) => ({
+          titre: p?.pilierTitre || undefined,
+          sous_titre: p?.pilierSousTitre || undefined,
+          image: transformAcfMediaEdge(p?.pilierImage),
+          cards: Array.isArray(p?.pilierCards)
+            ? p.pilierCards.map((c: any) => ({
+                montant: c?.cardMontant != null ? Number(c.cardMontant) : undefined,
+                description: c?.cardDescription || undefined,
+              }))
+            : undefined,
+        }))
+      : undefined,
+    cta_don: {
+      texte: nsData.ctaDonTexte || undefined,
+      url: nsData.ctaDonUrl ? transformLink(nsData.ctaDonUrl) : undefined,
+    },
+    fiscal: {
+      titre: nsData.fiscalTitre || undefined,
+      description: nsData.fiscalDescription || undefined,
+      image_tableau: transformAcfMediaEdge(nsData.fiscalImageTableau),
+      image_detail: transformAcfMediaEdge(nsData.fiscalImageDetail),
+      cta_texte: nsData.fiscalCtaTexte || undefined,
+      cta_url: nsData.fiscalCtaUrl ? transformLink(nsData.fiscalCtaUrl) : undefined,
+    },
+    presentation: {
+      surtitre: nsData.presentationSurtitre || undefined,
+      intro: nsData.presentationIntro || undefined,
+      paragraphe_1: nsData.presentationParagraphe1 || undefined,
+      paragraphe_2: nsData.presentationParagraphe2 || undefined,
+      paragraphe_3: nsData.presentationParagraphe3 || undefined,
+      compteurs: Array.isArray(nsData.compteurs)
+        ? nsData.compteurs.map((c: any) => ({
+            valeur: c?.compteurValeur != null ? Number(c.compteurValeur) : undefined,
+            label: c?.compteurLabel || undefined,
+          }))
+        : undefined,
+    },
+    societaire: {
+      surtitre: nsData.societaireSurtitre || undefined,
+      titre: nsData.societaireTitre || undefined,
+      description: nsData.societaireDescription || undefined,
+      cta_texte: nsData.societaireCtaTexte || undefined,
+      cta_url: nsData.societaireCtaUrl ? transformLink(nsData.societaireCtaUrl) : undefined,
+      image: transformAcfMediaEdge(nsData.societaireImage),
+    },
+  }
+}
+
 // --- Patrimoine data transformer (separate query to avoid ACF key collision) ---
 
 export function transformPatrimoineData(patData: Record<string, any>) {

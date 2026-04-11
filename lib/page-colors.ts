@@ -39,6 +39,7 @@ export const PAGE_COLORS: Record<string, string> = {
 
   "/participer": BRAND_COLORS.coral,
   "/reserver": BRAND_COLORS.coral,
+  "/soutenir-le-projet": BRAND_COLORS.coral,
 }
 
 export function getColorForPath(pathname: string): string | undefined {

@@ -407,7 +407,7 @@ export function PatrimoinePage({ acf }: PatrimoinePageProps) {
   }
 
   return (
-    <div className="overflow-x-hidden md:pt-2 md:pl-0.5">
+    <div className="overflow-x-clip md:pt-2 md:pl-0.5">
       <div className="max-w-7xl space-y-16">
         {/* Introduction : citation + texte 
         {(introduction?.citation || introduction?.texte) && (

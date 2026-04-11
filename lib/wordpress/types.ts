@@ -200,6 +200,8 @@ export interface PageACF {
     telephones?: Array<{ numero: string; label?: string }>
     adresse?: string
   }>
+  // Page Nous Soutenir fields
+  nous_soutenir?: NousSoutenirACF
   // Page Patrimoine fields
   patrimoine?: PatrimoineACF
   // Page Séminaires fields
@@ -207,6 +209,61 @@ export interface PageACF {
   // Page Recrutement fields
   recrutement?: RecrutementACF
   [key: string]: any
+}
+
+export interface NousSoutenirPilierCard {
+  montant?: number
+  description?: string
+}
+
+export interface NousSoutenirPilier {
+  titre?: string
+  sous_titre?: string
+  image?: WPImage
+  cards?: NousSoutenirPilierCard[]
+}
+
+export interface NousSoutenirCompteur {
+  valeur?: number
+  label?: string
+}
+
+export interface NousSoutenirACF {
+  hero?: {
+    titre?: string
+    mots_rotatifs?: string[]
+    sous_titre?: string
+    image?: WPImage
+  }
+  piliers?: NousSoutenirPilier[]
+  cta_don?: {
+    texte?: string
+    url?: WPLink
+  }
+  fiscal?: {
+    titre?: string
+    description?: string
+    image_tableau?: WPImage
+    image_detail?: WPImage
+    cta_texte?: string
+    cta_url?: WPLink
+  }
+  presentation?: {
+    surtitre?: string
+    intro?: string
+    paragraphe_1?: string
+    paragraphe_2?: string
+    paragraphe_3?: string
+    compteurs?: NousSoutenirCompteur[]
+  }
+  societaire?: {
+    surtitre?: string
+    titre?: string
+    description?: string
+    cta_texte?: string
+    cta_url?: WPLink
+    image?: WPImage
+  }
 }
 
 export interface ActiviteACF {

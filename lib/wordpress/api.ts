@@ -15,6 +15,7 @@ import type {
   EspaceDeTravailACF,
   SeminairesACF,
   PatrimoineACF,
+  NousSoutenirACF,
   FooterOptions,
 } from "./types"
 import { gqlRequest, gqlRequestList } from "./graphql/client"
@@ -32,6 +33,7 @@ import {
   transformServiceAcf,
   transformSeminairesData,
   transformPatrimoineData,
+  transformNousSoutenirData,
   transformMenuItems,
   transformTerm,
 } from "./graphql/transformers"
@@ -43,6 +45,7 @@ import {
   GET_PAGE_VIDEO_DENTETE,
   GET_PAGE_PATRIMOINE_DATA,
 } from "./graphql/queries/pages"
+import { GET_PAGE_NOUS_SOUTENIR_DATA } from "./graphql/queries/nous-soutenir"
 import {
   GET_HEBERGEMENTS,
   GET_HEBERGEMENT_BY_SLUG,
@@ -791,6 +794,27 @@ export class WordPressAPI {
       if (!patData) return null
       return transformPatrimoineData(patData)
     } catch {
+      return null
+    }
+  }
+
+  // Separate query for the "Nous Soutenir" page ACF field group.
+  // Isolated from PAGE_FIELDS so the central page query keeps working
+  // even before the matching field group is configured in WordPress.
+  async getNousSoutenirData(pagePath: string): Promise<NousSoutenirACF | null> {
+    try {
+      const pageId = await this.resolvePageId(pagePath)
+      if (!pageId) return null
+
+      const data = await gqlRequest<{
+        page: { pageNousSoutenir?: Record<string, any> } | null
+      }>(GET_PAGE_NOUS_SOUTENIR_DATA, { id: String(pageId) })
+
+      const nsData = data.page?.pageNousSoutenir
+      if (!nsData) return null
+      return transformNousSoutenirData(nsData)
+    } catch {
+      // Field group not yet configured in WordPress — fail silently
       return null
     }
   }
