@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import Image from "next/image"
 import type { WPImage } from "@/lib/wordpress/types"
+import { BRAND_COLORS } from "@/lib/theme/colors"
 
 interface HeroRotatingWordsProps {
   titre?: string
@@ -43,8 +44,7 @@ export function HeroRotatingWords({
 
   return (
     <section
-      className="relative overflow-hidden rounded-2xl"
-      style={{ backgroundColor: sectionColor }}
+      className="relative overflow-hidden rounded-2xl bg-brand-pink"
     >
       {image?.url && (
         <div className="absolute inset-0 opacity-25">

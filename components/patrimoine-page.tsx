@@ -45,6 +45,11 @@ function HistoryCarousel({
   const [active, setActive] = useState(0)
   const isScrolling = useRef(false)
   const [maxSlideHeight, setMaxSlideHeight] = useState<number | undefined>(undefined)
+  const [infoClosed, setInfoClosed] = useState(false)
+
+  useEffect(() => {
+    setInfoClosed(false)
+  }, [active])
 
   // Measure all slides and apply the tallest height to all
   useEffect(() => {
@@ -196,9 +201,12 @@ function HistoryCarousel({
                       alt={section.image.alt || section.titre || ""}
                       fill
                       className="object-cover"
-                      sizes="100vw"
-                      quality={85}
+                      sizes="(max-width: 768px) 100vw, (max-width: 1280px) 100vw, 1280px"
+                      quality={70}
                       priority={idx === 0}
+                      loading={idx === 0 ? undefined : idx <= 1 ? "eager" : "lazy"}
+                      placeholder="blur"
+                      blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPjxyZWN0IHdpZHRoPSI4IiBoZWlnaHQ9IjgiIGZpbGw9IiNkZGQiLz48L3N2Zz4="
                     />
                   ) : (
                     <div className="absolute inset-0" style={{ backgroundColor: bgColor }} />
@@ -224,9 +232,9 @@ function HistoryCarousel({
                 </div>
 
                 {/* Boîte contenu — pleine largeur, par dessus l'image */}
-                <div className="relative z-10 flex flex-col justify-end min-h-full">
+                <div className="relative z-10 flex flex-col justify-end min-h-full w-full">
                   <AnimatePresence mode="wait">
-                    {active === idx && (
+                    {active === idx && !infoClosed && (
                       <motion.div
                         key={idx}
                         initial={{ opacity: 0, y: 40 }}
@@ -235,9 +243,29 @@ function HistoryCarousel({
                         transition={{ duration: 0.5, ease: "easeOut", delay: 0.15 }}
                         className="m-4 md:m-6"
                       >
-                        <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 md:p-8 lg:p-10 shadow-xl">
+                        <div className="relative bg-white/90 backdrop-blur-sm rounded-xl p-6 md:p-8 lg:p-10 shadow-xl">
+                          <button
+                            type="button"
+                            onClick={() => setInfoClosed(true)}
+                            className="absolute top-3 right-3 md:top-4 md:right-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/5 text-brand-gray/70 transition-colors hover:bg-black/10 hover:text-brand-gray"
+                            aria-label="Fermer le panneau d'information"
+                          >
+                            <svg
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <line x1="18" y1="6" x2="6" y2="18" />
+                              <line x1="6" y1="6" x2="18" y2="18" />
+                            </svg>
+                          </button>
                           {section.titre && (
-                            <h3 className="text-2xl md:text-3xl mb-4" style={{ color: bgColor }}>
+                            <h3 className="text-2xl md:text-3xl mb-4 pr-10" style={{ color: bgColor }}>
                               {decodeHtmlEntities(section.titre)}
                             </h3>
                           )}
@@ -280,6 +308,20 @@ function HistoryCarousel({
                       </motion.div>
                     )}
                   </AnimatePresence>
+                  {active === idx && infoClosed && (
+                    <motion.button
+                      type="button"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      onClick={() => setInfoClosed(false)}
+                      className="absolute bottom-6 right-6 z-10 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold shadow-lg backdrop-blur-sm transition-colors hover:bg-white"
+                      style={{ color: bgColor }}
+                      aria-label="Afficher le panneau d'information"
+                    >
+                      Voir les infos
+                    </motion.button>
+                  )}
                 </div>
 
                 {/* Contenu invisible pour la mesure de hauteur */}

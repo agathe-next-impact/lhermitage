@@ -20,15 +20,16 @@ export function ImpactCard({ montant, description, color, index = 0 }: ImpactCar
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, delay: index * 0.08, ease: "easeOut" }}
-      className="rounded-xl p-5 md:p-6 bg-white shadow-md border border-black/5 flex flex-col gap-3"
+      className="rounded-xl p-5 md:p-6 shadow-md border border-black/5 flex flex-col gap-3"
+      style={{ backgroundColor: color }}
     >
       {montant != null && (
-        <div className="text-3xl md:text-4xl font-black tracking-tight" style={{ color }}>
+        <div className="text-3xl md:text-4xl font-black tracking-tight text-white">
           {montant}&nbsp;€
         </div>
       )}
       {description && (
-        <p className="text-sm md:text-base text-brand-dark/80 leading-snug">{description}</p>
+        <p className="text-base md:text-lg text-white/80 leading-snug">{description}</p>
       )}
     </motion.div>
   )

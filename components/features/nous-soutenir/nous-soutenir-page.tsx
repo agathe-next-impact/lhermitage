@@ -6,6 +6,7 @@ import { motion } from "framer-motion"
 import { ArrowRight, Heart } from "lucide-react"
 import type { NousSoutenirACF } from "@/lib/wordpress/types"
 import { BRAND_COLORS } from "@/lib/theme/colors"
+import { sanitizeHtml } from "@/lib/wordpress/sanitize"
 import { WordPressLink } from "@/components/content/wordpress-link"
 import { AnimatedCounter } from "@/components/ui/animated-counter"
 import { useMenuColor } from "@/components/menu-colors-provider"
@@ -40,7 +41,7 @@ export function NousSoutenirPage({ data }: NousSoutenirPageProps) {
 
   return (
     <div className="overflow-x-clip md:pl-2 md:pt-2">
-      <div className="max-w-7xl space-y-16 md:space-y-24">
+      <div className="max-w-7xl space-y-6 md:space-y-10">
         {/* === SECTION 1 — Bandeau de mots rotatifs ===
             Le titre / sous-titre / image du hero sont rendus par le bento
             header (override `getHeader` dans page-registry.ts). Ici on ne
@@ -112,24 +113,24 @@ export function NousSoutenirPage({ data }: NousSoutenirPageProps) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 mt-10">
               {data.fiscal.image_tableau?.url && (
-                <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden shadow-md bg-white">
+                <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden shadow-md bg-brand-green">
                   <Image
                     src={data.fiscal.image_tableau.url}
                     alt={data.fiscal.image_tableau.alt || "Tableau de réduction fiscale"}
                     fill
                     sizes="(max-width: 768px) 100vw, 50vw"
-                    className="object-contain"
+                    className="object-contain p-4"
                   />
                 </div>
               )}
               {data.fiscal.image_detail?.url && (
-                <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden shadow-md bg-white">
+                <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden shadow-md bg-brand-dark">
                   <Image
                     src={data.fiscal.image_detail.url}
                     alt={data.fiscal.image_detail.alt || "Détail réduction fiscale"}
                     fill
                     sizes="(max-width: 768px) 100vw, 50vw"
-                    className="object-contain"
+                    className="object-contain p-4"
                   />
                 </div>
               )}
@@ -167,21 +168,39 @@ export function NousSoutenirPage({ data }: NousSoutenirPageProps) {
                 <p
                   className="uppercase tracking-wider text-xs md:text-sm font-bold"
                   style={{ color: presentationColor }}
-                >
-                  {data.presentation.surtitre}
-                </p>
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.presentation.surtitre) }}
+                />
               )}
               {data.presentation.intro && (
-                <h2 className="text-2xl md:text-4xl font-black text-brand-dark leading-tight">
-                  {data.presentation.intro}
-                </h2>
+                <h2
+                  className="text-2xl md:text-4xl font-black text-brand-dark leading-tight"
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.presentation.intro) }}
+                />
               )}
             </div>
 
             <div className="max-w-4xl mx-auto space-y-5 text-base md:text-lg leading-relaxed text-brand-dark/85">
-              {data.presentation.paragraphe_1 && <p>{data.presentation.paragraphe_1}</p>}
-              {data.presentation.paragraphe_2 && <p>{data.presentation.paragraphe_2}</p>}
-              {data.presentation.paragraphe_3 && <p>{data.presentation.paragraphe_3}</p>}
+              {data.presentation.paragraphe_1 && (
+                <p
+                  dangerouslySetInnerHTML={{
+                    __html: sanitizeHtml(data.presentation.paragraphe_1),
+                  }}
+                />
+              )}
+              {data.presentation.paragraphe_2 && (
+                <p
+                  dangerouslySetInnerHTML={{
+                    __html: sanitizeHtml(data.presentation.paragraphe_2),
+                  }}
+                />
+              )}
+              {data.presentation.paragraphe_3 && (
+                <p
+                  dangerouslySetInnerHTML={{
+                    __html: sanitizeHtml(data.presentation.paragraphe_3),
+                  }}
+                />
+              )}
             </div>
 
             {/* Compteurs */}

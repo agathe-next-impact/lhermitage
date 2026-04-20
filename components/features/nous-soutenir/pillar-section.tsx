@@ -22,8 +22,8 @@ export function PillarSection({ pilier, color, index = 0 }: PillarSectionProps) 
   const imageRight = index % 2 === 0
 
   return (
-    <section className="py-10 md:py-16">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+    <section className="py-4 md:py-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-end">
         {/* Image */}
         <motion.div
           initial={{ opacity: 0, x: imageRight ? 30 : -30 }}
